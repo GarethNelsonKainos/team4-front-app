@@ -49,16 +49,3 @@ const server = app.listen(port, () => {
     console.log(`App listening on port ${port}`);
     console.log('Server started successfully...');
 });
-
-// Keep the process running
-process.on('SIGTERM', () => {
-    server.close(() => {
-        console.log('Server closed');
-    });
-});
-
-process.on('SIGINT', () => {
-    server.close(() => {
-        console.log('Server closed');
-    });
-});
