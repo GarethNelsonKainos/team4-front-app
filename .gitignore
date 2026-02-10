@@ -50,8 +50,15 @@ coverage/
 # Dependency directories
 jspm_packages/
 
+# Lock files (comment out if you want to commit them)
+# package-lock.json
+# yarn.lock
+
 # Optional npm cache directory
 .npm
 
 # Optional eslint cache
 .eslintcache
+
+# Public/built CSS (if generated)
+public/css/styles.css
