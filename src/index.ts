@@ -1,6 +1,7 @@
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
 import nunjucks from 'nunjucks';
+import { jobRoles } from './data/mockData';
 
 const app = express();
 const port = 3000
@@ -15,56 +16,7 @@ app.use(express.json());
 app.use(express.static('public')); // Serve static files from public directory
 app.use(express.static('src')); // Serve static CSS files
 
-// Mock job data
-const jobRoles = [
-    {
-        id: 1,
-        roleName: 'Software Developer',
-        location: 'Belfast',
-        capability: 'Engineering',
-        band: 'Consultant',
-        closingDate: '2026-03-15',
-        status: 'open'
-    },
-    {
-        id: 2,
-        roleName: 'Senior Business Analyst',
-        location: 'Belfast',
-        capability: 'Business Analysis',
-        band: 'Senior Consultant',
-        closingDate: '2026-03-20',
-        status: 'open'
-    },
-    {
-        id: 3,
-        roleName: 'DevOps Engineer',
-        location: 'London',
-        capability: 'Engineering',
-        band: 'Principal Consultant',
-        closingDate: '2026-03-10',
-        status: 'open'
-    },
-    {
-        id: 4,
-        roleName: 'UX Designer',
-        location: 'Birmingham',
-        capability: 'Design',
-        band: 'Consultant',
-        closingDate: '2026-03-25',
-        status: 'open'
-    },
-    {
-        id: 5,
-        roleName: 'Data Engineer',
-        location: 'Belfast',
-        capability: 'Data',
-        band: 'Senior Consultant',
-        closingDate: '2026-04-01',
-        status: 'open'
-    }
-];
-
-app.get('/', (req: Request, res: Response, next: NextFunction) => {
+app.get('/', (_req: Request, res: Response, next: NextFunction) => {
     try {
         res.render('templates/pages/home.njk', {
             title: 'Kainos Job Roles',
