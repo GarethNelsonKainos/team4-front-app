@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-     - uses: actions/checkout@v4
+     - uses: actions/checkout@v5
     
      - name: Setup Node.js
        uses: actions/setup-node@v4
@@ -25,14 +25,17 @@ jobs:
      - name: Run Biome checks
        run: npm run ci:check
     
-     - name: Build application
+     - name: Build TypeScript
        run: npm run build
     
-     # Optional: Add frontend-specific tests when you have them
-     #- name: Run tests
-     #  run: npm test
-     
-     # Optional: Deploy step for frontend
-     #- name: Deploy
-     #  if: github.ref == 'refs/heads/main'
-     #  run: npm run deploy
+     - name: Build CSS (Production)
+       run: npm run build-css-prod
+    
+     - name: Run tests with coverage
+       run: npm run test:coverage
+
+     - name: Upload coverage to Codecov
+       uses: actions/upload-artifact@v4
+       with:
+         name: coverage-report
+         path: output/test/

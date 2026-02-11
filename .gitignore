@@ -45,13 +45,13 @@ pids
 
 # Coverage directory used by tools like istanbul
 coverage/
+output/
 .nyc_output
 
 # Dependency directories
 jspm_packages/
 
-# Lock files (comment out if you want to commit them)
-# package-lock.json
+# Lock files (yarn only - keep package-lock.json for npm)
 # yarn.lock
 
 # Optional npm cache directory

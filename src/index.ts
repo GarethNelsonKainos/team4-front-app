@@ -76,6 +76,8 @@ app.get(
 	},
 );
 
+export { app };
+
 const _server = app.listen(port, () => {
 	console.log(`App listening on port ${port}`);
 	console.log("Server started successfully...");
