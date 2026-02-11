@@ -1,10 +1,11 @@
+import "dotenv/config";
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import nunjucks from "nunjucks";
 import { jobRoles } from "./data/mockData";
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 nunjucks.configure("views", {
 	autoescape: true,
@@ -75,9 +76,21 @@ app.get(
 	},
 );
 
+// Login page route
+app.get("/login", (_req: Request, res: Response, _next: NextFunction) => {
+	try {
+		res.render("pages/login.njk", {
+			title: "Login - Kainos",
+		});
+	} catch (error) {
+		console.error("Error rendering login template:", error);
+		res.status(500).send("Error rendering login template");
+	}
+});
+
 export { app };
 
 const _server = app.listen(port, () => {
-	console.log(`App listening on port ${port}`);
+	console.log(`App now listening on port ${port}`);
 	console.log("Server started successfully...");
 });
