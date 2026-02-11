@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+     - uses: actions/checkout@v5
+    
+     - name: Setup Node.js
+       uses: actions/setup-node@v4
+       with:
+         node-version: '20'
+         cache: 'npm'
+    
+     - name: Install dependencies
+       run: npm ci
+    
+     - name: Run Biome checks
+       run: npm run ci:check
+    
+     - name: Build TypeScript
+       run: npm run build
+    
+     - name: Build CSS (Production)
+       run: npm run build-css-prod
+    
+     - name: Run tests with coverage
+       run: npm run test:coverage
+
+     - name: Upload coverage to Coverage report folder
+       uses: actions/upload-artifact@v4
+       with:
+         name: coverage-report
+         path: output/test/

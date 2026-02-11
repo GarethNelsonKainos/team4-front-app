@@ -1,0 +1,53 @@
+{
+	"name": "team4-front-app",
+	"version": "1.0.0",
+	"description": "Team 4 Frontend Application Feb/March 2026",
+	"main": "index.js",
+	"scripts": {
+		"start": "node dist/index.js",
+		"dev": "tsx src/index.ts",
+		"build": "tsc && npm run build-css-prod",
+		"build-css": "npx tailwindcss -i public/input.css -o public/css/styles.css --watch",
+		"build-css-prod": "npx tailwindcss -i public/input.css -o public/css/styles.css --minify",
+		"test": "vitest run",
+		"test:coverage": "vitest run --coverage && cp output/test/index.html output/test/code-coverage.html",
+		"test:watch": "vitest",
+		"test:ui": "vitest --ui",
+		"format": "biome format --write",
+		"lint": "biome lint --write",
+		"check": "biome check --write",
+		"ci:check": "biome ci ."
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/GarethNelsonKainos/team4-front-app.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "module",
+	"bugs": {
+		"url": "https://github.com/GarethNelsonKainos/team4-front-app/issues"
+	},
+	"homepage": "https://github.com/GarethNelsonKainos/team4-front-app#readme",
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.14",
+		"@types/express": "^5.0.6",
+		"@types/node": "^25.2.2",
+		"@types/nunjucks": "^3.2.6",
+		"@types/supertest": "^6.0.3",
+		"@vitest/coverage-v8": "^4.0.18",
+		"@vitest/ui": "^4.0.18",
+		"autoprefixer": "^10.4.24",
+		"postcss": "^8.5.6",
+		"supertest": "^7.2.2",
+		"tailwindcss": "^3.4.19",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.18"
+	},
+	"dependencies": {
+		"express": "^5.2.1",
+		"nunjucks": "^3.2.4"
+	}
+}
