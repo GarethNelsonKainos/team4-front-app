@@ -6,18 +6,17 @@ import { jobRoles } from "./data/mockData";
 const app = express();
 const port = 3000;
 
-nunjucks.configure("src", {
+nunjucks.configure("views", {
 	autoescape: true,
 	express: app,
 });
 
 app.use(express.json());
 app.use(express.static("public"));
-app.use(express.static("src"));
 
 app.get("/", (_req: Request, res: Response, _next: NextFunction) => {
 	try {
-		res.render("templates/pages/home.njk", {
+		res.render("pages/home.njk", {
 			title: "Kainos Job Roles",
 			heading: "Kainos Job Opportunities",
 			message: "Find your dream job with us!",
@@ -34,7 +33,7 @@ app.get("/jobs", (_req: Request, res: Response, _next: NextFunction) => {
 		// Filter array to show only open jobs using arrow function
 		const openJobRoles = jobRoles.filter((job) => job.status === "open");
 
-		res.render("templates/pages/jobs.njk", {
+		res.render("pages/jobs.njk", {
 			title: "Available Job Roles - Kainos",
 			heading: "Kainos Job Opportunities",
 			jobRoles: openJobRoles,
@@ -64,7 +63,7 @@ app.get(
 				return;
 			}
 
-			res.render("templates/pages/job-detail.njk", {
+			res.render("pages/job-detail.njk", {
 				title: `${job.roleName} - Kainos`, // Template string with embedded variable
 				heading: "Kainos Job Opportunities",
 				job: job,
