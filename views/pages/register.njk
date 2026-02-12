@@ -17,7 +17,7 @@
             <div class="bg-white py-8 px-8 shadow-lg rounded-lg border-t-4 border-kainos-500">
 
             <!-- Register Form -->
-            <form id="registerForm" class="space-y-6">
+            <form id="registerForm" action="/api/register" method="post" class="space-y-6">
                 <!-- Email Field -->
                 <div>
                     <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
@@ -167,5 +167,5 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/register.js"></script>
+    <script src="/js/form-handler.js"></script>
 {% endblock %}
