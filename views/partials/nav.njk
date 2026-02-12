@@ -24,36 +24,10 @@
             
             <!-- Logout button - shown when logged in -->
             <li id="logoutButton" class="hidden">
-                <button onclick="logout()" class="bg-kainos-500 hover:bg-kainos-600 focus:ring-4 focus:ring-kainos-200 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">Logout</button>
+                <button id="logoutBtn" class="bg-kainos-500 hover:bg-kainos-600 focus:ring-4 focus:ring-kainos-200 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">Logout</button>
             </li>
         </ul>
     </div>
 </nav>
 
-<script src="/js/auth.js"></script>
-<script>
-    // Update navigation based on authentication status
-    document.addEventListener('DOMContentLoaded', () => {
-        const registerButton = document.getElementById('registerButton');
-        const loginButton = document.getElementById('loginButton');
-        const logoutButton = document.getElementById('logoutButton');
-        const userInfo = document.getElementById('userInfo');
-        const userEmailDisplay = document.getElementById('userEmailDisplay');
-        
-        if (isAuthenticated()) {
-            const email = getUserEmail();
-            registerButton.classList.add('hidden');
-            loginButton.classList.add('hidden');
-            logoutButton.classList.remove('hidden');
-            if (email) {
-                userInfo.classList.remove('hidden');
-                userEmailDisplay.textContent = email;
-            }
-        } else {
-            registerButton.classList.remove('hidden');
-            loginButton.classList.remove('hidden');
-            logoutButton.classList.add('hidden');
-            userInfo.classList.add('hidden');
-        }
-    });
-</script>
+<script src="/js/nav-auth.js"></script>

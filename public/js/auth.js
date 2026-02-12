@@ -1,6 +1,14 @@
 // Authentication helper functions for client-side
 
 /**
+ * Get the API base URL from environment
+ * @returns {string} The API base URL
+ */
+function getApiBaseUrl() {
+    return window.API_BASE_URL || 'http://localhost:8080';
+}
+
+/**
  * Check if user is logged in
  * @returns {boolean} True if user has a valid token
  */
@@ -79,6 +87,7 @@ function requireAuth() {
 // Export functions (if using modules)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
+        getApiBaseUrl,
         isAuthenticated,
         getAuthToken,
         getUserEmail,

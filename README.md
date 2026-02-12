@@ -120,7 +120,22 @@ The job detail page (`/job-roles/:id`) displays comprehensive information about 
 
 ## 🛠️ Development Workflow
 
-1. **Start development:**
+### First-Time Setup
+After cloning the repository:
+
+```bash
+# Install dependencies
+npm install
+
+# Generate the CSS for the first time
+npm run build-css-prod
+```
+
+**Note:** The generated `public/css/styles.css` file is excluded from source control and must be built locally or in CI/CD pipelines.
+
+### Daily Development
+
+1. **Start development server:**
    ```bash
    npm run dev
    ```
@@ -129,6 +144,7 @@ The job detail page (`/job-roles/:id`) displays comprehensive information about 
    ```bash
    npm run build-css
    ```
+   This watches for changes in templates and rebuilds CSS automatically.
 
 3. **Make changes to templates, TypeScript, or CSS**
 
@@ -146,6 +162,22 @@ The job detail page (`/job-roles/:id`) displays comprehensive information about 
    ```bash
    npm run check
    ```
+
+## 🏗️ Build Process
+
+### CSS Generation
+Tailwind CSS styles are generated from `public/input.css`:
+
+- **Development:** `npm run build-css` - Watches for changes and rebuilds
+- **Production:** `npm run build-css-prod` - Minified one-time build
+
+The output `public/css/styles.css` is a build artifact and is **not committed to source control**.
+
+### TypeScript Compilation
+TypeScript is compiled to JavaScript in the `dist/` directory:
+
+- **Development:** `tsx` runs TypeScript directly without compilation
+- **Production:** `npm run build` compiles to `dist/` for deployment
 
 ## 🔄 CI/CD Pipeline
 

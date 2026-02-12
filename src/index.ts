@@ -15,6 +15,12 @@ nunjucks.configure("views", {
 app.use(express.json());
 app.use(express.static("public"));
 
+// Make API base URL available to all templates
+app.use((_req: Request, res: Response, next: NextFunction) => {
+	res.locals.apiBaseUrl = process.env.API_BASE_URL || "http://localhost:8080";
+	next();
+});
+
 app.get("/", (_req: Request, res: Response, _next: NextFunction) => {
 	try {
 		res.render("pages/home.njk", {

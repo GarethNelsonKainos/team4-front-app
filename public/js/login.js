@@ -78,10 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
             passwordError.textContent = 'Password is required';
             passwordError.classList.remove('hidden');
             hasError = true;
-        } else if (password.length < 6) {
-            passwordError.textContent = 'Password must be at least 6 characters';
-            passwordError.classList.remove('hidden');
-            hasError = true;
+        } else {
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.valid) {
+                passwordError.textContent = passwordValidation.message;
+                passwordError.classList.remove('hidden');
+                hasError = true;
+            }
         }
 
         if (hasError) {
@@ -102,7 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Send login request to backend API
-            const response = await fetch('http://localhost:8080/api/login', {
+            const apiUrl = window.API_BASE_URL || 'http://localhost:8080';
+            const response = await fetch(`${apiUrl}/api/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

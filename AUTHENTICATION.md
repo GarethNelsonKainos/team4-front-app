@@ -18,6 +18,8 @@ JWT_SECRET=your-super-secret-jwt-key-change-in-production
 JWT_EXPIRES_IN=24h
 ```
 
+**Important:** The `API_BASE_URL` is automatically passed from the server to client-side JavaScript via a global variable `window.API_BASE_URL`. This makes it easy to switch between development, staging, and production environments by simply updating the `.env` file.
+
 ## How It Works
 
 ### 1. Registration Flow
@@ -44,7 +46,8 @@ Use the `authenticatedFetch()` helper function from `/js/auth.js`:
 // Example: Fetch protected job roles from backend
 async function getJobRoles() {
     try {
-        const response = await authenticatedFetch('http://localhost:8080/api/job-roles');
+        const apiUrl = getApiBaseUrl();
+        const response = await authenticatedFetch(`${apiUrl}/api/job-roles`);
         const data = await response.json();
         console.log('Job roles:', data);
         return data;
@@ -64,12 +67,22 @@ logout(); // Clears token and redirects to login page
 
 Located in `/public/js/auth.js`:
 
+- `getApiBaseUrl()` - Get the API base URL from environment
 - `isAuthenticated()` - Check if user is logged in
 - `getAuthToken()` - Get the stored JWT token
 - `getUserEmail()` - Get logged-in user's email
 - `logout()` - Logout and redirect to login page
 - `authenticatedFetch(url, options)` - Make authenticated API requests
 - `requireAuth()` - Redirect to login if not authenticated
+
+### Using the API Base URL
+
+The API base URL is automatically available via `window.API_BASE_URL` or the helper function:
+
+```javascript
+const apiUrl = getApiBaseUrl(); // Returns value from .env
+const response = await fetch(`${apiUrl}/api/job-roles`);
+```
 
 ## Example: Protecting a Page
 

@@ -1,6 +1,6 @@
 {% extends "layouts/base.njk" %}
 
-{% block title %}Login - {{ super() }}{% endblock %}
+{% block title %}{{ super() }}{% endblock %}
 
 {% block content %}
     <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-6">
@@ -131,6 +131,5 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/auth.js"></script>
     <script src="/js/login.js"></script>
 {% endblock %}

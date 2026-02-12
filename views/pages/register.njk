@@ -1,6 +1,6 @@
 {% extends "layouts/base.njk" %}
 
-{% block title %}Register - {{ super() }}{% endblock %}
+{% block title %}{{ super() }}{% endblock %}
 
 {% block content %}
     <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-6">
@@ -67,7 +67,7 @@
                         </button>
                     </div>
                     <div id="passwordError" class="text-red-500 text-sm mt-1 hidden"></div>
-                    <p class="text-xs text-gray-500 mt-1">Must be at least 6 characters long</p>
+                    <p class="text-xs text-gray-500 mt-1">At least 6 characters and must include a number (0-9) or special character (!@#$%^&*)</p>
                 </div>
 
                 <!-- Confirm Password Field -->
@@ -167,6 +167,5 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/auth.js"></script>
     <script src="/js/register.js"></script>
 {% endblock %}

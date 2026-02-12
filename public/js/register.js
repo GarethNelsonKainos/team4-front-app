@@ -60,6 +60,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return re.test(email);
     }
 
+    function validatePassword(password) {
+        // Password must be at least 6 characters and contain at least one number OR special character
+        if (password.length < 6) {
+            return { valid: false, message: 'Password must be at least 6 characters' };
+        }
+        
+        const hasNumber = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+        
+        if (!hasNumber && !hasSpecialChar) {
+            return { valid: false, message: 'Password must contain at least one number or special character' };
+        }
+        
+        return { valid: true, message: '' };
+    }
+
     function showError(message) {
         errorText.textContent = message;
         errorMessage.classList.remove('hidden');
@@ -113,10 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
             passwordError.textContent = 'Password is required';
             passwordError.classList.remove('hidden');
             hasError = true;
-        } else if (password.length < 6) {
-            passwordError.textContent = 'Password must be at least 6 characters';
-            passwordError.classList.remove('hidden');
-            hasError = true;
+        } else {
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.valid) {
+                passwordError.textContent = passwordValidation.message;
+                passwordError.classList.remove('hidden');
+                hasError = true;
+            }
         }
 
         if (!confirmPassword) {
@@ -153,7 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Send register request to backend API
-            const response = await fetch('http://localhost:8080/api/register', {
+            const apiUrl = window.API_BASE_URL || 'http://localhost:8080';
+            const response = await fetch(`${apiUrl}/api/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
