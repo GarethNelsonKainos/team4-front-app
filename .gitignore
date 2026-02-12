@@ -60,5 +60,5 @@ jspm_packages/
 # Optional eslint cache
 .eslintcache
 
-# Public/built CSS (if generated)
+# Generated Tailwind CSS build artifacts
 public/css/styles.css

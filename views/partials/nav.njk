@@ -1,11 +1,33 @@
 <nav class="bg-white shadow-lg border-b-2 border-blue-100">
     <div class="container mx-auto px-4 py-4 flex justify-between items-center">
         <img src="/images/kainos_logo.png" alt="Kainos Logo" class="h-10 w-auto">
-        <ul class="flex space-x-8">
+        <ul class="flex space-x-8 items-center">
             <li><a href="/" class="text-gray-700 hover:text-blue-600 transition-colors font-medium px-3 py-2 rounded-md hover:bg-blue-50">Home</a></li>
             <li><a href="/jobs" class="text-gray-700 hover:text-blue-600 transition-colors font-medium px-3 py-2 rounded-md hover:bg-blue-50">Jobs</a></li>
             <li><a href="/about" class="text-gray-700 hover:text-blue-600 transition-colors font-medium px-3 py-2 rounded-md hover:bg-blue-50">About</a></li>
             <li><a href="/contact" class="text-gray-700 hover:text-blue-600 transition-colors font-medium px-3 py-2 rounded-md hover:bg-blue-50">Contact</a></li>
+            
+            <!-- User info - shown when logged in -->
+            <li id="userInfo" class="hidden">
+                <span class="text-gray-600 text-sm mr-2" id="userEmailDisplay"></span>
+            </li>
+            
+            <!-- Register button - shown when not logged in -->
+            <li id="registerButton">
+                <a href="/register" class="text-kainos-600 hover:text-kainos-700 font-medium px-4 py-2 rounded-lg border border-kainos-500 hover:bg-kainos-50 transition-all duration-300">Register</a>
+            </li>
+            
+            <!-- Login button - shown when not logged in -->
+            <li id="loginButton">
+                <a href="/login" class="bg-kainos-500 hover:bg-kainos-600 focus:ring-4 focus:ring-kainos-200 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">Login</a>
+            </li>
+            
+            <!-- Logout button - shown when logged in -->
+            <li id="logoutButton" class="hidden">
+                <button id="logoutBtn" class="bg-kainos-500 hover:bg-kainos-600 focus:ring-4 focus:ring-kainos-200 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">Logout</button>
+            </li>
         </ul>
     </div>
 </nav>
+
+<script src="/js/nav-auth.js"></script>
