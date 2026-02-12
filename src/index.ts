@@ -88,6 +88,18 @@ app.get("/login", (_req: Request, res: Response, _next: NextFunction) => {
 	}
 });
 
+// Register page route
+app.get("/register", (_req: Request, res: Response, _next: NextFunction) => {
+	try {
+		res.render("pages/register.njk", {
+			title: "Register - Kainos",
+		});
+	} catch (error) {
+		console.error("Error rendering register template:", error);
+		res.status(500).send("Error rendering register template");
+	}
+});
+
 export { app };
 
 const _server = app.listen(port, () => {
