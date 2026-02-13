@@ -125,6 +125,7 @@ describe("PageController", () => {
 				jobRoles: expect.arrayContaining(
 					openJobs.map((job) => expect.objectContaining({ id: job.id })),
 				),
+				currentPage: "jobs",
 			});
 		});
 

@@ -47,7 +47,7 @@
                     </div>
                     {% endif %}
                     <div class="text-sm text-gray-600">
-                        <strong>Closing Date:</strong> {{ job.closingDate }}
+                        <strong>Closing Date:</strong> {{ job.closingDate | formatDate }}
                     </div>
                 </div>
             </div>
@@ -78,7 +78,7 @@
         <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
             <div class="flex flex-col sm:flex-row gap-4">
                 {% if job.sharepointUrl %}
-                <a href="{{ job.sharepointUrl }}" target="_blank" 
+                <a href="{{ job.sharepointUrl }}" target="_blank" rel="noopener noreferrer" 
                    class="flex items-center justify-center bg-kainos-500 hover:bg-kainos-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -97,11 +97,11 @@
                     Apply Now
                 </button>
                 
-                <button class="flex items-center justify-center bg-white hover:bg-gray-50 text-kainos-500 font-bold py-3 px-8 rounded-lg border-2 border-kainos-500 transition-colors duration-300">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button class="save-btn group flex items-center justify-center bg-white hover:bg-gray-50 text-kainos-500 font-bold py-3 px-8 rounded-lg border-2 border-kainos-500 transition-colors duration-300" data-job-id="{{ job.id }}">
+                    <svg class="w-5 h-5 mr-2 group-hover:fill-kainos-600 transition-all duration-200 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                     </svg>
-                    Save for Later
+                    <span class="save-text">Save for Later</span>
                 </button>
             </div>
         </div>
@@ -120,4 +120,54 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Initialize save button
+        function initializeSaveButton() {
+            const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            const jobId = {{ job.id }};
+            const btn = document.querySelector('.save-btn');
+            
+            // Load saved state on page load
+            if (savedJobs.includes(jobId)) {
+                updateButtonState(btn, true);
+            }
+
+            // Attach click handler
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const isCurrentlySaved = savedJobs.includes(jobId);
+                
+                if (isCurrentlySaved) {
+                    // Remove from saved
+                    const index = savedJobs.indexOf(jobId);
+                    savedJobs.splice(index, 1);
+                    updateButtonState(this, false);
+                } else {
+                    // Add to saved
+                    savedJobs.push(jobId);
+                    updateButtonState(this, true);
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+            });
+        }
+
+        function updateButtonState(btn, isSaved) {
+            const heart = btn.querySelector('.heart-icon');
+            const text = btn.querySelector('.save-text');
+            
+            if (isSaved) {
+                heart.setAttribute('fill', '#1f3a7d');
+                text.textContent = 'Saved';
+            } else {
+                heart.setAttribute('fill', 'none');
+                text.textContent = 'Save for Later';
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initializeSaveButton);
+    </script>
 {% endblock %}

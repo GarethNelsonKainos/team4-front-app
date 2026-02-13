@@ -48,6 +48,7 @@ export async function getJobsPage(
 			title: "Available Job Roles - Kainos",
 			heading: "Kainos Job Opportunities",
 			jobRoles: openJobRoles,
+			currentPage: "jobs",
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -97,6 +98,7 @@ export async function getJobDetailPage(
 			title: `${job.roleName} - Kainos`, // Template string with embedded variable
 			heading: "Kainos Job Opportunities",
 			job: job,
+			currentPage: "jobs",
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
