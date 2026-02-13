@@ -87,11 +87,12 @@ export async function register(
 
 		// Password must contain a number AND special character
 		const hasNumber = /[0-9]/.test(password);
-        const hasSpecialChar = /[!@#$%^&*]/.test(password);
+		const hasSpecialChar = /[!@#$%^&*]/.test(password);
 		if (!hasNumber || !hasSpecialChar) {
 			return res.json({
 				success: false,
-				message: "Password must include a number (0-9) and special character (!@#$%^&*)",
+				message:
+					"Password must include a number (0-9) and special character (!@#$%^&*)",
 			});
 		}
 

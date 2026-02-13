@@ -166,7 +166,10 @@ describe("AuthController", () => {
 
 	describe("register", () => {
 		it("should return error message when email is missing", async () => {
-			mockRequest.body = { password: "password123!", confirmPassword: "password123!" };
+			mockRequest.body = {
+				password: "password123!",
+				confirmPassword: "password123!",
+			};
 
 			await authController.register(
 				mockRequest as Request,
@@ -181,7 +184,10 @@ describe("AuthController", () => {
 		});
 
 		it("should return error message when password is missing", async () => {
-			mockRequest.body = { email: "test@example.com", confirmPassword: "password123!" };
+			mockRequest.body = {
+				email: "test@example.com",
+				confirmPassword: "password123!",
+			};
 
 			await authController.register(
 				mockRequest as Request,
@@ -196,7 +202,10 @@ describe("AuthController", () => {
 		});
 
 		it("should return error message when confirmPassword is missing", async () => {
-			mockRequest.body = { email: "test@example.com", password: "password123!" };
+			mockRequest.body = {
+				email: "test@example.com",
+				password: "password123!",
+			};
 
 			await authController.register(
 				mockRequest as Request,
@@ -263,7 +272,8 @@ describe("AuthController", () => {
 
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: false,
-				message: "Password must include a number (0-9) and special character (!@#$%^&*)",
+				message:
+					"Password must include a number (0-9) and special character (!@#$%^&*)",
 			});
 		});
 
@@ -282,7 +292,8 @@ describe("AuthController", () => {
 
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: false,
-				message: "Password must include a number (0-9) and special character (!@#$%^&*)",
+				message:
+					"Password must include a number (0-9) and special character (!@#$%^&*)",
 			});
 		});
 
@@ -306,14 +317,13 @@ describe("AuthController", () => {
 
 			expect(apiClient.registerUser).toHaveBeenCalledWith(
 				"newuser@example.com",
-				"password123!!",
+				"password123!",
 			);
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: true,
 				redirectUrl: "/jobs",
 			});
 		});
-
 
 		it("should set auth cookie and redirect to jobs on successful registration", async () => {
 			mockRequest.body = {
