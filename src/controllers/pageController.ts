@@ -72,7 +72,7 @@ export async function getJobDetailPage(
 		);
 
 		// Validate that the ID is a valid number
-		if (isNaN(jobId)) {
+		if (Number.isNaN(jobId)) {
 			return res.redirect("/error");
 		}
 

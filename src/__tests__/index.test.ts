@@ -1,8 +1,8 @@
 import request from "supertest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { jobRoles } from "../data/mockData.js";
 import { app } from "../index.js";
 import * as apiClient from "../utils/apiClient.js";
-import { jobRoles } from "../data/mockData.js";
 
 // Mock the API client to prevent actual API calls during tests
 vi.mock("../utils/apiClient.js");
