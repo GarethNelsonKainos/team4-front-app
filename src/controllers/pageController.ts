@@ -21,17 +21,28 @@ export function getHomePage(_req: Request, res: Response, _next: NextFunction) {
 /**
  * Render jobs listing page - shows only open positions
  */
-export async function getJobsPage(_req: Request, res: Response, _next: NextFunction) {
+export async function getJobsPage(
+	_req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
 	try {
 		// Fetch jobs from API
 		const result = await getJobRolesPublic();
 
 		if (!result.success) {
-			console.error("Error fetching jobs:", result.error, "Status:", result.status);
+			console.error(
+				"Error fetching jobs:",
+				result.error,
+				"Status:",
+				result.status,
+			);
 			return res.redirect("/error");
 		}
 
-		const openJobRoles = result.data.filter((job: any) => job.status?.toLowerCase() === "open");
+		const openJobRoles = result.data.filter(
+			(job: { status: string }) => job.status?.toLowerCase() === "open",
+		);
 
 		res.render("pages/jobs.njk", {
 			title: "Available Job Roles - Kainos",
@@ -68,7 +79,9 @@ export async function getJobDetailPage(
 			return res.redirect("/error");
 		}
 
-		const job = result.data.find((job: any) => job.id === jobId);
+		const job = result.data.find(
+			(job: { jobRoleId: number }) => job.jobRoleId === jobId,
+		);
 
 		if (!job) {
 			// Production: redirect to error page instead of exposing "not found" details
