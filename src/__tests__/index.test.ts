@@ -2,6 +2,7 @@ import request from "supertest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { app } from "../index.js";
 import * as apiClient from "../utils/apiClient.js";
+import { jobRoles } from "../data/mockData.js";
 
 // Mock the API client to prevent actual API calls during tests
 vi.mock("../utils/apiClient.js");
@@ -9,6 +10,14 @@ vi.mock("../utils/apiClient.js");
 describe("Express App Routes", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		// Setup the mock for getJobRolesPublic
+		vi.mocked(apiClient.getJobRolesPublic).mockResolvedValue({
+			success: true,
+			data: jobRoles.map((job) => ({
+				...job,
+				jobRoleId: job.id,
+			})),
+		});
 	});
 
 	afterEach(() => {

@@ -71,6 +71,11 @@ export async function getJobDetailPage(
 			10,
 		);
 
+		// Validate that the ID is a valid number
+		if (isNaN(jobId)) {
+			return res.redirect("/error");
+		}
+
 		// Fetch jobs from API and find job by ID using array.find() method
 		const result = await getJobRolesPublic();
 
