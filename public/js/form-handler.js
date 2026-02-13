@@ -1,7 +1,7 @@
 /**
  * Simple form handler that submits forms to the server
  * All API communication happens on the server-side, not in the browser
- * Production-ready: handles error page redirects from server
+ * Shows error messages inline on failed login/registration, redirects on success
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -34,7 +34,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
 				const result = await response.json();
 
-				// Production: server provides redirectUrl for both success and error cases
+				// Clear any previous error messages
+				const errorContainer = form.querySelector("[data-error-message]");
+				if (errorContainer) {
+					errorContainer.textContent = "";
+					errorContainer.classList.add("hidden");
+				}
+
+				// Handle error response with message
+				if (!result.success && result.message) {
+					// Display error message inline instead of redirecting
+					if (errorContainer) {
+						errorContainer.textContent = result.message;
+						errorContainer.classList.remove("hidden");
+					}
+					// Re-enable submit button so user can try again
+					if (submitButton) {
+						submitButton.disabled = false;
+						const buttonText = form.id === "loginForm" ? "Sign In" : "Create Account";
+						submitButton.innerHTML = buttonText;
+					}
+					return;
+				}
+
+				// Production: server provides redirectUrl for success cases
 				if (result.redirectUrl) {
 					window.location.href = result.redirectUrl;
 				} else if (result.success) {
@@ -45,9 +68,19 @@ document.addEventListener("DOMContentLoaded", () => {
 					window.location.href = "/error";
 				}
 			} catch (error) {
-				// Network error - redirect to generic error page
+				// Network error - display message but don't redirect
 				console.error("Network error:", error);
-				window.location.href = "/error";
+				const errorContainer = form.querySelector("[data-error-message]");
+				if (errorContainer) {
+					errorContainer.textContent = "Network error. Please check your connection";
+					errorContainer.classList.remove("hidden");
+				}
+				// Re-enable submit button
+				if (submitButton) {
+					submitButton.disabled = false;
+					const buttonText = form.id === "loginForm" ? "Sign In" : "Create Account";
+					submitButton.innerHTML = buttonText;
+				}
 			}
 		});
 	}

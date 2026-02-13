@@ -190,7 +190,7 @@ describe("Express App Routes", () => {
 
 	describe("API Routes", () => {
 		describe("POST /api/login", () => {
-			it("should redirect to login-failed when email is missing", async () => {
+			it("should return error message when email is missing", async () => {
 				const response = await request(app)
 					.post("/api/login")
 					.send({ password: "password123" })
@@ -198,10 +198,10 @@ describe("Express App Routes", () => {
 
 				expect(response.status).toBe(200);
 				expect(response.body.success).toBe(false);
-				expect(response.body.redirectUrl).toBe("/login-failed");
+				expect(response.body.message).toBe("Please enter your email and password");
 			});
 
-			it("should redirect to login-failed when password is missing", async () => {
+			it("should return error message when password is missing", async () => {
 				const response = await request(app)
 					.post("/api/login")
 					.send({ email: "test@example.com" })
@@ -209,7 +209,7 @@ describe("Express App Routes", () => {
 
 				expect(response.status).toBe(200);
 				expect(response.body.success).toBe(false);
-				expect(response.body.redirectUrl).toBe("/login-failed");
+				expect(response.body.message).toBe("Please enter your email and password");
 			});
 
 			it("should set HTTP-only cookie and redirect on successful login", async () => {
@@ -231,7 +231,7 @@ describe("Express App Routes", () => {
 				expect(response.headers["set-cookie"][0]).toContain("HttpOnly");
 			});
 
-			it("should redirect to login-failed on API error", async () => {
+			it("should return error message on API error", async () => {
 				vi.mocked(apiClient.loginUser).mockResolvedValue({
 					success: false,
 					error: "Invalid credentials",
@@ -245,10 +245,10 @@ describe("Express App Routes", () => {
 
 				expect(response.status).toBe(200);
 				expect(response.body.success).toBe(false);
-				expect(response.body.redirectUrl).toBe("/login-failed");
+				expect(response.body.message).toBe("Invalid email or password");
 			});
 
-			it("should redirect to error page on exception", async () => {
+			it("should return generic error message on exception", async () => {
 				vi.mocked(apiClient.loginUser).mockRejectedValue(
 					new Error("Network error"),
 				);
@@ -260,33 +260,64 @@ describe("Express App Routes", () => {
 
 				expect(response.status).toBe(200);
 				expect(response.body.success).toBe(false);
-				expect(response.body.redirectUrl).toBe("/error");
+				expect(response.body.message).toBe("An error occurred. Please try again later");
 			});
 		});
 
 		describe("POST /api/register", () => {
-			it("should redirect to register-failed when email is missing", async () => {
+			it("should return error message when email is missing", async () => {
 				const response = await request(app)
 					.post("/api/register")
-					.send({ password: "password123" })
+					.send({ password: "password123", confirmPassword: "password123" })
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(200);
 				expect(response.body.success).toBe(false);
-				expect(response.body.redirectUrl).toBe("/register-failed");
+				expect(response.body.message).toBe("Please fill in all required fields");
 			});
 
-			it("should redirect to register-failed when password is missing", async () => {
+			it("should return error message when password is missing", async () => {
 				const response = await request(app)
 					.post("/api/register")
-					.send({ email: "test@example.com" })
+					.send({ email: "test@example.com", confirmPassword: "password123" })
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(200);
 				expect(response.body.success).toBe(false);
-				expect(response.body.redirectUrl).toBe("/register-failed");
+				expect(response.body.message).toBe("Please fill in all required fields");
 			});
 
+			it("should return error message when passwords do not match", async () => {
+				const response = await request(app)
+					.post("/api/register")
+					.send({ email: "test@example.com", password: "password123", confirmPassword: "password456" })
+					.set("Content-Type", "application/json");
+
+				expect(response.status).toBe(200);
+				expect(response.body.success).toBe(false);
+				expect(response.body.message).toBe("Passwords do not match");
+			});
+			it("should return error message when password is too short", async () => {
+				const response = await request(app)
+					.post("/api/register")
+					.send({ email: "test@example.com", password: "pass1", confirmPassword: "pass1" })
+					.set("Content-Type", "application/json");
+
+				expect(response.status).toBe(200);
+				expect(response.body.success).toBe(false);
+				expect(response.body.message).toBe("Password must be at least 6 characters");
+			});
+
+			it("should return error message when password lacks number or special character", async () => {
+				const response = await request(app)
+					.post("/api/register")
+					.send({ email: "test@example.com", password: "password", confirmPassword: "password" })
+					.set("Content-Type", "application/json");
+
+				expect(response.status).toBe(200);
+				expect(response.body.success).toBe(false);
+				expect(response.body.message).toBe("Password must include a number (0-9) or special character (!@#$%^&*)");
+			});
 			it("should set HTTP-only cookie and redirect on successful registration", async () => {
 				vi.mocked(apiClient.registerUser).mockResolvedValue({
 					success: true,
@@ -295,7 +326,7 @@ describe("Express App Routes", () => {
 
 				const response = await request(app)
 					.post("/api/register")
-					.send({ email: "newuser@example.com", password: "password123" })
+					.send({ email: "newuser@example.com", password: "password123", confirmPassword: "password123" })
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(200);
@@ -306,7 +337,7 @@ describe("Express App Routes", () => {
 				expect(response.headers["set-cookie"][0]).toContain("HttpOnly");
 			});
 
-			it("should redirect to register-failed on API error", async () => {
+			it("should return error message on API error", async () => {
 				vi.mocked(apiClient.registerUser).mockResolvedValue({
 					success: false,
 					error: "Email already exists",
@@ -315,27 +346,27 @@ describe("Express App Routes", () => {
 
 				const response = await request(app)
 					.post("/api/register")
-					.send({ email: "existing@example.com", password: "password123" })
+					.send({ email: "existing@example.com", password: "password123", confirmPassword: "password123" })
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(200);
 				expect(response.body.success).toBe(false);
-				expect(response.body.redirectUrl).toBe("/register-failed");
+				expect(response.body.message).toBe("Registration failed. Email may already be in use");
 			});
 
-			it("should redirect to error page on exception", async () => {
+			it("should return generic error message on exception", async () => {
 				vi.mocked(apiClient.registerUser).mockRejectedValue(
 					new Error("Database error"),
 				);
 
 				const response = await request(app)
 					.post("/api/register")
-					.send({ email: "test@example.com", password: "password123" })
+					.send({ email: "newuser@example.com", password: "password123", confirmPassword: "password123" })
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(200);
 				expect(response.body.success).toBe(false);
-				expect(response.body.redirectUrl).toBe("/error");
+				expect(response.body.message).toBe("An error occurred. Please try again later");
 			});
 		});
 

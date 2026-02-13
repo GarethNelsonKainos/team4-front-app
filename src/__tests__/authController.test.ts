@@ -28,8 +28,8 @@ describe("AuthController", () => {
 	});
 
 	describe("login", () => {
-		it("should redirect to login-failed when email is missing", async () => {
-			mockRequest.body = { password: "password123" };
+		it("should return error message when email is missing", async () => {
+			mockRequest.body = { password: "password123!" };
 
 			await authController.login(
 				mockRequest as Request,
@@ -39,11 +39,11 @@ describe("AuthController", () => {
 
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: false,
-				redirectUrl: "/login-failed",
+				message: "Please enter your email and password",
 			});
 		});
 
-		it("should redirect to login-failed when password is missing", async () => {
+		it("should return error message when password is missing", async () => {
 			mockRequest.body = { email: "test@example.com" };
 
 			await authController.login(
@@ -54,14 +54,14 @@ describe("AuthController", () => {
 
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: false,
-				redirectUrl: "/login-failed",
+				message: "Please enter your email and password",
 			});
 		});
 
 		it("should set auth cookie and redirect to jobs on successful login", async () => {
 			mockRequest.body = {
 				email: "test@example.com",
-				password: "password123",
+				password: "password123!",
 			};
 
 			vi.mocked(apiClient.loginUser).mockResolvedValue({
@@ -77,7 +77,7 @@ describe("AuthController", () => {
 
 			expect(apiClient.loginUser).toHaveBeenCalledWith(
 				"test@example.com",
-				"password123",
+				"password123!",
 			);
 			expect(auth.setAuthCookie).toHaveBeenCalledWith(
 				"test-jwt-token",
@@ -89,7 +89,7 @@ describe("AuthController", () => {
 			});
 		});
 
-		it("should redirect to login-failed when API returns error", async () => {
+		it("should return error message when API returns error", async () => {
 			mockRequest.body = {
 				email: "test@example.com",
 				password: "wrongpassword",
@@ -109,14 +109,14 @@ describe("AuthController", () => {
 
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: false,
-				redirectUrl: "/login-failed",
+				message: "Invalid email or password",
 			});
 		});
 
-		it("should redirect to error page on exception", async () => {
+		it("should return generic error message on exception", async () => {
 			mockRequest.body = {
 				email: "test@example.com",
-				password: "password123",
+				password: "password123!",
 			};
 
 			vi.mocked(apiClient.loginUser).mockRejectedValue(
@@ -131,7 +131,7 @@ describe("AuthController", () => {
 
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: false,
-				redirectUrl: "/error",
+				message: "An error occurred. Please try again later",
 			});
 		});
 
@@ -141,7 +141,7 @@ describe("AuthController", () => {
 				.mockImplementation(() => {});
 			mockRequest.body = {
 				email: "test@example.com",
-				password: "password123",
+				password: "password123!",
 			};
 
 			vi.mocked(apiClient.loginUser).mockResolvedValue({
@@ -165,8 +165,8 @@ describe("AuthController", () => {
 	});
 
 	describe("register", () => {
-		it("should redirect to register-failed when email is missing", async () => {
-			mockRequest.body = { password: "password123" };
+		it("should return error message when email is missing", async () => {
+			mockRequest.body = { password: "password123!", confirmPassword: "password123!" };
 
 			await authController.register(
 				mockRequest as Request,
@@ -176,12 +176,12 @@ describe("AuthController", () => {
 
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: false,
-				redirectUrl: "/register-failed",
+				message: "Please fill in all required fields",
 			});
 		});
 
-		it("should redirect to register-failed when password is missing", async () => {
-			mockRequest.body = { email: "test@example.com" };
+		it("should return error message when password is missing", async () => {
+			mockRequest.body = { email: "test@example.com", confirmPassword: "password123!" };
 
 			await authController.register(
 				mockRequest as Request,
@@ -191,14 +191,106 @@ describe("AuthController", () => {
 
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: false,
-				redirectUrl: "/register-failed",
+				message: "Please fill in all required fields",
 			});
 		});
 
-		it("should set auth cookie and redirect to jobs on successful registration", async () => {
+		it("should return error message when confirmPassword is missing", async () => {
+			mockRequest.body = { email: "test@example.com", password: "password123!" };
+
+			await authController.register(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.json).toHaveBeenCalledWith({
+				success: false,
+				message: "Please fill in all required fields",
+			});
+		});
+
+		it("should return error message when passwords do not match", async () => {
+			mockRequest.body = {
+				email: "test@example.com",
+				password: "password123!",
+				confirmPassword: "password456",
+			};
+
+			await authController.register(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.json).toHaveBeenCalledWith({
+				success: false,
+				message: "Passwords do not match",
+			});
+		});
+
+		it("should return error message when password is too short", async () => {
+			mockRequest.body = {
+				email: "test@example.com",
+				password: "pass1",
+				confirmPassword: "pass1",
+			};
+
+			await authController.register(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.json).toHaveBeenCalledWith({
+				success: false,
+				message: "Password must be at least 6 characters",
+			});
+		});
+
+		it("should return error message when password lacks a special character", async () => {
+			mockRequest.body = {
+				email: "test@example.com",
+				password: "password",
+				confirmPassword: "password",
+			};
+
+			await authController.register(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.json).toHaveBeenCalledWith({
+				success: false,
+				message: "Password must include a number (0-9) and special character (!@#$%^&*)",
+			});
+		});
+
+		it("should return error message when password lacks number", async () => {
+			mockRequest.body = {
+				email: "test@example.com",
+				password: "password",
+				confirmPassword: "password",
+			};
+
+			await authController.register(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.json).toHaveBeenCalledWith({
+				success: false,
+				message: "Password must include a number (0-9) and special character (!@#$%^&*)",
+			});
+		});
+
+		it("should accept password with number and special character", async () => {
 			mockRequest.body = {
 				email: "newuser@example.com",
-				password: "password123",
+				password: "password123!",
+				confirmPassword: "password123!",
 			};
 
 			vi.mocked(apiClient.registerUser).mockResolvedValue({
@@ -214,7 +306,36 @@ describe("AuthController", () => {
 
 			expect(apiClient.registerUser).toHaveBeenCalledWith(
 				"newuser@example.com",
-				"password123",
+				"password123!!",
+			);
+			expect(mockResponse.json).toHaveBeenCalledWith({
+				success: true,
+				redirectUrl: "/jobs",
+			});
+		});
+
+
+		it("should set auth cookie and redirect to jobs on successful registration", async () => {
+			mockRequest.body = {
+				email: "newuser@example.com",
+				password: "password123!",
+				confirmPassword: "password123!",
+			};
+
+			vi.mocked(apiClient.registerUser).mockResolvedValue({
+				success: true,
+				data: { token: "test-jwt-token" },
+			});
+
+			await authController.register(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(apiClient.registerUser).toHaveBeenCalledWith(
+				"newuser@example.com",
+				"password123!",
 			);
 			expect(auth.setAuthCookie).toHaveBeenCalledWith(
 				"test-jwt-token",
@@ -229,7 +350,8 @@ describe("AuthController", () => {
 		it("should redirect to login if no token provided in response", async () => {
 			mockRequest.body = {
 				email: "newuser@example.com",
-				password: "password123",
+				password: "password123!",
+				confirmPassword: "password123!",
 			};
 
 			vi.mocked(apiClient.registerUser).mockResolvedValue({
@@ -250,10 +372,11 @@ describe("AuthController", () => {
 			});
 		});
 
-		it("should redirect to register-failed when API returns error", async () => {
+		it("should return error message when API returns error", async () => {
 			mockRequest.body = {
 				email: "existing@example.com",
-				password: "password123",
+				password: "password123!",
+				confirmPassword: "password123!",
 			};
 
 			vi.mocked(apiClient.registerUser).mockResolvedValue({
@@ -270,14 +393,15 @@ describe("AuthController", () => {
 
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: false,
-				redirectUrl: "/register-failed",
+				message: "Registration failed. Email may already be in use",
 			});
 		});
 
-		it("should redirect to error page on exception", async () => {
+		it("should return generic error message on exception", async () => {
 			mockRequest.body = {
 				email: "test@example.com",
-				password: "password123",
+				password: "password123!",
+				confirmPassword: "password123!",
 			};
 
 			vi.mocked(apiClient.registerUser).mockRejectedValue(
@@ -292,7 +416,7 @@ describe("AuthController", () => {
 
 			expect(mockResponse.json).toHaveBeenCalledWith({
 				success: false,
-				redirectUrl: "/error",
+				message: "An error occurred. Please try again later",
 			});
 		});
 	});

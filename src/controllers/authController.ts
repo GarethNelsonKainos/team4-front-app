@@ -11,10 +11,10 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 
 		// Validate input
 		if (!email || !password) {
-			// Production: redirect to login failed page instead of exposing validation details
+			// Return error message for better UX - don't redirect
 			return res.json({
 				success: false,
-				redirectUrl: "/login-failed",
+				message: "Please enter your email and password",
 			});
 		}
 
@@ -22,11 +22,11 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 		const result = await loginUser(email, password);
 
 		if (!result.success) {
-			// Production: redirect to error page instead of exposing API errors
+			// Return error message instead of redirecting
 			console.error("Login failed:", result.error);
 			return res.json({
 				success: false,
-				redirectUrl: "/login-failed",
+				message: "Invalid email or password",
 			});
 		}
 
@@ -40,11 +40,11 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 			redirectUrl: "/jobs",
 		});
 	} catch (error) {
-		// Production: log error privately, show generic error page to user
+		// Production: log error privately, return generic error message to user
 		console.error("Login error:", error);
 		res.json({
 			success: false,
-			redirectUrl: "/error",
+			message: "An error occurred. Please try again later",
 		});
 	}
 }
@@ -58,14 +58,40 @@ export async function register(
 	_next: NextFunction,
 ) {
 	try {
-		const { email, password } = req.body;
+		const { email, password, confirmPassword } = req.body;
 
 		// Validate required fields
-		if (!email || !password) {
-			// Production: redirect to register failed page instead of exposing validation details
+		if (!email || !password || !confirmPassword) {
+			// Return error message for better UX - don't redirect
 			return res.json({
 				success: false,
-				redirectUrl: "/register-failed",
+				message: "Please fill in all required fields",
+			});
+		}
+
+		// Validate passwords match
+		if (password !== confirmPassword) {
+			return res.json({
+				success: false,
+				message: "Passwords do not match",
+			});
+		}
+
+		// Validate password strength
+		if (password.length < 6) {
+			return res.json({
+				success: false,
+				message: "Password must be at least 6 characters",
+			});
+		}
+
+		// Password must contain a number AND special character
+		const hasNumber = /[0-9]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*]/.test(password);
+		if (!hasNumber || !hasSpecialChar) {
+			return res.json({
+				success: false,
+				message: "Password must include a number (0-9) and special character (!@#$%^&*)",
 			});
 		}
 
@@ -73,11 +99,11 @@ export async function register(
 		const result = await registerUser(email, password);
 
 		if (!result.success) {
-			// Production: redirect to error page instead of exposing API errors
+			// Return error message instead of redirecting
 			console.error("Registration failed:", result.error);
 			return res.json({
 				success: false,
-				redirectUrl: "/register-failed",
+				message: "Registration failed. Email may already be in use",
 			});
 		}
 
@@ -91,11 +117,11 @@ export async function register(
 			redirectUrl: result.data.token ? "/jobs" : "/login",
 		});
 	} catch (error) {
-		// Production: log error privately, show generic error page to user
+		// Production: log error privately, return generic error message to user
 		console.error("Registration error:", error);
 		res.json({
 			success: false,
-			redirectUrl: "/error",
+			message: "An error occurred. Please try again later",
 		});
 	}
 }
