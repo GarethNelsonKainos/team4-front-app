@@ -72,11 +72,35 @@ export async function registerUser(email: string, password: string) {
  */
 export async function getJobRoles(token: string) {
 	try {
+		console.log("getJobRoles called with token length:", token.length);
+		console.log("Sending request to /api/job-roles with Authorization header");
 		const response = await apiClient.get("/api/job-roles", {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
 		});
+		console.log("getJobRoles response received:", response.status);
+		return {
+			success: true,
+			data: response.data,
+		};
+	} catch (error) {
+		const axiosError = error as AxiosError<{ message?: string }>;
+		return {
+			success: false,
+			error: axiosError.response?.data?.message || "Failed to fetch job roles",
+			status: axiosError.response?.status,
+		};
+	}
+}
+
+/**
+ * Get all job roles (public endpoint - no authentication required)
+ * @returns Promise with job roles data
+ */
+export async function getJobRolesPublic() {
+	try {
+		const response = await apiClient.get("/api/job-roles");
 		return {
 			success: true,
 			data: response.data,

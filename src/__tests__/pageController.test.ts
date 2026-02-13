@@ -3,6 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as pageController from "../controllers/pageController.js";
 import { jobRoles } from "../data/mockData.js";
 
+// Mock the apiClient module
+vi.mock("../utils/apiClient.js");
+
 // Type definitions for testing
 interface JobRole {
 	id: number;
@@ -27,7 +30,7 @@ describe("PageController", () => {
 	let mockResponse: Partial<Response>;
 	let mockNext: NextFunction;
 
-	beforeEach(() => {
+	beforeEach(async () => {
 		mockRequest = {
 			params: {},
 		};
@@ -39,6 +42,16 @@ describe("PageController", () => {
 		};
 		mockNext = vi.fn();
 		vi.clearAllMocks();
+
+		// Setup the mock for getJobRolesPublic
+		const { getJobRolesPublic } = await import("../utils/apiClient.js");
+		vi.mocked(getJobRolesPublic).mockResolvedValue({
+			success: true,
+			data: jobRoles.map((job) => ({
+				...job,
+				jobRoleId: job.id,
+			})),
+		});
 	});
 
 	describe("getHomePage", () => {
@@ -97,8 +110,8 @@ describe("PageController", () => {
 	});
 
 	describe("getJobsPage", () => {
-		it("should render jobs page with only open job roles", () => {
-			pageController.getJobsPage(
+		it("should render jobs page with only open job roles", async () => {
+			await pageController.getJobsPage(
 				mockRequest as Request,
 				mockResponse as Response,
 				mockNext,
@@ -109,12 +122,14 @@ describe("PageController", () => {
 			expect(mockResponse.render).toHaveBeenCalledWith("pages/jobs.njk", {
 				title: "Available Job Roles - Kainos",
 				heading: "Kainos Job Opportunities",
-				jobRoles: openJobs,
+				jobRoles: expect.arrayContaining(
+					openJobs.map((job) => expect.objectContaining({ id: job.id })),
+				),
 			});
 		});
 
-		it("should filter out closed job roles", () => {
-			pageController.getJobsPage(
+		it("should filter out closed job roles", async () => {
+			await pageController.getJobsPage(
 				mockRequest as Request,
 				mockResponse as Response,
 				mockNext,
@@ -131,14 +146,14 @@ describe("PageController", () => {
 			).toBe(true);
 		});
 
-		it("should redirect to error page on exception", () => {
+		it("should redirect to error page on exception", async () => {
 			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
 				() => {
 					throw new Error("Template error");
 				},
 			);
 
-			pageController.getJobsPage(
+			await pageController.getJobsPage(
 				mockRequest as Request,
 				mockResponse as Response,
 				mockNext,
@@ -149,10 +164,10 @@ describe("PageController", () => {
 	});
 
 	describe("getJobDetailPage", () => {
-		it("should render job detail page for valid job ID", () => {
+		it("should render job detail page for valid job ID", async () => {
 			mockRequest.params = { id: "1" };
 
-			pageController.getJobDetailPage(
+			await pageController.getJobDetailPage(
 				mockRequest as Request,
 				mockResponse as Response,
 				mockNext,
@@ -160,17 +175,20 @@ describe("PageController", () => {
 
 			const job = jobRoles.find((job) => job.id === 1);
 
-			expect(mockResponse.render).toHaveBeenCalledWith("pages/job-detail.njk", {
-				title: `${job?.roleName} - Kainos`,
-				heading: "Kainos Job Opportunities",
-				job: job,
-			});
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/job-detail.njk",
+				expect.objectContaining({
+					title: `${job?.roleName} - Kainos`,
+					heading: "Kainos Job Opportunities",
+					job: expect.objectContaining({ id: job?.id }),
+				}),
+			);
 		});
 
-		it("should handle array parameter format", () => {
+		it("should handle array parameter format", async () => {
 			mockRequest.params = { id: ["2"] };
 
-			pageController.getJobDetailPage(
+			await pageController.getJobDetailPage(
 				mockRequest as Request,
 				mockResponse as Response,
 				mockNext,
@@ -178,17 +196,20 @@ describe("PageController", () => {
 
 			const job = jobRoles.find((job) => job.id === 2);
 
-			expect(mockResponse.render).toHaveBeenCalledWith("pages/job-detail.njk", {
-				title: `${job?.roleName} - Kainos`,
-				heading: "Kainos Job Opportunities",
-				job: job,
-			});
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/job-detail.njk",
+				expect.objectContaining({
+					title: `${job?.roleName} - Kainos`,
+					heading: "Kainos Job Opportunities",
+					job: expect.objectContaining({ id: job?.id }),
+				}),
+			);
 		});
 
-		it("should redirect to error page for non-existent job ID", () => {
+		it("should redirect to error page for non-existent job ID", async () => {
 			mockRequest.params = { id: "999" };
 
-			pageController.getJobDetailPage(
+			await pageController.getJobDetailPage(
 				mockRequest as Request,
 				mockResponse as Response,
 				mockNext,
@@ -198,10 +219,10 @@ describe("PageController", () => {
 			expect(mockResponse.render).not.toHaveBeenCalled();
 		});
 
-		it("should redirect to error page for non-numeric ID", () => {
+		it("should redirect to error page for non-numeric ID", async () => {
 			mockRequest.params = { id: "abc" };
 
-			pageController.getJobDetailPage(
+			await pageController.getJobDetailPage(
 				mockRequest as Request,
 				mockResponse as Response,
 				mockNext,
@@ -210,7 +231,7 @@ describe("PageController", () => {
 			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
 		});
 
-		it("should redirect to error page on exception", () => {
+		it("should redirect to error page on exception", async () => {
 			mockRequest.params = { id: "1" };
 			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
 				() => {
@@ -218,7 +239,7 @@ describe("PageController", () => {
 				},
 			);
 
-			pageController.getJobDetailPage(
+			await pageController.getJobDetailPage(
 				mockRequest as Request,
 				mockResponse as Response,
 				mockNext,

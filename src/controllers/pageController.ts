@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { jobRoles } from "../data/mockData";
+import { getJobRolesPublic } from "../utils/apiClient";
 
 /**
  * Render home page
@@ -21,10 +21,28 @@ export function getHomePage(_req: Request, res: Response, _next: NextFunction) {
 /**
  * Render jobs listing page - shows only open positions
  */
-export function getJobsPage(_req: Request, res: Response, _next: NextFunction) {
+export async function getJobsPage(
+	_req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
 	try {
-		// Filter array to show only open jobs using arrow function
-		const openJobRoles = jobRoles.filter((job) => job.status === "open");
+		// Fetch jobs from API
+		const result = await getJobRolesPublic();
+
+		if (!result.success) {
+			console.error(
+				"Error fetching jobs:",
+				result.error,
+				"Status:",
+				result.status,
+			);
+			return res.redirect("/error");
+		}
+
+		const openJobRoles = result.data.filter(
+			(job: { status: string }) => job.status?.toLowerCase() === "open",
+		);
 
 		res.render("pages/jobs.njk", {
 			title: "Available Job Roles - Kainos",
@@ -41,7 +59,7 @@ export function getJobsPage(_req: Request, res: Response, _next: NextFunction) {
 /**
  * Render job detail page
  */
-export function getJobDetailPage(
+export async function getJobDetailPage(
 	req: Request,
 	res: Response,
 	_next: NextFunction,
@@ -53,8 +71,22 @@ export function getJobDetailPage(
 			10,
 		);
 
-		// Find job by ID using array.find() method
-		const job = jobRoles.find((job) => job.id === jobId);
+		// Validate that the ID is a valid number
+		if (Number.isNaN(jobId)) {
+			return res.redirect("/error");
+		}
+
+		// Fetch jobs from API and find job by ID using array.find() method
+		const result = await getJobRolesPublic();
+
+		if (!result.success) {
+			console.error("Error fetching jobs:", result.error);
+			return res.redirect("/error");
+		}
+
+		const job = result.data.find(
+			(job: { jobRoleId: number }) => job.jobRoleId === jobId,
+		);
 
 		if (!job) {
 			// Production: redirect to error page instead of exposing "not found" details
