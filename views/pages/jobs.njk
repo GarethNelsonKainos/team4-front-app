@@ -65,9 +65,9 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <svg class="w-4 h-4 text-kainos-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v1a2 2 0 01-2 2 2 2 0 102 2 2 2 0 012 2v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1a2 2 0 012-2 2 2 0 102-2 2 2 0 01-2-2V9a2 2 0 012-2h3z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
-                                <span class="text-sm text-gray-900">{{ job.closingDate }}</span>
+                                <span class="text-sm text-gray-900">{{ job.closingDate | formatDate }}</span>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -84,11 +84,11 @@
                                     </svg>
                                     View
                                 </a>
-                                <button class="bg-white hover:bg-gray-50 text-kainos-500 px-4 py-2 rounded-lg border border-kainos-500 text-sm font-medium transition-colors duration-200 flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button class="save-btn group bg-white hover:bg-gray-50 text-kainos-500 px-4 py-2 rounded-lg border border-kainos-500 text-sm font-medium transition-colors duration-200 flex items-center" data-job-id="{{ job.id }}">
+                                    <svg class="w-4 h-4 mr-1 group-hover:fill-kainos-600 transition-all duration-200 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                                     </svg>
-                                    Save
+                                    <span class="save-text">Save</span>
                                 </button>
                             </div>
                         </td>
@@ -108,4 +108,58 @@
             Get in Touch
         </a>
     </div>
+
+    <script>
+        // Initialize saved jobs
+        function initializeSaveButtons() {
+            const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            
+            // Load saved state on page load
+            savedJobs.forEach(jobId => {
+                const btn = document.querySelector(`[data-job-id="${jobId}"]`);
+                if (btn) {
+                    updateButtonState(btn, true);
+                }
+            });
+
+            // Attach click handlers to all save buttons
+            document.querySelectorAll('.save-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const jobId = this.dataset.jobId;
+                    const isCurrentlySaved = savedJobs.includes(parseInt(jobId));
+                    
+                    if (isCurrentlySaved) {
+                        // Remove from saved
+                        const index = savedJobs.indexOf(parseInt(jobId));
+                        savedJobs.splice(index, 1);
+                        updateButtonState(this, false);
+                    } else {
+                        // Add to saved
+                        savedJobs.push(parseInt(jobId));
+                        updateButtonState(this, true);
+                    }
+                    
+                    // Save to localStorage
+                    localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+                });
+            });
+        }
+
+        function updateButtonState(btn, isSaved) {
+            const heart = btn.querySelector('.heart-icon');
+            const text = btn.querySelector('.save-text');
+            
+            if (isSaved) {
+                heart.setAttribute('fill', '#1f3a7d');
+                text.textContent = 'Saved';
+            } else {
+                heart.setAttribute('fill', 'none');
+                text.textContent = 'Save';
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initializeSaveButtons);
+    </script>
 {% endblock %}
