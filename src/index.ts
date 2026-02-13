@@ -1,7 +1,10 @@
 import "dotenv/config";
+import cookieParser from "cookie-parser";
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import nunjucks from "nunjucks";
+import * as authController from "./controllers/authController";
+import * as pageController from "./controllers/pageController";
 import { jobRoles } from "./data/mockData";
 
 const app = express();
@@ -25,6 +28,7 @@ nunjucksEnv.addFilter("formatDate", (dateString: string) => {
 });
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.static("public"));
 
 app.get("/", (_req: Request, res: Response, _next: NextFunction) => {
@@ -70,12 +74,16 @@ app.get(
 				10,
 			);
 
+			// Validate that the ID is a valid number
+			if (Number.isNaN(jobId)) {
+				return res.redirect("/error");
+			}
+
 			// Find job by ID using array.find() method
 			const job = jobRoles.find((job) => job.id === jobId);
 
 			if (!job) {
-				res.status(404).send("Job role not found");
-				return;
+				return res.redirect("/error");
 			}
 
 			res.render("pages/job-detail.njk", {
@@ -103,6 +111,24 @@ app.get("/login", (_req: Request, res: Response, _next: NextFunction) => {
 		res.status(500).send("Error rendering login template");
 	}
 });
+
+// Register page route
+app.get("/register", pageController.getRegisterPage);
+
+// Error page route
+app.get("/error", pageController.getErrorPage);
+
+// Login failed page route
+app.get("/login-failed", pageController.getLoginFailedPage);
+
+// Register failed page route
+app.get("/register-failed", pageController.getRegisterFailedPage);
+
+// API Routes
+app.post("/api/login", authController.login);
+app.post("/api/register", authController.register);
+app.post("/api/logout", authController.logout);
+app.get("/api/auth-status", authController.checkAuthStatus);
 
 export { app };
 
