@@ -5,7 +5,7 @@ import express from "express";
 import nunjucks from "nunjucks";
 import * as authController from "./controllers/authController";
 import * as pageController from "./controllers/pageController";
-import { authMiddleware } from "./utils/auth";
+import { authMiddleware, requireAdmin } from "./utils/auth";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -72,6 +72,12 @@ app.get("/login-failed", pageController.getLoginFailedPage);
 
 // Register failed page route
 app.get("/register-failed", pageController.getRegisterFailedPage);
+
+// Admin Routes (require admin role)
+app.get("/admin", requireAdmin, pageController.getAdminDashboard);
+app.get("/admin/jobs", requireAdmin, pageController.getAdminJobsPage);
+app.get("/admin/create-job", requireAdmin, pageController.getAdminCreateJobPage);
+app.get("/admin/create-admin", requireAdmin, pageController.getAdminCreateAdminPage);
 
 // API Routes
 app.post("/api/login", authController.login);

@@ -220,3 +220,102 @@ export function getRegisterFailedPage(
 		res.redirect("/error");
 	}
 }
+
+/**
+ * Render admin dashboard page
+ */
+export function getAdminDashboard(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+		res.render("pages/admin-dashboard.njk", {
+			title: "Admin Dashboard - Kainos",
+			currentPage: "admin",
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering admin dashboard:", error);
+		res.redirect("/error");
+	}
+}
+
+/**
+ * Render admin jobs management page - list all jobs for editing/deleting
+ */
+export async function getAdminJobsPage(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+
+		// Fetch all jobs from API
+		const result = await getJobRolesPublic();
+
+		if (!result.success) {
+			console.error(
+				"Error fetching jobs:",
+				result.error,
+				"Status:",
+				result.status,
+			);
+			return res.redirect("/error");
+		}
+
+		res.render("pages/admin-jobs.njk", {
+			title: "Manage Job Listings - Kainos",
+			currentPage: "admin",
+			jobRoles: result.data,
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering admin jobs page:", error);
+		res.redirect("/error");
+	}
+}
+
+/**
+ * Render create new job page
+ */
+export function getAdminCreateJobPage(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+		res.render("pages/admin-create-job.njk", {
+			title: "Create New Job - Kainos",
+			currentPage: "admin",
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering create job page:", error);
+		res.redirect("/error");
+	}
+}
+
+/**
+ * Render create new admin account page
+ */
+export function getAdminCreateAdminPage(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+		res.render("pages/admin-create-admin.njk", {
+			title: "Create Admin Account - Kainos",
+			currentPage: "admin",
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering create admin page:", error);
+		res.redirect("/error");
+	}
+}
