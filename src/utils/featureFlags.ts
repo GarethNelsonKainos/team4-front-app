@@ -64,8 +64,7 @@ export function isFeatureEnabled(flagName: string): boolean {
 function getDefaultFlags(): FeatureFlags {
 	return {
 		JOB_DETAIL_VIEW: process.env.FEATURE_JOB_DETAIL_VIEW === "true" || false,
-		JOB_APPLY:
-			process.env.FEATURE_JOB_APPLY === "true" || false,
+		JOB_APPLY: process.env.FEATURE_JOB_APPLY === "true" || false,
 	};
 }
 

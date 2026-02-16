@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { getJobRolesPublic } from "../utils/apiClient";
-import { loadFeatureFlags, isFeatureEnabled } from "../utils/featureFlags";
+import { isFeatureEnabled, loadFeatureFlags } from "../utils/featureFlags";
 
 /**
  * Render home page

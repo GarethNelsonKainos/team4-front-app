@@ -130,7 +130,8 @@ export async function getFeatureFlags() {
 		const axiosError = error as AxiosError<{ message?: string }>;
 		return {
 			success: false,
-			error: axiosError.response?.data?.message || "Failed to fetch feature flags",
+			error:
+				axiosError.response?.data?.message || "Failed to fetch feature flags",
 			status: axiosError.response?.status,
 		};
 	}
