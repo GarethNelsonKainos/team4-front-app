@@ -59,12 +59,17 @@ jobs:
      - name: Run Pa11y accessibility tests
        continue-on-error: true
        run: |
-         pa11y-ci --json > output/accessibility/pa11y-results.json 2>&1 || true
-         pa11y-ci
+         pa11y-ci --json > output/accessibility/pa11y-results.json || true
+         cat output/accessibility/pa11y-results.json
 
      - name: Generate HTML accessibility report
        if: always()
-       run: node generate-a11y-report.js output/accessibility/pa11y-results.json
+       run: |
+         if [ -f output/accessibility/pa11y-results.json ]; then
+           node generate-a11y-report.js output/accessibility/pa11y-results.json || echo "Failed to generate report"
+         else
+           echo "No Pa11y results found"
+         fi
 
      - name: Upload accessibility report
        if: always()

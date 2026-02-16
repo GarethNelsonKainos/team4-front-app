@@ -7,12 +7,38 @@ const __dirname = dirname(__filename);
 
 // Read the JSON results
 const resultsPath = process.argv[2] || './output/accessibility/pa11y-results.json';
-const rawData = readFileSync(resultsPath, 'utf8');
 
-// Extract just the JSON (last line after any warnings)
-const lines = rawData.trim().split('\n');
-const jsonLine = lines[lines.length - 1];
-const results = JSON.parse(jsonLine);
+let results;
+try {
+    const rawData = readFileSync(resultsPath, 'utf8');
+    
+    // Try to parse as direct JSON first
+    try {
+        results = JSON.parse(rawData);
+    } catch {
+        // If that fails, try to extract JSON from last line (handles warnings)
+        const lines = rawData.trim().split('\n');
+        const jsonLine = lines[lines.length - 1];
+        results = JSON.parse(jsonLine);
+    }
+} catch (error) {
+    console.error('❌ Failed to parse Pa11y results:', error.message);
+    console.error('Creating error report...');
+    
+    // Create a fallback report
+    results = {
+        total: 0,
+        passes: 0,
+        errors: 1,
+        results: {
+            'Pa11y Test': [{
+                message: 'Failed to run accessibility tests or parse results',
+                type: 'error',
+                code: 'PARSE_ERROR'
+            }]
+        }
+    };
+}
 
 // Generate HTML report
 const html = `
