@@ -6,13 +6,6 @@ import { jobRoles } from "../data/mockData.js";
 // Mock the apiClient module
 vi.mock("../utils/apiClient.js");
 
-// Mock the featureFlags module
-vi.mock("../utils/featureFlags.js", () => ({
-	loadFeatureFlags: vi.fn().mockResolvedValue(undefined),
-	isFeatureEnabled: vi.fn((flagName: string) => flagName === "JOB_DETAIL_VIEW"),
-	invalidateCache: vi.fn(),
-}));
-
 // Type definitions for testing
 interface JobRole {
 	id: number;
@@ -51,9 +44,7 @@ describe("PageController", () => {
 		vi.clearAllMocks();
 
 		// Setup the mock for getJobRolesPublic
-		const { getJobRolesPublic, getFeatureFlags } = await import(
-			"../utils/apiClient.js"
-		);
+		const { getJobRolesPublic } = await import("../utils/apiClient.js");
 		vi.mocked(getJobRolesPublic).mockResolvedValue({
 			success: true,
 			data: jobRoles.map((job) => ({
@@ -62,14 +53,8 @@ describe("PageController", () => {
 			})),
 		});
 
-		// Setup the mock for getFeatureFlags
-		vi.mocked(getFeatureFlags).mockResolvedValue({
-			success: true,
-			data: {
-				JOB_DETAIL_VIEW: true,
-				JOB_APPLY: false,
-			},
-		});
+		// Set the feature flag environment variable for tests
+		process.env.FEATURE_JOB_DETAIL_VIEW = "true";
 	});
 
 	describe("getHomePage", () => {

@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
 import { getJobRolesPublic } from "../utils/apiClient";
-import { isFeatureEnabled, loadFeatureFlags } from "../utils/featureFlags";
 
 /**
  * Render home page
@@ -28,9 +27,8 @@ export async function getJobsPage(
 	_next: NextFunction,
 ) {
 	try {
-		// Load feature flags
-		await loadFeatureFlags();
-		const showJobDetail = isFeatureEnabled("JOB_DETAIL_VIEW");
+		// Check feature flag from environment variable
+		const showJobDetail = process.env.FEATURE_JOB_DETAIL_VIEW === "true";
 
 		// Fetch jobs from API
 		const result = await getJobRolesPublic();
