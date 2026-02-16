@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { getJobRolesPublic } from "../utils/apiClient";
+import { getJobRolesPublic, getJobRoleById } from "../utils/apiClient";
 
 /**
  * Render home page
@@ -74,20 +74,26 @@ export async function getJobDetailPage(
 
 		// Validate that the ID is a valid number
 		if (Number.isNaN(jobId)) {
+			console.error(`❌ Invalid job ID: ${req.params.id}`);
 			return res.redirect("/error");
 		}
 
-		// Fetch jobs from API and find job by ID using array.find() method
-		const result = await getJobRolesPublic();
+		console.log(`🔍 PageController: Fetching job role with ID ${jobId}`);
+
+		// Fetch specific job role by ID using the new API endpoint
+		const result = await getJobRoleById(jobId);
 
 		if (!result.success) {
-			console.error("Error fetching jobs:", result.error);
+			console.error("❌ PageController: Error fetching job:", {
+				error: result.error,
+				status: result.status,
+				jobId: jobId
+			});
 			return res.redirect("/error");
 		}
 
-		const job = result.data.find(
-			(job: { jobRoleId: number }) => job.jobRoleId === jobId,
-		);
+		const job = result.data;
+		console.log(`✅ PageController: Successfully got job data:`, job);
 
 		if (!job) {
 			// Production: redirect to error page instead of exposing "not found" details
