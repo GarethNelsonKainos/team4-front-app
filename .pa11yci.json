@@ -57,8 +57,34 @@
         "height": 667
       }
     },
-    "http://localhost:3000/login",
-    "http://localhost:3000/register",
+    {
+      "url": "http://localhost:3000/login#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/login#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
+    {
+      "url": "http://localhost:3000/register#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/register#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
     "http://localhost:3000/error",
     "http://localhost:3000/login-failed",
     "http://localhost:3000/register-failed"
