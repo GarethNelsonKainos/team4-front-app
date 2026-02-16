@@ -97,7 +97,7 @@
                     Apply Now
                 </button>
                 
-                <button class="save-btn group flex items-center justify-center text-base bg-white hover:bg-gray-50 text-kainos-500 font-bold py-3 px-8 rounded-lg border-2 border-kainos-500 transition-colors duration-300" data-job-id="{{ job.id }}">
+                <button class="save-btn group flex items-center justify-center text-base bg-white hover:bg-gray-50 text-kainos-500 font-bold py-3 px-8 rounded-lg border-2 border-kainos-500 transition-colors duration-300" data-job-id="{{ job.jobRoleId }}">
                     <svg class="w-5 h-5 mr-2 group-hover:fill-kainos-600 transition-all duration-200 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                     </svg>
@@ -125,7 +125,7 @@
         // Initialize save button
         function initializeSaveButton() {
             const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-            const jobId = {{ job.id }};
+            const jobId = {{ job.jobRoleId }};
             const btn = document.querySelector('.save-btn');
             
             // Load saved state on page load

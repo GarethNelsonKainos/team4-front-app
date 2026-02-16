@@ -40,9 +40,6 @@ jobs:
          name: coverage-report
          path: output/test/
 
-     - name: Install Pa11y CI
-       run: npm install -g pa11y-ci pa11y-runner-axe pa11y-runner-htmlcs
-
      - name: Create accessibility reports directory
        run: mkdir -p output/accessibility
 
@@ -57,10 +54,21 @@ jobs:
          timeout 30 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
 
      - name: Run Pa11y accessibility tests
-       continue-on-error: true
+       id: pa11y
        run: |
-         pa11y-ci --json > output/accessibility/pa11y-results.json || true
-         cat output/accessibility/pa11y-results.json
+         set +e
+         npx pa11y-ci --json > output/accessibility/pa11y-results.json 2>&1
+         EXIT_CODE=$?
+         echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+         npx pa11y-ci
+         exit 0
+
+     - name: Display Pa11y results
+       if: always()
+       run: |
+         if [ -f output/accessibility/pa11y-results.json ]; then
+           cat output/accessibility/pa11y-results.json
+         fi
 
      - name: Generate HTML accessibility report
        if: always()
@@ -77,6 +85,12 @@ jobs:
        with:
          name: accessibility-report
          path: output/accessibility/
+
+     - name: Fail build if accessibility tests failed
+       if: steps.pa11y.outputs.exit_code != '0'
+       run: |
+         echo "❌ Accessibility tests failed. Please review the accessibility report artifact."
+         exit 1
 
      - name: Stop server
        if: always()

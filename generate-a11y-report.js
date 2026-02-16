@@ -5,6 +5,17 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// HTML escape function to prevent XSS
+function escapeHtml(text) {
+    if (text == null) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Read the JSON results
 const resultsPath = process.argv[2] || './output/accessibility/pa11y-results.json';
 
@@ -191,7 +202,7 @@ const html = `
         ${Object.entries(results.results).map(([url, errors]) => `
             <div class="url-section">
                 <div class="url-header">
-                    <div class="url-title">${url}</div>
+                    <div class="url-title">${escapeHtml(url)}</div>
                     <span class="badge ${errors.length === 0 ? 'badge-success' : 'badge-error'}">
                         ${errors.length === 0 ? '✓ Passed' : `${errors.length} Error${errors.length > 1 ? 's' : ''}`}
                     </span>
@@ -201,11 +212,11 @@ const html = `
                     : `<ul class="error-list">
                         ${errors.map(error => `
                             <li class="error-item">
-                                <div class="error-message">${error.message || 'Accessibility issue detected'}</div>
-                                ${error.context ? `<div class="error-details"><strong>Context:</strong> ${error.context}</div>` : ''}
-                                ${error.selector ? `<div class="error-details"><strong>Element:</strong> <code>${error.selector}</code></div>` : ''}
-                                ${error.code ? `<div class="error-code">${error.code}</div>` : ''}
-                                ${error.type ? `<div class="error-details"><strong>Type:</strong> ${error.type}</div>` : ''}
+                                <div class="error-message">${escapeHtml(error.message || 'Accessibility issue detected')}</div>
+                                ${error.context ? `<div class="error-details"><strong>Context:</strong> ${escapeHtml(error.context)}</div>` : ''}
+                                ${error.selector ? `<div class="error-details"><strong>Element:</strong> <code>${escapeHtml(error.selector)}</code></div>` : ''}
+                                ${error.code ? `<div class="error-code">${escapeHtml(error.code)}</div>` : ''}
+                                ${error.type ? `<div class="error-details"><strong>Type:</strong> ${escapeHtml(error.type)}</div>` : ''}
                             </li>
                         `).join('')}
                     </ul>`
