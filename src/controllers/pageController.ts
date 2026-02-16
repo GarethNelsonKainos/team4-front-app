@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
-import { getJobRolesPublic } from "../utils/apiClient";
+import { getJobRolesPublic, getJobRole } from "../utils/apiClient";
 import type { AuthRequest } from "../utils/auth";
-import { features } from "node:process";
 
 const showAdminFeatures = process.env.FEATURE_ADMIN_DASHBOARD === "true";
 
@@ -100,22 +99,15 @@ export async function getJobDetailPage(
 		// Get user info
 		const authReq = req as AuthRequest;
 
-		// Fetch jobs from API and find job by ID using array.find() method
-		const result = await getJobRolesPublic();
+		// Fetch specific job from API
+		const result = await getJobRole(jobId);
 
 		if (!result.success) {
-			console.error("Error fetching jobs:", result.error);
+			console.error("Error fetching job:", result.error);
 			return res.redirect("/error");
 		}
 
-		const job = result.data.find(
-			(job: { jobRoleId: number }) => job.jobRoleId === jobId,
-		);
-
-		if (!job) {
-			// Production: redirect to error page instead of exposing "not found" details
-			return res.redirect("/error");
-		}
+		const job = result.data;
 
 		res.render("pages/job-detail.njk", {
 			title: `${job.roleName} - Kainos`, // Template string with embedded variable

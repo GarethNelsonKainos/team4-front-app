@@ -18,6 +18,18 @@ describe("Express App Routes", () => {
 				jobRoleId: job.id,
 			})),
 		});
+
+		// Setup the mock for getJobRole (single job detail endpoint)
+		vi.mocked(apiClient.getJobRole).mockImplementation(async (id: number) => {
+			const job = jobRoles.find((j) => j.id === id);
+			if (!job) {
+				return { success: false, error: "Job role not found", status: 404 };
+			}
+			return {
+				success: true,
+				data: { ...job, jobRoleId: job.id },
+			};
+		});
 	});
 
 	afterEach(() => {

@@ -66,35 +66,6 @@ export async function registerUser(email: string, password: string) {
 }
 
 /**
- * Get all job roles (requires authentication token)
- * @param token - JWT token for authentication
- * @returns Promise with job roles data
- */
-export async function getJobRoles(token: string) {
-	try {
-		console.log("getJobRoles called with token length:", token.length);
-		console.log("Sending request to /api/job-roles with Authorization header");
-		const response = await apiClient.get("/api/job-roles", {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		});
-		console.log("getJobRoles response received:", response.status);
-		return {
-			success: true,
-			data: response.data,
-		};
-	} catch (error) {
-		const axiosError = error as AxiosError<{ message?: string }>;
-		return {
-			success: false,
-			error: axiosError.response?.data?.message || "Failed to fetch job roles",
-			status: axiosError.response?.status,
-		};
-	}
-}
-
-/**
  * Get all job roles (public endpoint - no authentication required)
  * @returns Promise with job roles data
  */
@@ -110,6 +81,110 @@ export async function getJobRolesPublic() {
 		return {
 			success: false,
 			error: axiosError.response?.data?.message || "Failed to fetch job roles",
+			status: axiosError.response?.status,
+		};
+	}
+}
+
+/**
+ * Get a specific job role by ID (public endpoint - no authentication required)
+ * @param id - Job role ID
+ * @returns Promise with job role data
+ */
+export async function getJobRole(id: number) {
+	try {
+		const response = await apiClient.get(`/api/job-roles/${id}`);
+		return {
+			success: true,
+			data: response.data,
+		};
+	} catch (error) {
+		const axiosError = error as AxiosError<{ message?: string }>;
+		return {
+			success: false,
+			error: axiosError.response?.data?.message || "Failed to fetch job role",
+			status: axiosError.response?.status,
+		};
+	}
+}
+
+/**
+ * Create a new job role (requires authentication)
+ * @param jobRoleData - Job role data
+ * @param token - JWT token for authentication
+ * @returns Promise with created job role data
+ */
+export async function createJobRole(jobRoleData: Record<string, unknown>, token: string) {
+	try {
+		const response = await apiClient.post("/api/job-roles", jobRoleData, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		return {
+			success: true,
+			data: response.data,
+		};
+	} catch (error) {
+		const axiosError = error as AxiosError<{ message?: string }>;
+		return {
+			success: false,
+			error: axiosError.response?.data?.message || "Failed to create job role",
+			status: axiosError.response?.status,
+		};
+	}
+}
+
+/**
+ * Update an existing job role (requires authentication)
+ * @param id - Job role ID
+ * @param jobRoleData - Updated job role data
+ * @param token - JWT token for authentication
+ * @returns Promise with updated job role data
+ */
+export async function updateJobRole(id: number, jobRoleData: Record<string, unknown>, token: string) {
+	try {
+		const response = await apiClient.put(`/api/job-roles/${id}`, jobRoleData, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		return {
+			success: true,
+			data: response.data,
+		};
+	} catch (error) {
+		const axiosError = error as AxiosError<{ message?: string }>;
+		return {
+			success: false,
+			error: axiosError.response?.data?.message || "Failed to update job role",
+			status: axiosError.response?.status,
+		};
+	}
+}
+
+/**
+ * Delete a job role (requires authentication)
+ * @param id - Job role ID
+ * @param token - JWT token for authentication
+ * @returns Promise with deletion result
+ */
+export async function deleteJobRole(id: number, token: string) {
+	try {
+		const response = await apiClient.delete(`/api/job-roles/${id}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		return {
+			success: true,
+			data: response.data,
+		};
+	} catch (error) {
+		const axiosError = error as AxiosError<{ message?: string }>;
+		return {
+			success: false,
+			error: axiosError.response?.data?.message || "Failed to delete job role",
 			status: axiosError.response?.status,
 		};
 	}
