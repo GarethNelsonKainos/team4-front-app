@@ -53,9 +53,7 @@ describe("PageController", () => {
 		vi.clearAllMocks();
 
 		// Setup the mock for getJobRolesPublic
-		const { getJobRolesPublic } = await import(
-			"../utils/apiClient.js"
-		);
+		const { getJobRolesPublic } = await import("../utils/apiClient.js");
 		vi.mocked(getJobRolesPublic).mockResolvedValue({
 			success: true,
 			data: jobRoles.map((job) => ({
@@ -356,7 +354,7 @@ describe("PageController", () => {
 			expect(mockResponse.status).toHaveBeenCalledWith(500);
 			expect(mockResponse.render).toHaveBeenCalledWith("pages/error.njk", {
 				title: "Error - Kainos",
-			user: expect.objectContaining({
+				user: expect.objectContaining({
 					isAuthenticated: true,
 				}),
 			});

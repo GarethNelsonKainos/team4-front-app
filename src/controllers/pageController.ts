@@ -31,7 +31,6 @@ export async function getJobsPage(
 	_next: NextFunction,
 ) {
 	try {
-
 		// Get user info
 		const authReq = req as AuthRequest;
 
@@ -124,11 +123,7 @@ export async function getJobDetailPage(
 /**
  * Render login page
  */
-export function getLoginPage(
-	req: Request,
-	res: Response,
-	_next: NextFunction,
-) {
+export function getLoginPage(req: Request, res: Response, _next: NextFunction) {
 	try {
 		const authReq = req as AuthRequest;
 		res.render("pages/login.njk", {
@@ -168,11 +163,7 @@ export function getRegisterPage(
 /**
  * Render generic error page
  */
-export function getErrorPage(
-	req: Request,
-	res: Response,
-	_next: NextFunction,
-) {
+export function getErrorPage(req: Request, res: Response, _next: NextFunction) {
 	try {
 		const authReq = req as AuthRequest;
 		res.status(500).render("pages/error.njk", {

@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { getUserRole, getUserEmail, isTokenExpired } from "./jwtDecoder";
+import { getUserEmail, getUserRole, isTokenExpired } from "./jwtDecoder";
 
 /**
  * Extended Request interface with authentication token and user info
@@ -73,11 +73,7 @@ export function authMiddleware(
  * Middleware to require authentication
  * Redirects to login if not authenticated
  */
-export function requireAuth(
-	req: Request,
-	res: Response,
-	next: NextFunction,
-) {
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
 	const authReq = req as AuthRequest;
 	if (!authReq.user?.isAuthenticated) {
 		return res.redirect("/login");
@@ -89,11 +85,7 @@ export function requireAuth(
  * Middleware to require admin role
  * Redirects to error page if not admin
  */
-export function requireAdmin(
-	req: Request,
-	res: Response,
-	next: NextFunction,
-) {
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
 	const authReq = req as AuthRequest;
 	if (!authReq.user?.isAuthenticated || authReq.user?.role !== "admin") {
 		return res.redirect("/error");

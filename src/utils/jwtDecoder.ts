@@ -28,7 +28,9 @@ export function decodeToken(token: string): DecodedToken | null {
 
 		// Decode the payload (second part)
 		const payload = parts[1];
-		const decoded = JSON.parse(Buffer.from(payload, "base64").toString("utf-8"));
+		const decoded = JSON.parse(
+			Buffer.from(payload, "base64").toString("utf-8"),
+		);
 
 		return decoded as DecodedToken;
 	} catch (error) {
