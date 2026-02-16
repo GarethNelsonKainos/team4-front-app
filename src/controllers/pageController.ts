@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { getJobRolesPublic, getJobRoleById } from "../utils/apiClient";
+import { getJobRoleById, getJobRolesPublic } from "../utils/apiClient";
 
 /**
  * Render home page
@@ -87,7 +87,7 @@ export async function getJobDetailPage(
 			console.error("❌ PageController: Error fetching job:", {
 				error: result.error,
 				status: result.status,
-				jobId: jobId
+				jobId: jobId,
 			});
 			return res.redirect("/error");
 		}

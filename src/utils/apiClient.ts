@@ -122,19 +122,21 @@ export async function getJobRolesPublic() {
  */
 export async function getJobRoleById(id: number) {
 	try {
-		console.log(`🔍 Frontend: Fetching job role with ID ${id} from: ${API_BASE_URL}/api/job-roles/${id}`);
+		console.log(
+			`🔍 Frontend: Fetching job role with ID ${id} from: ${API_BASE_URL}/api/job-roles/${id}`,
+		);
 		const response = await apiClient.get(`/api/job-roles/${id}`);
-		console.log('✅ Frontend: Successfully fetched job role:', response.data);
+		console.log("✅ Frontend: Successfully fetched job role:", response.data);
 		return {
 			success: true,
 			data: response.data,
 		};
 	} catch (error) {
 		const axiosError = error as AxiosError<{ message?: string }>;
-		console.error('❌ Frontend: Error fetching job role:', {
+		console.error("❌ Frontend: Error fetching job role:", {
 			status: axiosError.response?.status,
 			message: axiosError.response?.data?.message || axiosError.message,
-			url: `${API_BASE_URL}/api/job-roles/${id}`
+			url: `${API_BASE_URL}/api/job-roles/${id}`,
 		});
 		return {
 			success: false,
