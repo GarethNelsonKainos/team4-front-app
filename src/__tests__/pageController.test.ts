@@ -260,6 +260,7 @@ describe("PageController", () => {
 
 			expect(mockResponse.render).toHaveBeenCalledWith("pages/login.njk", {
 				title: "Login - Kainos",
+				currentPage: "login",
 			});
 		});
 
@@ -290,6 +291,7 @@ describe("PageController", () => {
 
 			expect(mockResponse.render).toHaveBeenCalledWith("pages/register.njk", {
 				title: "Register - Kainos",
+				currentPage: "login",
 			});
 		});
 
