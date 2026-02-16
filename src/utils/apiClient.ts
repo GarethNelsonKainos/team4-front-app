@@ -115,4 +115,25 @@ export async function getJobRolesPublic() {
 	}
 }
 
+/**
+ * Get feature flags from backend
+ * @returns Promise with feature flags object
+ */
+export async function getFeatureFlags() {
+	try {
+		const response = await apiClient.get("/api/feature-flags");
+		return {
+			success: true,
+			data: response.data,
+		};
+	} catch (error) {
+		const axiosError = error as AxiosError<{ message?: string }>;
+		return {
+			success: false,
+			error: axiosError.response?.data?.message || "Failed to fetch feature flags",
+			status: axiosError.response?.status,
+		};
+	}
+}
+
 export default apiClient;
