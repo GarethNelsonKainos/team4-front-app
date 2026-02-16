@@ -5,6 +5,7 @@ import express from "express";
 import nunjucks from "nunjucks";
 import * as authController from "./controllers/authController";
 import * as pageController from "./controllers/pageController";
+import { authMiddleware } from "./utils/auth";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static("public"));
+app.use(authMiddleware);
 
 app.get("/", (_req: Request, res: Response, _next: NextFunction) => {
 	try {

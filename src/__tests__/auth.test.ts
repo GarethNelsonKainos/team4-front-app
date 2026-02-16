@@ -152,8 +152,8 @@ describe("Auth Utils", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
-			expect(mockNext).not.toHaveBeenCalled();
+			expect((mockRequest as AuthRequest).user?.isAuthenticated).toBe(false);
+			expect(mockNext).toHaveBeenCalled();
 		});
 
 		it("should redirect to login when auth token is undefined", () => {
@@ -165,8 +165,8 @@ describe("Auth Utils", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
-			expect(mockNext).not.toHaveBeenCalled();
+			expect((mockRequest as AuthRequest).user?.isAuthenticated).toBe(false);
+			expect(mockNext).toHaveBeenCalled();
 		});
 
 		it("should redirect to login when auth token is empty string", () => {
@@ -178,8 +178,8 @@ describe("Auth Utils", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
-			expect(mockNext).not.toHaveBeenCalled();
+			expect((mockRequest as AuthRequest).user?.isAuthenticated).toBe(false);
+			expect(mockNext).toHaveBeenCalled();
 		});
 	});
 });

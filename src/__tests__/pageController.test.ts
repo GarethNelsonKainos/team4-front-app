@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as pageController from "../controllers/pageController.js";
 import { jobRoles } from "../data/mockData.js";
+import type { AuthRequest } from "../utils/auth.js";
 
 // Mock the apiClient module
 vi.mock("../utils/apiClient.js");
@@ -33,7 +34,15 @@ describe("PageController", () => {
 	beforeEach(async () => {
 		mockRequest = {
 			params: {},
+		} as AuthRequest;
+
+		// Add user info to mock request
+		(mockRequest as AuthRequest).user = {
+			email: "test@example.com",
+			role: "applicant",
+			isAuthenticated: true,
 		};
+
 		mockResponse = {
 			render: vi.fn(),
 			redirect: vi.fn(),
@@ -44,7 +53,9 @@ describe("PageController", () => {
 		vi.clearAllMocks();
 
 		// Setup the mock for getJobRolesPublic
-		const { getJobRolesPublic } = await import("../utils/apiClient.js");
+		const { getJobRolesPublic } = await import(
+			"../utils/apiClient.js"
+		);
 		vi.mocked(getJobRolesPublic).mockResolvedValue({
 			success: true,
 			data: jobRoles.map((job) => ({
@@ -66,6 +77,11 @@ describe("PageController", () => {
 				title: "Kainos Job Roles",
 				heading: "Kainos Job Opportunities",
 				message: "Find your dream job with us!",
+				currentPage: "home",
+				user: expect.objectContaining({
+					isAuthenticated: true,
+					role: "applicant",
+				}),
 			});
 		});
 
@@ -126,6 +142,9 @@ describe("PageController", () => {
 					openJobs.map((job) => expect.objectContaining({ id: job.id })),
 				),
 				currentPage: "jobs",
+				user: expect.objectContaining({
+					isAuthenticated: true,
+				}),
 			});
 		});
 
@@ -182,6 +201,10 @@ describe("PageController", () => {
 					title: `${job?.roleName} - Kainos`,
 					heading: "Kainos Job Opportunities",
 					job: expect.objectContaining({ id: job?.id }),
+					currentPage: "jobs",
+					user: expect.objectContaining({
+						isAuthenticated: true,
+					}),
 				}),
 			);
 		});
@@ -203,6 +226,10 @@ describe("PageController", () => {
 					title: `${job?.roleName} - Kainos`,
 					heading: "Kainos Job Opportunities",
 					job: expect.objectContaining({ id: job?.id }),
+					currentPage: "jobs",
+					user: expect.objectContaining({
+						isAuthenticated: true,
+					}),
 				}),
 			);
 		});
@@ -260,6 +287,10 @@ describe("PageController", () => {
 
 			expect(mockResponse.render).toHaveBeenCalledWith("pages/login.njk", {
 				title: "Login - Kainos",
+				currentPage: "login",
+				user: expect.objectContaining({
+					isAuthenticated: true,
+				}),
 			});
 		});
 
@@ -290,6 +321,10 @@ describe("PageController", () => {
 
 			expect(mockResponse.render).toHaveBeenCalledWith("pages/register.njk", {
 				title: "Register - Kainos",
+				currentPage: "register",
+				user: expect.objectContaining({
+					isAuthenticated: true,
+				}),
 			});
 		});
 
@@ -321,6 +356,9 @@ describe("PageController", () => {
 			expect(mockResponse.status).toHaveBeenCalledWith(500);
 			expect(mockResponse.render).toHaveBeenCalledWith("pages/error.njk", {
 				title: "Error - Kainos",
+			user: expect.objectContaining({
+					isAuthenticated: true,
+				}),
 			});
 		});
 
@@ -357,6 +395,9 @@ describe("PageController", () => {
 				"pages/login-failed.njk",
 				{
 					title: "Login Failed - Kainos",
+					user: expect.objectContaining({
+						isAuthenticated: true,
+					}),
 				},
 			);
 		});
@@ -391,6 +432,9 @@ describe("PageController", () => {
 				"pages/register-failed.njk",
 				{
 					title: "Registration Failed - Kainos",
+					user: expect.objectContaining({
+						isAuthenticated: true,
+					}),
 				},
 			);
 		});

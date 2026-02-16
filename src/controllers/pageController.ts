@@ -1,15 +1,19 @@
 import type { NextFunction, Request, Response } from "express";
 import { getJobRolesPublic } from "../utils/apiClient";
+import type { AuthRequest } from "../utils/auth";
 
 /**
  * Render home page
  */
-export function getHomePage(_req: Request, res: Response, _next: NextFunction) {
+export function getHomePage(req: Request, res: Response, _next: NextFunction) {
 	try {
+		const authReq = req as AuthRequest;
 		res.render("pages/home.njk", {
 			title: "Kainos Job Roles",
 			heading: "Kainos Job Opportunities",
 			message: "Find your dream job with us!",
+			currentPage: "home",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -22,11 +26,15 @@ export function getHomePage(_req: Request, res: Response, _next: NextFunction) {
  * Render jobs listing page - shows only open positions
  */
 export async function getJobsPage(
-	_req: Request,
+	req: Request,
 	res: Response,
 	_next: NextFunction,
 ) {
 	try {
+
+		// Get user info
+		const authReq = req as AuthRequest;
+
 		// Fetch jobs from API
 		const result = await getJobRolesPublic();
 
@@ -49,6 +57,8 @@ export async function getJobsPage(
 			heading: "Kainos Job Opportunities",
 			jobRoles: openJobRoles,
 			currentPage: "jobs",
+
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -77,6 +87,9 @@ export async function getJobDetailPage(
 			return res.redirect("/error");
 		}
 
+		// Get user info
+		const authReq = req as AuthRequest;
+
 		// Fetch jobs from API and find job by ID using array.find() method
 		const result = await getJobRolesPublic();
 
@@ -99,6 +112,7 @@ export async function getJobDetailPage(
 			heading: "Kainos Job Opportunities",
 			job: job,
 			currentPage: "jobs",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -111,13 +125,16 @@ export async function getJobDetailPage(
  * Render login page
  */
 export function getLoginPage(
-	_req: Request,
+	req: Request,
 	res: Response,
 	_next: NextFunction,
 ) {
 	try {
+		const authReq = req as AuthRequest;
 		res.render("pages/login.njk", {
 			title: "Login - Kainos",
+			currentPage: "login",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -130,13 +147,16 @@ export function getLoginPage(
  * Render register page
  */
 export function getRegisterPage(
-	_req: Request,
+	req: Request,
 	res: Response,
 	_next: NextFunction,
 ) {
 	try {
+		const authReq = req as AuthRequest;
 		res.render("pages/register.njk", {
 			title: "Register - Kainos",
+			currentPage: "register",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -149,13 +169,15 @@ export function getRegisterPage(
  * Render generic error page
  */
 export function getErrorPage(
-	_req: Request,
+	req: Request,
 	res: Response,
 	_next: NextFunction,
 ) {
 	try {
+		const authReq = req as AuthRequest;
 		res.status(500).render("pages/error.njk", {
 			title: "Error - Kainos",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Fallback if even error page fails
@@ -170,13 +192,15 @@ export function getErrorPage(
  * Render login failed page
  */
 export function getLoginFailedPage(
-	_req: Request,
+	req: Request,
 	res: Response,
 	_next: NextFunction,
 ) {
 	try {
+		const authReq = req as AuthRequest;
 		res.status(401).render("pages/login-failed.njk", {
 			title: "Login Failed - Kainos",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Fallback to generic error page
@@ -189,13 +213,15 @@ export function getLoginFailedPage(
  * Render register failed page
  */
 export function getRegisterFailedPage(
-	_req: Request,
+	req: Request,
 	res: Response,
 	_next: NextFunction,
 ) {
 	try {
+		const authReq = req as AuthRequest;
 		res.status(400).render("pages/register-failed.njk", {
 			title: "Registration Failed - Kainos",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Fallback to generic error page
