@@ -115,4 +115,33 @@ export async function getJobRolesPublic() {
 	}
 }
 
+/**
+ * Get a specific job role by ID (public endpoint - no authentication required)
+ * @param id - Job role ID
+ * @returns Promise with job role data
+ */
+export async function getJobRoleById(id: number) {
+	try {
+		console.log(`🔍 Frontend: Fetching job role with ID ${id} from: ${API_BASE_URL}/api/job-roles/${id}`);
+		const response = await apiClient.get(`/api/job-roles/${id}`);
+		console.log('✅ Frontend: Successfully fetched job role:', response.data);
+		return {
+			success: true,
+			data: response.data,
+		};
+	} catch (error) {
+		const axiosError = error as AxiosError<{ message?: string }>;
+		console.error('❌ Frontend: Error fetching job role:', {
+			status: axiosError.response?.status,
+			message: axiosError.response?.data?.message || axiosError.message,
+			url: `${API_BASE_URL}/api/job-roles/${id}`
+		});
+		return {
+			success: false,
+			error: axiosError.response?.data?.message || "Failed to fetch job role",
+			status: axiosError.response?.status,
+		};
+	}
+}
+
 export default apiClient;
