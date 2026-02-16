@@ -165,4 +165,3 @@ export function getErrorPage(
 			.send("An unexpected error occurred. Please try again later.");
 	}
 }
-

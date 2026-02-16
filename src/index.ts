@@ -65,12 +65,6 @@ app.get("/register", pageController.getRegisterPage);
 // Error page route
 app.get("/error", pageController.getErrorPage);
 
-// Login failed page route
-app.get("/login-failed", pageController.getLoginFailedPage);
-
-// Register failed page route
-app.get("/register-failed", pageController.getRegisterFailedPage);
-
 // API Routes
 app.post("/api/login", authController.login);
 app.post("/api/register", authController.register);
