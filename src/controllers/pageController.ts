@@ -118,6 +118,7 @@ export function getLoginPage(
 	try {
 		res.render("pages/login.njk", {
 			title: "Login - Kainos",
+			currentPage: "login",
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -137,6 +138,7 @@ export function getRegisterPage(
 	try {
 		res.render("pages/register.njk", {
 			title: "Register - Kainos",
+			currentPage: "login",
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
