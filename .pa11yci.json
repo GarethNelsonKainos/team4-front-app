@@ -15,9 +15,52 @@
     }
   },
   "urls": [
-    "http://localhost:3000",
-    "http://localhost:3000/jobs",
+    {
+      "url": "http://localhost:3000#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
+    {
+      "url": "http://localhost:3000/jobs#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/jobs#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
+    {
+      "url": "http://localhost:3000/job-roles/1#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/job-roles/1#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
     "http://localhost:3000/login",
-    "http://localhost:3000/register"
+    "http://localhost:3000/register",
+    "http://localhost:3000/error",
+    "http://localhost:3000/login-failed",
+    "http://localhost:3000/register-failed"
   ]
 }
