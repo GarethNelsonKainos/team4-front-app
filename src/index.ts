@@ -76,8 +76,16 @@ app.get("/register-failed", pageController.getRegisterFailedPage);
 // Admin Routes (require admin role)
 app.get("/admin", requireAdmin, pageController.getAdminDashboard);
 app.get("/admin/jobs", requireAdmin, pageController.getAdminJobsPage);
-app.get("/admin/create-job", requireAdmin, pageController.getAdminCreateJobPage);
-app.get("/admin/create-admin", requireAdmin, pageController.getAdminCreateAdminPage);
+app.get(
+	"/admin/create-job",
+	requireAdmin,
+	pageController.getAdminCreateJobPage,
+);
+app.get(
+	"/admin/create-admin",
+	requireAdmin,
+	pageController.getAdminCreateAdminPage,
+);
 
 // API Routes
 app.post("/api/login", authController.login);

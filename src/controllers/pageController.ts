@@ -1,19 +1,27 @@
 import type { NextFunction, Request, Response } from "express";
 import { getJobRolesPublic } from "../utils/apiClient";
 import type { AuthRequest } from "../utils/auth";
+import { features } from "node:process";
+
+const showAdminFeatures = process.env.FEATURE_ADMIN_DASHBOARD === "true";
 
 /**
  * Render home page
  */
 export function getHomePage(req: Request, res: Response, _next: NextFunction) {
+
 	try {
 		const authReq = req as AuthRequest;
+
 		res.render("pages/home.njk", {
 			title: "Kainos Job Roles",
 			heading: "Kainos Job Opportunities",
 			message: "Find your dream job with us!",
 			currentPage: "home",
 			user: authReq.user,
+			features: {
+				adminDashboard: showAdminFeatures,
+			},
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -58,6 +66,9 @@ export async function getJobsPage(
 			currentPage: "jobs",
 
 			user: authReq.user,
+			features: {
+				adminDashboard: showAdminFeatures,
+			},
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -112,6 +123,9 @@ export async function getJobDetailPage(
 			job: job,
 			currentPage: "jobs",
 			user: authReq.user,
+			features: {
+				adminDashboard: showAdminFeatures,
+			},
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
