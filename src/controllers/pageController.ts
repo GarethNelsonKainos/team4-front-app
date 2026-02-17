@@ -1,16 +1,27 @@
 import type { NextFunction, Request, Response } from "express";
-import { getJobRolesPublic, getJobRoleById } from "../utils/apiClient";
+import { getJobRolesPublic, getJobRole } from "../utils/apiClient";
+import type { AuthRequest } from "../utils/auth";
+
+const showAdminFeatures = process.env.FEATURE_ADMIN_DASHBOARD === "true";
 import { features } from "node:process";
 
 /**
  * Render home page
  */
-export function getHomePage(_req: Request, res: Response, _next: NextFunction) {
+export function getHomePage(req: Request, res: Response, _next: NextFunction) {
+
 	try {
+		const authReq = req as AuthRequest;
+
 		res.render("pages/home.njk", {
 			title: "Kainos Job Roles",
 			heading: "Kainos Job Opportunities",
 			message: "Find your dream job with us!",
+			currentPage: "home",
+			user: authReq.user,
+			features: {
+				adminDashboard: showAdminFeatures,
+			},
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -23,11 +34,14 @@ export function getHomePage(_req: Request, res: Response, _next: NextFunction) {
  * Render jobs listing page - shows only open positions
  */
 export async function getJobsPage(
-	_req: Request,
+	req: Request,
 	res: Response,
 	_next: NextFunction,
 ) {
 	try {
+		// Get user info
+		const authReq = req as AuthRequest;
+
 		// Check feature flag from environment variable
 		const showJobDetail = process.env.FEATURE_JOB_DETAIL_VIEW === "true";
 
@@ -53,7 +67,10 @@ export async function getJobsPage(
 			heading: "Kainos Job Opportunities",
 			jobRoles: openJobRoles,
 			currentPage: "jobs",
+
+			user: authReq.user,
 			features: {
+				adminDashboard: showAdminFeatures,
 				jobDetailView: showJobDetail,
 			},
 		});
@@ -86,10 +103,12 @@ export async function getJobDetailPage(
 			return res.redirect("/error");
 		}
 
+		// Get user info
+		const authReq = req as AuthRequest;
 		console.log(`🔍 PageController: Fetching job role with ID ${jobId}`);
 
-		// Fetch specific job role by ID using the new API endpoint
-		const result = await getJobRoleById(jobId);
+		// Fetch specific job from API
+		const result = await getJobRole(jobId);
 
 		if (!result.success) {
 			console.error("❌ PageController: Error fetching job:", {
@@ -113,7 +132,9 @@ export async function getJobDetailPage(
 			heading: "Kainos Job Opportunities",
 			job: job,
 			currentPage: "jobs",
+			user: authReq.user,
 			features: {
+				adminDashboard: showAdminFeatures,
 				jobApplyView: jobApplyView,
 			},
 		});
@@ -127,14 +148,13 @@ export async function getJobDetailPage(
 /**
  * Render login page
  */
-export function getLoginPage(
-	_req: Request,
-	res: Response,
-	_next: NextFunction,
-) {
+export function getLoginPage(req: Request, res: Response, _next: NextFunction) {
 	try {
+		const authReq = req as AuthRequest;
 		res.render("pages/login.njk", {
 			title: "Login - Kainos",
+			currentPage: "login",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -147,13 +167,16 @@ export function getLoginPage(
  * Render register page
  */
 export function getRegisterPage(
-	_req: Request,
+	req: Request,
 	res: Response,
 	_next: NextFunction,
 ) {
 	try {
+		const authReq = req as AuthRequest;
 		res.render("pages/register.njk", {
 			title: "Register - Kainos",
+			currentPage: "register",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Production: log error privately, redirect to generic error page
@@ -165,14 +188,12 @@ export function getRegisterPage(
 /**
  * Render generic error page
  */
-export function getErrorPage(
-	_req: Request,
-	res: Response,
-	_next: NextFunction,
-) {
+export function getErrorPage(req: Request, res: Response, _next: NextFunction) {
 	try {
+		const authReq = req as AuthRequest;
 		res.status(500).render("pages/error.njk", {
 			title: "Error - Kainos",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Fallback if even error page fails
@@ -187,13 +208,15 @@ export function getErrorPage(
  * Render login failed page
  */
 export function getLoginFailedPage(
-	_req: Request,
+	req: Request,
 	res: Response,
 	_next: NextFunction,
 ) {
 	try {
+		const authReq = req as AuthRequest;
 		res.status(401).render("pages/login-failed.njk", {
 			title: "Login Failed - Kainos",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Fallback to generic error page
@@ -206,17 +229,118 @@ export function getLoginFailedPage(
  * Render register failed page
  */
 export function getRegisterFailedPage(
-	_req: Request,
+	req: Request,
 	res: Response,
 	_next: NextFunction,
 ) {
 	try {
+		const authReq = req as AuthRequest;
 		res.status(400).render("pages/register-failed.njk", {
 			title: "Registration Failed - Kainos",
+			user: authReq.user,
 		});
 	} catch (error) {
 		// Fallback to generic error page
 		console.error("Error rendering register failed page:", error);
+		res.redirect("/error");
+	}
+}
+
+/**
+ * Render admin dashboard page
+ */
+export function getAdminDashboard(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+		res.render("pages/admin-dashboard.njk", {
+			title: "Admin Dashboard - Kainos",
+			currentPage: "admin",
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering admin dashboard:", error);
+		res.redirect("/error");
+	}
+}
+
+/**
+ * Render admin jobs management page - list all jobs for editing/deleting
+ */
+export async function getAdminJobsPage(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+
+		// Fetch all jobs from API
+		const result = await getJobRolesPublic();
+
+		if (!result.success) {
+			console.error(
+				"Error fetching jobs:",
+				result.error,
+				"Status:",
+				result.status,
+			);
+			return res.redirect("/error");
+		}
+
+		res.render("pages/admin-jobs.njk", {
+			title: "Manage Job Listings - Kainos",
+			currentPage: "admin",
+			jobRoles: result.data,
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering admin jobs page:", error);
+		res.redirect("/error");
+	}
+}
+
+/**
+ * Render create new job page
+ */
+export function getAdminCreateJobPage(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+		res.render("pages/admin-create-job.njk", {
+			title: "Create New Job - Kainos",
+			currentPage: "admin",
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering create job page:", error);
+		res.redirect("/error");
+	}
+}
+
+/**
+ * Render create new admin account page
+ */
+export function getAdminCreateAdminPage(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+		res.render("pages/admin-create-admin.njk", {
+			title: "Create Admin Account - Kainos",
+			currentPage: "admin",
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering create admin page:", error);
 		res.redirect("/error");
 	}
 }

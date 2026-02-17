@@ -35,10 +35,7 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 		setAuthCookie(result.data.token, res);
 
 		// Redirect to jobs page on successful login
-		res.json({
-			success: true,
-			redirectUrl: "/jobs",
-		});
+		res.redirect("/job-roles");
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
 		console.error("Login error:", error);
@@ -111,12 +108,10 @@ export async function register(
 		// Set secure HTTP-only cookie with the token if provided
 		if (result.data.token) {
 			setAuthCookie(result.data.token, res);
+			res.redirect("/jobs");
+		} else {
+			res.redirect("/login");
 		}
-
-		res.json({
-			success: true,
-			redirectUrl: result.data.token ? "/jobs" : "/login",
-		});
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
 		console.error("Registration error:", error);
@@ -133,14 +128,11 @@ export async function register(
 export function logout(_req: Request, res: Response, _next: NextFunction) {
 	try {
 		clearAuthCookie(res);
-		res.json({ success: true, redirectUrl: "/" });
+		res.redirect("/");
 	} catch (error) {
 		// Production: log error privately, show generic error page to user
 		console.error("Logout error:", error);
-		res.json({
-			success: false,
-			redirectUrl: "/error",
-		});
+		res.redirect("/error");
 	}
 }
 

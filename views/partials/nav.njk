@@ -11,7 +11,22 @@
                 <li><a href="/jobs" class="{% if currentPage == 'jobs' %}bg-green-600 text-white hover:bg-green-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-2 rounded-md">Jobs</a></li>
                 <li><a href="/about" class="{% if currentPage == 'about' %}bg-green-600 text-white hover:bg-green-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-2 rounded-md">About</a></li>
                 <li><a href="/contact" class="{% if currentPage == 'contact' %}bg-green-600 text-white hover:bg-green-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-2 rounded-md">Contact</a></li>
+                {% if user and user.isAuthenticated %}
+                {% if user.role === "admin" %}
+                <li><a href="/admin" class="{% if currentPage == 'admin' %}bg-purple-600 text-white hover:bg-purple-700{% else %}text-gray-600 hover:text-purple-600 hover:bg-purple-50{% endif %} transition-colors font-medium px-3 py-2 rounded-md">Admin</a></li>
+                {% endif %}
+                <li class="flex items-center gap-3">
+                    <span class="text-gray-700 font-medium">{{ user.email }}</span>
+                    {% if user.role === "admin" %}
+                    <span class="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-1 rounded">ADMIN</span>
+                    {% endif %}
+                    <form action="/api/logout" method="post" class="inline">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">Logout</button>
+                    </form>
+                </li>
+                {% else %}
                 <li><a href="/login" class="{% if currentPage == 'login' %}bg-green-600 text-white hover:bg-green-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} focus:ring-4 focus:ring-green-200 font-medium px-4 py-2 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">Login</a></li>
+                {% endif %}
             </ul>
 
             <!-- Mobile Menu Button -->
@@ -36,7 +51,24 @@
                 <li><a href="/jobs" class="block {% if currentPage == 'jobs' %}bg-green-600 text-white hover:bg-green-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-3 rounded-md">Jobs</a></li>
                 <li><a href="/about" class="block {% if currentPage == 'about' %}bg-green-600 text-white hover:bg-green-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-3 rounded-md">About</a></li>
                 <li><a href="/contact" class="block {% if currentPage == 'contact' %}bg-green-600 text-white hover:bg-green-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-3 rounded-md">Contact</a></li>
+                {% if user and user.isAuthenticated %}
+                {% if user.role === "admin" %}
+                <li><a href="/admin" class="block {% if currentPage == 'admin' %}bg-purple-600 text-white hover:bg-purple-700{% else %}text-gray-600 hover:text-purple-600 hover:bg-purple-50{% endif %} transition-colors font-medium px-3 py-3 rounded-md">Admin</a></li>
+                {% endif %}
+                <li class="pt-2 border-t border-blue-100">
+                    <div class="text-gray-700 font-medium px-3 py-3">{{ user.email }}</div>
+                    {% if user.role === "admin" %}
+                    <div class="bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-2 rounded inline-block mx-3">ADMIN</div>
+                    {% endif %}
+                </li>
+                <li>
+                    <form action="/api/logout" method="post">
+                        <button type="submit" class="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-3 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">Logout</button>
+                    </form>
+                </li>
+                {% else %}
                 <li class="pt-2"><a href="/login" class="block text-center {% if currentPage == 'login' %}bg-green-600 hover:bg-green-700 text-white{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} focus:ring-4 focus:ring-green-200 font-medium px-4 py-3 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">Login</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>

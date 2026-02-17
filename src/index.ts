@@ -5,6 +5,7 @@ import express from "express";
 import nunjucks from "nunjucks";
 import * as authController from "./controllers/authController";
 import * as pageController from "./controllers/pageController";
+import { authMiddleware, requireAdmin } from "./utils/auth";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -25,39 +26,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static("public"));
+app.use(authMiddleware);
 
-app.get("/", (_req: Request, res: Response, _next: NextFunction) => {
-	try {
-		res.render("pages/home.njk", {
-			title: "Kainos Job Roles",
-			heading: "Kainos Job Opportunities",
-			message: "Find your dream job with us!",
-			currentPage: "home",
-		});
-	} catch (error) {
-		console.error("Error rendering template:", error);
-		res.status(500).send("Error rendering template");
-	}
-});
+app.get("/", pageController.getHomePage);
 
 // Jobs listing route - shows only open positions
-app.get("/jobs", pageController.getJobsPage);
+app.get("/job-roles", pageController.getJobsPage);
 
 // Job detail route - :id is a route parameter (e.g. /job-roles/123)
 app.get("/job-roles/:id", pageController.getJobDetailPage);
 
 // Login page route
-app.get("/login", (_req: Request, res: Response, _next: NextFunction) => {
-	try {
-		res.render("pages/login.njk", {
-			title: "Login - Kainos",
-			currentPage: "login",
-		});
-	} catch (error) {
-		console.error("Error rendering login template:", error);
-		res.status(500).send("Error rendering login template");
-	}
-});
+app.get("/login", pageController.getLoginPage);
 
 // Register page route
 app.get("/register", pageController.getRegisterPage);
@@ -65,16 +45,21 @@ app.get("/register", pageController.getRegisterPage);
 // Error page route
 app.get("/error", pageController.getErrorPage);
 
-// Login failed page route
-app.get("/login-failed", pageController.getLoginFailedPage);
-
-// Register failed page route
-app.get("/register-failed", pageController.getRegisterFailedPage);
+// Admin routes
+app.get("/admin", requireAdmin, pageController.getAdminDashboard);
+app.get("/admin/jobs", requireAdmin, pageController.getAdminJobsPage);
+app.get("/admin/create-job", requireAdmin, pageController.getAdminCreateJobPage);
+app.get(
+	"/admin/create-admin",
+	requireAdmin,
+	pageController.getAdminCreateAdminPage,
+);
 
 // API Routes
 app.post("/api/login", authController.login);
 app.post("/api/register", authController.register);
 app.post("/api/logout", authController.logout);
+app.get("/api/logout", authController.logout);
 app.get("/api/auth-status", authController.checkAuthStatus);
 
 export { app };
