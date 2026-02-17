@@ -4,10 +4,23 @@
     <div class="max-w-6xl mx-auto">
         <!-- Hero Section -->
         <div class="text-center mb-8 md:mb-16 bg-blue-50 rounded-3xl p-6 md:p-12 shadow-2xl border-4 border-green-600">
+            {% if user and user.isAuthenticated %}
+            <h1 class="text-4xl md:text-6xl font-bold text-blue-800 mb-6 leading-tight drop-shadow-lg">
+                Welcome Back!
+            </h1>
+            <p class="text-lg md:text-xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
+                {% if user.role === "admin" %}
+                You have admin access. Manage job postings and view applicants.
+                {% else %}
+                Ready to find your next opportunity? Browse our open positions.
+                {% endif %}
+            </p>
+            {% else %}
             <h1 class="text-4xl md:text-6xl font-bold text-blue-900 mb-6 leading-tight drop-shadow-lg">
                 Welcome to Kainos
             </h1>
             <p class="text-xl md:text-2xl text-gray-900 mb-8 max-w-3xl mx-auto leading-relaxed font-semibold">{{ message }}</p>
+            {% endif %}
         
             <!-- Primary CTA for Job Opportunities -->
             <div class="mb-8">
@@ -24,6 +37,11 @@
             
             <!-- Secondary CTA -->
             <div class="flex justify-center gap-4">
+                {% if not user or not user.isAuthenticated %}
+                <a href="/register" class="bg-white hover:bg-blue-600 text-blue-600 hover:text-white font-semibold py-3 px-6 md:px-8 rounded-full border-2 border-blue-200 hover:border-blue-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                    Create Account
+                </a>
+                {% endif %}
                 <a href="/about" class="bg-white hover:bg-blue-600 text-blue-600 hover:text-white font-semibold py-3 px-6 md:px-8 rounded-full transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 text-base">
                     About Kainos
                 </a>

@@ -1,10 +1,16 @@
 import type { NextFunction, Request, Response } from "express";
+import { getUserEmail, getUserRole, isTokenExpired } from "./jwtDecoder";
 
 /**
- * Extended Request interface with authentication token
+ * Extended Request interface with authentication token and user info
  */
 export interface AuthRequest extends Request {
 	authToken?: string;
+	user?: {
+		email: string | null;
+		role: "admin" | "applicant" | null;
+		isAuthenticated: boolean;
+	};
 }
 
 /**
@@ -21,8 +27,8 @@ export function setAuthCookie(token: string, res: Response) {
 }
 
 /**
- * Middleware to check if user is authenticated
- * Verifies the presence of authToken cookie
+ * Middleware to check if user is authenticated and extract user info
+ * Verifies the presence of authToken cookie and decodes it
  */
 export function authMiddleware(
 	req: Request,
@@ -32,11 +38,73 @@ export function authMiddleware(
 	const token = req.cookies.authToken;
 
 	if (!token) {
-		return res.redirect("/login");
+		// Set empty user info for unauthenticated requests
+		(req as AuthRequest).user = {
+			email: null,
+			role: null,
+			isAuthenticated: false,
+		};
+		return next();
 	}
 
-	// Store token in request for use in route handlers
+	// Check if token is expired
+	if (isTokenExpired(token)) {
+		clearAuthCookie(res);
+		(req as AuthRequest).user = {
+			email: null,
+			role: null,
+			isAuthenticated: false,
+		};
+		return next();
+	}
+
+	// Store token and extracted user info in request
+	const email = getUserEmail(token);
+	const role = getUserRole(token);
 	(req as AuthRequest).authToken = token;
+	(req as AuthRequest).user = {
+		email: email,
+		role: role,
+		isAuthenticated: true,
+	};
+
+	console.log("🔑 Auth middleware result:", {
+		email,
+		role,
+		isAuthenticated: true,
+	});
+
+	next();
+}
+
+/**
+ * Middleware to require authentication
+ * Redirects to login if not authenticated
+ */
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+	const authReq = req as AuthRequest;
+	if (!authReq.user?.isAuthenticated) {
+		return res.redirect("/login");
+	}
+	next();
+}
+
+/**
+ * Middleware to require admin role
+ * Redirects to error page if not admin
+ */
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+	const authReq = req as AuthRequest;
+	console.log("🔐 requireAdmin check:", {
+		isAuthenticated: authReq.user?.isAuthenticated,
+		role: authReq.user?.role,
+		fullUser: authReq.user,
+	});
+	if (!authReq.user?.isAuthenticated || authReq.user?.role !== "admin") {
+		console.log("❌ Admin check failed, redirecting to /error");
+		return res.redirect("/error");
+	}
+	console.log("✅ Admin check passed");
 	next();
 }
 
