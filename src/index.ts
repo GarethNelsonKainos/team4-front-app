@@ -1,6 +1,5 @@
 import "dotenv/config";
 import cookieParser from "cookie-parser";
-import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import nunjucks from "nunjucks";
 import * as authController from "./controllers/authController";
@@ -33,6 +32,9 @@ app.get("/", pageController.getHomePage);
 // Jobs listing route - shows only open positions
 app.get("/job-roles", pageController.getJobsPage);
 
+// Alias for /job-roles
+app.get("/jobs", pageController.getJobsPage);
+
 // Job detail route - :id is a route parameter (e.g. /job-roles/123)
 app.get("/job-roles/:id", pageController.getJobDetailPage);
 
@@ -42,13 +44,23 @@ app.get("/login", pageController.getLoginPage);
 // Register page route
 app.get("/register", pageController.getRegisterPage);
 
+// Login failed page route
+app.get("/login-failed", pageController.getLoginFailedPage);
+
+// Register failed page route
+app.get("/register-failed", pageController.getRegisterFailedPage);
+
 // Error page route
 app.get("/error", pageController.getErrorPage);
 
 // Admin routes
 app.get("/admin", requireAdmin, pageController.getAdminDashboard);
 app.get("/admin/jobs", requireAdmin, pageController.getAdminJobsPage);
-app.get("/admin/create-job", requireAdmin, pageController.getAdminCreateJobPage);
+app.get(
+	"/admin/create-job",
+	requireAdmin,
+	pageController.getAdminCreateJobPage,
+);
 app.get(
 	"/admin/create-admin",
 	requireAdmin,

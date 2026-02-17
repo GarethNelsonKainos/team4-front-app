@@ -114,7 +114,10 @@ export async function getJobRole(id: number) {
  * @param token - JWT token for authentication
  * @returns Promise with created job role data
  */
-export async function createJobRole(jobRoleData: Record<string, unknown>, token: string) {
+export async function createJobRole(
+	jobRoleData: Record<string, unknown>,
+	token: string,
+) {
 	try {
 		const response = await apiClient.post("/api/job-roles", jobRoleData, {
 			headers: {
@@ -142,7 +145,11 @@ export async function createJobRole(jobRoleData: Record<string, unknown>, token:
  * @param token - JWT token for authentication
  * @returns Promise with updated job role data
  */
-export async function updateJobRole(id: number, jobRoleData: Record<string, unknown>, token: string) {
+export async function updateJobRole(
+	id: number,
+	jobRoleData: Record<string, unknown>,
+	token: string,
+) {
 	try {
 		const response = await apiClient.put(`/api/job-roles/${id}`, jobRoleData, {
 			headers: {

@@ -160,9 +160,9 @@ describe("PageController", () => {
 						openJobs.map((job) => expect.objectContaining({ id: job.id })),
 					),
 					currentPage: "jobs",
-				features: expect.objectContaining({
-					jobDetailView: true,
-				}),
+					features: expect.objectContaining({
+						jobDetailView: true,
+					}),
 					user: expect.objectContaining({
 						isAuthenticated: true,
 					}),

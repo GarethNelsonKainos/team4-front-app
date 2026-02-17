@@ -34,12 +34,15 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 		// This prevents XSS attacks - token is not accessible to JavaScript
 		setAuthCookie(result.data.token, res);
 
-		// Redirect to jobs page on successful login
-		res.redirect("/job-roles");
+		// Return success response with redirect URL for client-side handling
+		return res.json({
+			success: true,
+			redirectUrl: "/jobs",
+		});
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
 		console.error("Login error:", error);
-		res.json({
+		return res.json({
 			success: false,
 			message: "An error occurred. Please try again later",
 		});
@@ -108,14 +111,20 @@ export async function register(
 		// Set secure HTTP-only cookie with the token if provided
 		if (result.data.token) {
 			setAuthCookie(result.data.token, res);
-			res.redirect("/jobs");
+			return res.json({
+				success: true,
+				redirectUrl: "/jobs",
+			});
 		} else {
-			res.redirect("/login");
+			return res.json({
+				success: true,
+				redirectUrl: "/login",
+			});
 		}
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
 		console.error("Registration error:", error);
-		res.json({
+		return res.json({
 			success: false,
 			message: "An error occurred. Please try again later",
 		});
@@ -128,11 +137,17 @@ export async function register(
 export function logout(_req: Request, res: Response, _next: NextFunction) {
 	try {
 		clearAuthCookie(res);
-		res.redirect("/");
+		return res.json({
+			success: true,
+			redirectUrl: "/",
+		});
 	} catch (error) {
-		// Production: log error privately, show generic error page to user
+		// Production: log error privately, return error response
 		console.error("Logout error:", error);
-		res.redirect("/error");
+		return res.json({
+			success: false,
+			redirectUrl: "/error",
+		});
 	}
 }
 

@@ -47,7 +47,10 @@ export function decodeToken(token: string): DecodedToken | null {
  */
 export function getUserRole(token: string): "admin" | "applicant" | null {
 	const decoded = decodeToken(token);
-	console.log("🔍 Decoding JWT role:", { decoded, userRole: decoded?.userRole });
+	console.log("🔍 Decoding JWT role:", {
+		decoded,
+		userRole: decoded?.userRole,
+	});
 
 	if (!decoded || !decoded.userRole) {
 		console.log("⚠️ No userRole found in JWT");
@@ -57,7 +60,9 @@ export function getUserRole(token: string): "admin" | "applicant" | null {
 	if (typeof decoded.userRole === "string") {
 		const normalizedRole = decoded.userRole.toLowerCase();
 		if (normalizedRole === "admin" || normalizedRole === "applicant") {
-			console.log(`✅ Role normalized: "${decoded.userRole}" -> "${normalizedRole}"`);
+			console.log(
+				`✅ Role normalized: "${decoded.userRole}" -> "${normalizedRole}"`,
+			);
 			return normalizedRole;
 		}
 	}

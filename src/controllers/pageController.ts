@@ -1,15 +1,13 @@
 import type { NextFunction, Request, Response } from "express";
-import { getJobRolesPublic, getJobRole } from "../utils/apiClient";
+import { getJobRole, getJobRolesPublic } from "../utils/apiClient";
 import type { AuthRequest } from "../utils/auth";
 
 const showAdminFeatures = process.env.FEATURE_ADMIN_DASHBOARD === "true";
-import { features } from "node:process";
 
 /**
  * Render home page
  */
 export function getHomePage(req: Request, res: Response, _next: NextFunction) {
-
 	try {
 		const authReq = req as AuthRequest;
 
