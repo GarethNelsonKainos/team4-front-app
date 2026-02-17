@@ -1,0 +1,243 @@
+{% extends "layouts/base.njk" %}
+
+{% block content %}
+    <div class="max-w-2xl mx-auto py-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <a href="/admin" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold mb-4">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Create New Job</h1>
+            <p class="text-lg text-gray-600">Add a new job listing to your careers page</p>
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <form id="createJobForm" action="/api/job-roles" method="post" class="space-y-6">
+                <!-- Role Name -->
+                <div>
+                    <label for="roleName" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Role Name
+                    </label>
+                    <input type="text" 
+                           id="roleName" 
+                           name="roleName" 
+                           required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                           placeholder="e.g. Senior Software Engineer">
+                    <div id="roleNameError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <!-- Location -->
+                <div>
+                    <label for="location" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Location
+                    </label>
+                    <input type="text" 
+                           id="location" 
+                           name="location" 
+                           required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                           placeholder="e.g. London, UK">
+                    <div id="locationError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <!-- Capability -->
+                <div>
+                    <label for="capability" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Capability/Department
+                    </label>
+                    <input type="text" 
+                           id="capability" 
+                           name="capability" 
+                           required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                           placeholder="e.g. Engineering">
+                    <div id="capabilityError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <!-- Band -->
+                <div>
+                    <label for="band" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Band/Level
+                    </label>
+                    <input type="text" 
+                           id="band" 
+                           name="band" 
+                           required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                           placeholder="e.g. Band 5">
+                    <div id="bandError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Status
+                    </label>
+                    <select id="status" 
+                            name="status" 
+                            required 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="">Select Status</option>
+                        <option value="open">Open</option>
+                        <option value="closed">Closed</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                    <div id="statusError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <!-- Closing Date -->
+                <div>
+                    <label for="closingDate" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Closing Date
+                    </label>
+                    <input type="date" 
+                           id="closingDate" 
+                           name="closingDate" 
+                           required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    <div id="closingDateError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <!-- Number of Open Positions -->
+                <div>
+                    <label for="numberOfOpenPositions" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Number of Open Positions
+                    </label>
+                    <input type="number" 
+                           id="numberOfOpenPositions" 
+                           name="numberOfOpenPositions" 
+                           required 
+                           min="1"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                           placeholder="1">
+                    <div id="numberOfOpenPositionsError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Description
+                    </label>
+                    <textarea id="description" 
+                              name="description" 
+                              required 
+                              rows="5"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                              placeholder="Enter job description..."></textarea>
+                    <div id="descriptionError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <!-- Responsibilities (JSON Array) -->
+                <div>
+                    <label for="responsibilities" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Key Responsibilities (JSON format)
+                    </label>
+                    <textarea id="responsibilities" 
+                              name="responsibilities" 
+                              rows="4"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                              placeholder='["Lead development teams", "Design system architecture"]'></textarea>
+                    <p class="text-sm text-gray-500 mt-1">Enter as JSON array of strings</p>
+                    <div id="responsibilitiesError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <!-- Sharepoint URL -->
+                <div>
+                    <label for="sharepointUrl" class="block text-sm font-semibold text-gray-700 mb-2">
+                        SharePoint URL (optional)
+                    </label>
+                    <input type="url" 
+                           id="sharepointUrl" 
+                           name="sharepointUrl" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                           placeholder="https://example.sharepoint.com/...">
+                    <div id="sharepointUrlError" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex gap-4 pt-6">
+                    <button type="submit" 
+                            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                        Create Job
+                    </button>
+                    <a href="/admin/jobs" 
+                       class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-lg transition-colors text-center">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
+            <!-- Info Box -->
+            <div class="mt-8 bg-yellow-50 border-l-4 border-yellow-400 rounded p-4">
+                <p class="text-yellow-800 text-sm">
+                    <strong>Note:</strong> Enter responsibilities as a JSON array, e.g. <code class="bg-yellow-100 px-2 py-1 rounded text-xs">["Task 1", "Task 2"]</code>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('createJobForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Clear previous errors
+            document.querySelectorAll('[id$="Error"]').forEach(el => el.classList.add('hidden'));
+
+            try {
+                // Parse responsibilities if provided
+                const responsibilitiesInput = document.getElementById('responsibilities').value.trim();
+                let responsibilities = [];
+                if (responsibilitiesInput) {
+                    try {
+                        responsibilities = JSON.parse(responsibilitiesInput);
+                        if (!Array.isArray(responsibilities)) {
+                            throw new Error('Must be an array');
+                        }
+                    } catch {
+                        document.getElementById('responsibilitiesError').textContent = 'Invalid JSON format';
+                        document.getElementById('responsibilitiesError').classList.remove('hidden');
+                        return;
+                    }
+                }
+
+                const formData = {
+                    roleName: document.getElementById('roleName').value,
+                    location: document.getElementById('location').value,
+                    capability: document.getElementById('capability').value,
+                    band: document.getElementById('band').value,
+                    status: document.getElementById('status').value,
+                    closingDate: document.getElementById('closingDate').value,
+                    numberOfOpenPositions: parseInt(document.getElementById('numberOfOpenPositions').value),
+                    description: document.getElementById('description').value,
+                    responsibilities: responsibilities,
+                    sharepointUrl: document.getElementById('sharepointUrl').value || null
+                };
+
+                const response = await fetch('/api/job-roles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Job created successfully!');
+                    window.location.href = '/admin/jobs';
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.message || 'Failed to create job'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error creating job. Please try again.');
+            }
+        });
+    </script>
+{% endblock %}

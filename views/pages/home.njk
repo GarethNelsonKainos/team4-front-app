@@ -3,15 +3,28 @@
 {% block content %}
     <div class="max-w-6xl mx-auto">
         <!-- Hero Section -->
-        <div class="text-center mb-16 bg-gradient-to-br from-white via-blue-50 to-green-100 rounded-3xl p-12 shadow-2xl border-4 border-green-600">
+        <div class="text-center mb-8 md:mb-16 bg-blue-50 rounded-3xl p-6 md:p-12 shadow-2xl border-4 border-green-600">
+            {% if user and user.isAuthenticated %}
             <h1 class="text-4xl md:text-6xl font-bold text-blue-800 mb-6 leading-tight drop-shadow-lg">
+                Welcome Back!
+            </h1>
+            <p class="text-lg md:text-xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
+                {% if user.role === "admin" %}
+                You have admin access. Manage job postings and view applicants.
+                {% else %}
+                Ready to find your next opportunity? Browse our open positions.
+                {% endif %}
+            </p>
+            {% else %}
+            <h1 class="text-4xl md:text-6xl font-bold text-blue-900 mb-6 leading-tight drop-shadow-lg">
                 Welcome to Kainos
             </h1>
-            <p class="text-lg md:text-xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">{{ message }}</p>
+            <p class="text-xl md:text-2xl text-gray-900 mb-8 max-w-3xl mx-auto leading-relaxed font-semibold">{{ message }}</p>
+            {% endif %}
         
             <!-- Primary CTA for Job Opportunities -->
             <div class="mb-8">
-                <a href="/jobs" class="inline-flex items-center bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-200 text-white font-bold py-4 px-8 md:px-10 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-base md:text-lg group">
+                <a href="/jobs" class="inline-flex items-center bg-[#008933] hover:bg-[#007a2e] focus:ring-4 focus:ring-green-200 text-white font-bold py-4 px-8 md:px-10 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-base md:text-lg group border-2 border-[#008933]">
                 <svg class="w-8 h-8 mr-3 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
@@ -24,53 +37,240 @@
             
             <!-- Secondary CTA -->
             <div class="flex justify-center gap-4">
-                <a href="/about" class="bg-white hover:bg-blue-600 text-blue-600 hover:text-white font-semibold py-3 px-6 md:px-8 rounded-full border-2 border-blue-200 hover:border-blue-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                {% if not user or not user.isAuthenticated %}
+                <a href="/register" class="bg-white hover:bg-blue-600 text-blue-600 hover:text-white font-semibold py-3 px-6 md:px-8 rounded-full border-2 border-blue-200 hover:border-blue-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                    Create Account
+                </a>
+                {% endif %}
+                <a href="/about" class="bg-white hover:bg-blue-600 text-blue-600 hover:text-white font-semibold py-3 px-6 md:px-8 rounded-full transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 text-base">
                     About Kainos
                 </a>
             </div>
         </div>
     
         <!-- Features Section -->
-        <div class="mb-12 bg-gradient-to-r from-blue-100 to-green-100 rounded-3xl p-12 shadow-xl">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-blue-800 mb-12 drop-shadow-md">Why Choose Kainos?</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-            <div class="bg-gradient-to-br from-white to-green-50 hover:to-blue-50 rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-l-8 border-green-600 hover:border-blue-600 group">
-                <div class="bg-gradient-to-r from-green-600 to-green-700 group-hover:from-blue-600 group-hover:to-blue-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-green-600 group-hover:text-blue-600 transition-colors duration-300 mb-4">Innovation</h3>
-                <p class="text-gray-600 leading-relaxed">Cutting-edge solutions for modern challenges. We drive technological advancement and digital transformation across industries.</p>
-            </div>
+        <div class="mb-8 md:mb-12 bg-blue-50 rounded-3xl p-6 md:p-12 shadow-xl border-4 border-green-600">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-blue-900 mb-12 drop-shadow-md">Why Choose Kainos?</h2>
             
-            <div class="bg-gradient-to-br from-white to-green-50 hover:to-blue-50 rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-l-8 border-green-600 hover:border-blue-600 group">
-                <div class="bg-gradient-to-r from-green-600 to-green-700 group-hover:from-blue-600 group-hover:to-blue-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                    </svg>
+            <!-- Mobile Carousel Container -->
+            <div class="relative md:hidden">
+                <!-- Carousel Cards -->
+                <div id="carousel-container" class="overflow-hidden">
+                    <div id="carousel-track" class="flex transition-transform duration-500 ease-in-out">
+                        <!-- Clone of last card (for seamless loop) -->
+                        <div class="w-full flex-shrink-0 px-2">
+                            <div class="bg-blue-50 rounded-xl shadow-lg p-8 border-l-8 border-green-600 min-h-80">
+                                <div class="bg-gradient-to-r from-green-600 to-green-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-green-900 mb-4">Collaboration</h3>
+                                <p class="text-base md:text-xl font-semibold text-gray-950 leading-relaxed">Working together to achieve great results. We believe in the power of teamwork and inclusive innovation.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 1 - Innovation -->
+                        <div class="w-full flex-shrink-0 px-2">
+                            <div class="bg-blue-50 rounded-xl shadow-lg p-8 border-l-8 border-green-600 min-h-80">
+                                <div class="bg-gradient-to-r from-green-600 to-green-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-green-900 mb-4">Innovation</h3>
+                                <p class="text-base md:text-xl font-semibold text-gray-950 leading-relaxed">Cutting-edge solutions for modern challenges. We drive technological advancement and digital transformation across industries.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 - Excellence -->
+                        <div class="w-full flex-shrink-0 px-2">
+                            <div class="bg-blue-50 rounded-xl shadow-lg p-8 border-l-8 border-green-600 min-h-80">
+                                <div class="bg-gradient-to-r from-green-600 to-green-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-green-900 mb-4">Excellence</h3>
+                                <p class="text-base md:text-xl font-semibold text-gray-950 leading-relaxed">Delivering quality in everything we do. Our commitment to excellence drives outstanding results for our clients and partners.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 - Collaboration -->
+                        <div class="w-full flex-shrink-0 px-2">
+                            <div class="bg-blue-50 rounded-xl shadow-lg p-8 border-l-8 border-green-600 min-h-80">
+                                <div class="bg-gradient-to-r from-green-600 to-green-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-green-900 mb-4">Collaboration</h3>
+                                <p class="text-base md:text-xl font-semibold text-gray-950 leading-relaxed">Working together to achieve great results. We believe in the power of teamwork and inclusive innovation.</p>
+                            </div>
+                        </div>
+
+                        <!-- Clone of first card (for seamless loop) -->
+                        <div class="w-full flex-shrink-0 px-2">
+                            <div class="bg-blue-50 rounded-xl shadow-lg p-8 border-l-8 border-green-600 min-h-80">
+                                <div class="bg-gradient-to-r from-green-600 to-green-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-green-900 mb-4">Innovation</h3>
+                                <p class="text-base md:text-xl font-semibold text-gray-950 leading-relaxed">Cutting-edge solutions for modern challenges. We drive technological advancement and digital transformation across industries.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="text-2xl font-bold text-green-600 group-hover:text-blue-600 transition-colors duration-300 mb-4">Excellence</h3>
-                <p class="text-gray-600 leading-relaxed">Delivering quality in everything we do. Our commitment to excellence drives outstanding results for our clients and partners.</p>
-            </div>
-            
-            <div class="bg-gradient-to-br from-white to-green-50 hover:to-blue-50 rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-l-8 border-green-600 hover:border-blue-600 group">
-                <div class="bg-gradient-to-r from-green-600 to-green-700 group-hover:from-blue-600 group-hover:to-blue-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
+
+                <!-- Carousel Navigation - Arrows and Indicators -->
+                <div class="flex items-center justify-center gap-4 mt-6">
+                    <button id="carousel-prev" class="bg-white hover:bg-green-600 text-green-600 hover:text-white rounded-full p-2 shadow-lg transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-200" aria-label="Previous card">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <div class="flex gap-2">
+                        <button class="carousel-indicator w-3 h-3 rounded-full bg-green-600 transition-all duration-300" data-index="0" aria-label="Go to card 1"></button>
+                        <button class="carousel-indicator w-3 h-3 rounded-full bg-gray-300 transition-all duration-300" data-index="1" aria-label="Go to card 2"></button>
+                        <button class="carousel-indicator w-3 h-3 rounded-full bg-gray-300 transition-all duration-300" data-index="2" aria-label="Go to card 3"></button>
+                    </div>
+                    
+                    <button id="carousel-next" class="bg-white hover:bg-green-600 text-green-600 hover:text-white rounded-full p-2 shadow-lg transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-200" aria-label="Next card">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
                 </div>
-                <h3 class="text-2xl font-bold text-green-600 group-hover:text-blue-600 transition-colors duration-300 mb-4">Collaboration</h3>
-                <p class="text-gray-600 leading-relaxed">Working together to achieve great results. We believe in the power of teamwork and inclusive innovation.</p>
             </div>
+
+            <!-- Desktop Grid (hidden on mobile) -->
+            <div class="hidden md:grid md:grid-cols-3 gap-8">
+                <div class="bg-blue-50 rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-l-8 border-green-600 hover:border-blue-600 group">
+                    <div class="bg-gradient-to-r from-green-600 to-green-700 group-hover:from-blue-600 group-hover:to-blue-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-green-900 group-hover:text-blue-600 transition-colors duration-300 mb-4">Innovation</h3>
+                    <p class="text-xl font-semibold text-gray-950 leading-relaxed">Cutting-edge solutions for modern challenges. We drive technological advancement and digital transformation across industries.</p>
+                </div>
+                
+                <div class="bg-blue-50 rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-l-8 border-green-600 hover:border-blue-600 group">
+                    <div class="bg-gradient-to-r from-green-600 to-green-700 group-hover:from-blue-600 group-hover:to-blue-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-green-900 group-hover:text-blue-600 transition-colors duration-300 mb-4">Excellence</h3>
+                    <p class="text-xl font-semibold text-gray-950 leading-relaxed">Delivering quality in everything we do. Our commitment to excellence drives outstanding results for our clients and partners.</p>
+                </div>
+                
+                <div class="bg-blue-50 rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-l-8 border-green-600 hover:border-blue-600 group">
+                    <div class="bg-gradient-to-r from-green-600 to-green-700 group-hover:from-blue-600 group-hover:to-blue-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-green-900 group-hover:text-blue-600 transition-colors duration-300 mb-4">Collaboration</h3>
+                    <p class="text-xl font-semibold text-gray-950 leading-relaxed">Working together to achieve great results. We believe in the power of teamwork and inclusive innovation.</p>
+                </div>
             </div>
         </div>
 
+        <!-- Carousel JavaScript -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const track = document.getElementById('carousel-track');
+                const prevBtn = document.getElementById('carousel-prev');
+                const nextBtn = document.getElementById('carousel-next');
+                const indicators = document.querySelectorAll('.carousel-indicator');
+                const totalCards = 3;
+                let currentIndex = 1; // Start at first real card (after clone)
+                let isTransitioning = false;
+
+                function updateCarousel(animate = true) {
+                    const offset = -currentIndex * 100;
+                    
+                    if (animate) {
+                        track.style.transition = 'transform 500ms ease-in-out';
+                    } else {
+                        track.style.transition = 'none';
+                    }
+                    
+                    track.style.transform = `translateX(${offset}%)`;
+
+                    // Update indicators based on real card position
+                    // currentIndex: 0=clone3, 1=card1, 2=card2, 3=card3, 4=clone1
+                    let indicatorIndex = currentIndex - 1;
+                    if (currentIndex === 0) indicatorIndex = 2; // clone of card 3
+                    if (currentIndex === 4) indicatorIndex = 0; // clone of card 1
+                    
+                    indicators.forEach((indicator, index) => {
+                        if (index === indicatorIndex) {
+                            indicator.classList.remove('bg-gray-300');
+                            indicator.classList.add('bg-green-600');
+                        } else {
+                            indicator.classList.remove('bg-green-600');
+                            indicator.classList.add('bg-gray-300');
+                        }
+                    });
+                }
+
+                function handleTransitionEnd() {
+                    if (currentIndex === 0) {
+                        // We're at the clone before the first card, jump to real last card
+                        currentIndex = 3;
+                        updateCarousel(false);
+                    } else if (currentIndex === 4) {
+                        // We're at the clone after the last card, jump to real first card
+                        currentIndex = 1;
+                        updateCarousel(false);
+                    }
+                    isTransitioning = false;
+                }
+
+                track.addEventListener('transitionend', handleTransitionEnd);
+
+                prevBtn.addEventListener('click', function() {
+                    if (isTransitioning) return;
+                    isTransitioning = true;
+                    currentIndex--;
+                    updateCarousel(true);
+                });
+
+                nextBtn.addEventListener('click', function() {
+                    if (isTransitioning) return;
+                    isTransitioning = true;
+                    currentIndex++;
+                    updateCarousel(true);
+                });
+
+                // Indicator click handlers
+                indicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', function() {
+                        if (isTransitioning) return;
+                        isTransitioning = true;
+                        currentIndex = index + 1; // +1 because first real card starts at index 1
+                        updateCarousel(true);
+                        setTimeout(() => {
+                            isTransitioning = false;
+                        }, 500);
+                    });
+                });
+
+                // Initialize
+                updateCarousel(false);
+            });
+        </script>
+
         <!-- Call to Action Section -->
-        <div class="text-center bg-gradient-to-r from-blue-100 to-green-100 rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-white">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 drop-shadow-md text-blue-800">Ready to Join Our Team?</h2>
-            <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto font-medium text-gray-700">Discover exciting career opportunities and be part of our innovative journey in technology and digital transformation.</p>
-            <a href="/jobs" class="inline-flex items-center bg-white text-blue-600 font-bold py-4 px-8 md:px-10 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 border-2 border-white hover:border-blue-600">
+        <div class="text-center bg-blue-50 rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-green-600">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 drop-shadow-md text-blue-900">Ready to Join Our Team?</h2>
+            <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto font-semibold text-gray-900">Discover exciting career opportunities and be part of our innovative journey in technology and digital transformation.</p>
+            <a href="/jobs" class="inline-flex items-center bg-white text-blue-600 font-bold py-4 px-8 md:px-10 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 border-2 border-white hover:border-blue-600 text-base md:text-lg">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
                 </svg>
