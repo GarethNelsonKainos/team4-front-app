@@ -12,10 +12,7 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 		// Validate input
 		if (!email || !password) {
 			// Return error message for better UX - don't redirect
-			return res.json({
-				success: false,
-				message: "Please enter your email and password",
-			});
+			return res.redirect("/login");
 		}
 
 		// Call backend API through server-side client
@@ -24,10 +21,7 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 		if (!result.success) {
 			// Return error message instead of redirecting
 			console.error("Login failed:", result.error);
-			return res.json({
-				success: false,
-				message: "Invalid email or password",
-			});
+			return res.redirect("/login");
 		}
 
 		// Set secure HTTP-only cookie with the token
@@ -35,17 +29,11 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 		setAuthCookie(result.data.token, res);
 
 		// Return success response with redirect URL for client-side handling
-		return res.json({
-			success: true,
-			redirectUrl: "/jobs",
-		});
+		return res.redirect("/jobs");
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
 		console.error("Login error:", error);
-		return res.json({
-			success: false,
-			message: "An error occurred. Please try again later",
-		});
+		return res.redirect("/login");
 	}
 }
 
@@ -63,37 +51,24 @@ export async function register(
 		// Validate required fields
 		if (!email || !password || !confirmPassword) {
 			// Return error message for better UX - don't redirect
-			return res.json({
-				success: false,
-				message: "Please fill in all required fields",
-			});
+			return res.redirect("/register");
 		}
 
 		// Validate passwords match
 		if (password !== confirmPassword) {
-			return res.json({
-				success: false,
-				message: "Passwords do not match",
-			});
+			return res.redirect("/register");
 		}
 
 		// Validate password strength
 		if (password.length < 6) {
-			return res.json({
-				success: false,
-				message: "Password must be at least 6 characters",
-			});
+			return res.redirect("/register");
 		}
 
 		// Password must contain a number AND special character
 		const hasNumber = /[0-9]/.test(password);
 		const hasSpecialChar = /[!@#$%^&*]/.test(password);
 		if (!hasNumber || !hasSpecialChar) {
-			return res.json({
-				success: false,
-				message:
-					"Password must include a number (0-9) and special character (!@#$%^&*)",
-			});
+			return res.redirect("/register");
 		}
 
 		// Call backend API through server-side client
@@ -102,32 +77,20 @@ export async function register(
 		if (!result.success) {
 			// Return error message instead of redirecting
 			console.error("Registration failed:", result.error);
-			return res.json({
-				success: false,
-				message: "Registration failed. Email may already be in use",
-			});
+			return res.redirect("/register");
 		}
 
 		// Set secure HTTP-only cookie with the token if provided
 		if (result.data.token) {
 			setAuthCookie(result.data.token, res);
-			return res.json({
-				success: true,
-				redirectUrl: "/jobs",
-			});
+			return res.redirect("/jobs");
 		} else {
-			return res.json({
-				success: true,
-				redirectUrl: "/login",
-			});
+			return res.redirect("/login");
 		}
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
 		console.error("Registration error:", error);
-		return res.json({
-			success: false,
-			message: "An error occurred. Please try again later",
-		});
+		return res.redirect("/login");
 	}
 }
 
@@ -137,17 +100,11 @@ export async function register(
 export function logout(_req: Request, res: Response, _next: NextFunction) {
 	try {
 		clearAuthCookie(res);
-		return res.json({
-			success: true,
-			redirectUrl: "/",
-		});
+		return res.redirect("/");
 	} catch (error) {
 		// Production: log error privately, return error response
 		console.error("Logout error:", error);
-		return res.json({
-			success: false,
-			redirectUrl: "/error",
-		});
+		return res.redirect("/error");
 	}
 }
 

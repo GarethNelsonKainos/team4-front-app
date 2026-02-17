@@ -174,11 +174,8 @@ describe("Express App Routes", () => {
 					.send({ password: "password123!" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe(
-					"Please enter your email and password",
-				);
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/login");
 			});
 
 			it("should return error message when password is missing", async () => {
@@ -187,11 +184,8 @@ describe("Express App Routes", () => {
 					.send({ email: "test@example.com" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe(
-					"Please enter your email and password",
-				);
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/login");
 			});
 
 			it("should set HTTP-only cookie and redirect on successful login", async () => {
@@ -205,9 +199,8 @@ describe("Express App Routes", () => {
 					.send({ email: "test@example.com", password: "password123!" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(true);
-				expect(response.body.redirectUrl).toBe("/jobs");
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/jobs");
 				expect(response.headers["set-cookie"]).toBeDefined();
 				expect(response.headers["set-cookie"][0]).toContain("authToken");
 				expect(response.headers["set-cookie"][0]).toContain("HttpOnly");
@@ -225,9 +218,8 @@ describe("Express App Routes", () => {
 					.send({ email: "test@example.com", password: "wrongpassword" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe("Invalid email or password");
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/login");
 			});
 
 			it("should return generic error message on exception", async () => {
@@ -240,11 +232,8 @@ describe("Express App Routes", () => {
 					.send({ email: "test@example.com", password: "password123!" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe(
-					"An error occurred. Please try again later",
-				);
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/login");
 			});
 		});
 
@@ -255,11 +244,8 @@ describe("Express App Routes", () => {
 					.send({ password: "password123!", confirmPassword: "password123!" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe(
-					"Please fill in all required fields",
-				);
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/register");
 			});
 
 			it("should return error message when password is missing", async () => {
@@ -268,11 +254,8 @@ describe("Express App Routes", () => {
 					.send({ email: "test@example.com", confirmPassword: "password123!" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe(
-					"Please fill in all required fields",
-				);
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/register");
 			});
 
 			it("should return error message when passwords do not match", async () => {
@@ -285,9 +268,8 @@ describe("Express App Routes", () => {
 					})
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe("Passwords do not match");
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/register");
 			});
 			it("should return error message when password is too short", async () => {
 				const response = await request(app)
@@ -299,11 +281,8 @@ describe("Express App Routes", () => {
 					})
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe(
-					"Password must be at least 6 characters",
-				);
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/register");
 			});
 
 			it("should return error message when password lacks number and special character", async () => {
@@ -316,11 +295,8 @@ describe("Express App Routes", () => {
 					})
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe(
-					"Password must include a number (0-9) and special character (!@#$%^&*)",
-				);
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/register");
 			});
 			it("should set HTTP-only cookie and redirect on successful registration", async () => {
 				vi.mocked(apiClient.registerUser).mockResolvedValue({
@@ -337,9 +313,8 @@ describe("Express App Routes", () => {
 					})
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(true);
-				expect(response.body.redirectUrl).toBe("/jobs");
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/jobs");
 				expect(response.headers["set-cookie"]).toBeDefined();
 				expect(response.headers["set-cookie"][0]).toContain("authToken");
 				expect(response.headers["set-cookie"][0]).toContain("HttpOnly");
@@ -361,11 +336,8 @@ describe("Express App Routes", () => {
 					})
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe(
-					"Registration failed. Email may already be in use",
-				);
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/register");
 			});
 
 			it("should return generic error message on exception", async () => {
@@ -382,11 +354,8 @@ describe("Express App Routes", () => {
 					})
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(false);
-				expect(response.body.message).toBe(
-					"An error occurred. Please try again later",
-				);
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/login");
 			});
 		});
 
@@ -396,9 +365,8 @@ describe("Express App Routes", () => {
 					.post("/api/logout")
 					.set("Cookie", ["authToken=test-token"]);
 
-				expect(response.status).toBe(200);
-				expect(response.body.success).toBe(true);
-				expect(response.body.redirectUrl).toBe("/");
+				expect(response.status).toBe(302);
+				expect(response.header.location).toBe("/");
 				expect(response.headers["set-cookie"]).toBeDefined();
 				expect(response.headers["set-cookie"][0]).toContain("authToken=;");
 			});
