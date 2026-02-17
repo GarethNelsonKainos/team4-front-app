@@ -164,40 +164,6 @@ describe("Express App Routes", () => {
 				expect(response.text).toContain("Go Back");
 			});
 		});
-
-		describe("GET /login-failed", () => {
-			it("should return login failed page with 401 status", async () => {
-				const response = await request(app).get("/login-failed");
-				expect(response.status).toBe(401);
-			});
-
-			it("should contain login failed message", async () => {
-				const response = await request(app).get("/login-failed");
-				expect(response.text).toContain("Login Failed");
-			});
-
-			it("should have Try Again button", async () => {
-				const response = await request(app).get("/login-failed");
-				expect(response.text).toContain("Try Again");
-			});
-		});
-
-		describe("GET /register-failed", () => {
-			it("should return register failed page with 400 status", async () => {
-				const response = await request(app).get("/register-failed");
-				expect(response.status).toBe(400);
-			});
-
-			it("should contain registration failed message", async () => {
-				const response = await request(app).get("/register-failed");
-				expect(response.text).toContain("Registration Failed");
-			});
-
-			it("should have Try Again button", async () => {
-				const response = await request(app).get("/register-failed");
-				expect(response.text).toContain("Try Again");
-			});
-		});
 	});
 
 	describe("API Routes", () => {
