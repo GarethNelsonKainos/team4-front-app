@@ -37,10 +37,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "Please enter your email and password",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
 		});
 
 		it("should return error message when password is missing", async () => {
@@ -52,10 +49,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "Please enter your email and password",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
 		});
 
 		it("should set auth cookie and redirect to jobs on successful login", async () => {
@@ -83,10 +77,7 @@ describe("AuthController", () => {
 				"test-jwt-token",
 				mockResponse,
 			);
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: true,
-				redirectUrl: "/jobs",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/jobs");
 		});
 
 		it("should return error message when API returns error", async () => {
@@ -107,10 +98,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "Invalid email or password",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
 		});
 
 		it("should return generic error message on exception", async () => {
@@ -129,10 +117,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "An error occurred. Please try again later",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
 		});
 
 		it("should log errors privately without exposing them to user", async () => {
@@ -177,10 +162,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "Please fill in all required fields",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
 		});
 
 		it("should return error message when password is missing", async () => {
@@ -195,10 +177,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "Please fill in all required fields",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
 		});
 
 		it("should return error message when confirmPassword is missing", async () => {
@@ -213,10 +192,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "Please fill in all required fields",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
 		});
 
 		it("should return error message when passwords do not match", async () => {
@@ -232,10 +208,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "Passwords do not match",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
 		});
 
 		it("should return error message when password is too short", async () => {
@@ -251,10 +224,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "Password must be at least 6 characters",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
 		});
 
 		it("should return error message when password lacks a special character", async () => {
@@ -270,11 +240,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message:
-					"Password must include a number (0-9) and special character (!@#$%^&*)",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
 		});
 
 		it("should return error message when password lacks number", async () => {
@@ -290,11 +256,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message:
-					"Password must include a number (0-9) and special character (!@#$%^&*)",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
 		});
 
 		it("should accept password with number and special character", async () => {
@@ -319,10 +281,7 @@ describe("AuthController", () => {
 				"newuser@example.com",
 				"password123!",
 			);
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: true,
-				redirectUrl: "/jobs",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/jobs");
 		});
 
 		it("should set auth cookie and redirect to jobs on successful registration", async () => {
@@ -351,10 +310,7 @@ describe("AuthController", () => {
 				"test-jwt-token",
 				mockResponse,
 			);
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: true,
-				redirectUrl: "/jobs",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/jobs");
 		});
 
 		it("should redirect to login if no token provided in response", async () => {
@@ -376,10 +332,7 @@ describe("AuthController", () => {
 			);
 
 			expect(auth.setAuthCookie).not.toHaveBeenCalled();
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: true,
-				redirectUrl: "/login",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
 		});
 
 		it("should return error message when API returns error", async () => {
@@ -401,10 +354,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "Registration failed. Email may already be in use",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
 		});
 
 		it("should return generic error message on exception", async () => {
@@ -424,10 +374,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				message: "An error occurred. Please try again later",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
 		});
 	});
 
@@ -440,10 +387,7 @@ describe("AuthController", () => {
 			);
 
 			expect(auth.clearAuthCookie).toHaveBeenCalledWith(mockResponse);
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: true,
-				redirectUrl: "/",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/");
 		});
 
 		it("should redirect to error page on exception", () => {
@@ -457,10 +401,7 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.json).toHaveBeenCalledWith({
-				success: false,
-				redirectUrl: "/error",
-			});
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
 		});
 	});
 
