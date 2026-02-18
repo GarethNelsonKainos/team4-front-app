@@ -22,6 +22,7 @@ describe("AuthController", () => {
 			json: vi.fn().mockReturnThis(),
 			status: vi.fn().mockReturnThis(),
 			redirect: vi.fn().mockReturnThis(),
+			render: vi.fn().mockReturnThis(),
 		};
 		mockNext = vi.fn();
 		vi.clearAllMocks();
@@ -102,8 +103,12 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/login?error=invalid_credentials",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/login.njk",
+				expect.objectContaining({
+					errorMessage: "Invalid email or password. Please try again.",
+					formData: expect.objectContaining({ email: "test@example.com" }),
+				}),
 			);
 		});
 
@@ -123,8 +128,11 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/login?error=server_error",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/login.njk",
+				expect.objectContaining({
+					errorMessage: "A server error occurred. Please try again later.",
+				}),
 			);
 		});
 
@@ -170,8 +178,11 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/register?error=missing_fields",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({ email: "Email is required." }),
+				}),
 			);
 		});
 
@@ -187,8 +198,13 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/register?error=missing_fields",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						password: "Password is required.",
+					}),
+				}),
 			);
 		});
 
@@ -204,8 +220,13 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/register?error=missing_fields",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						confirmPassword: "Please confirm your password.",
+					}),
+				}),
 			);
 		});
 
@@ -222,8 +243,13 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/register?error=passwords_mismatch",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						confirmPassword: "Passwords do not match.",
+					}),
+				}),
 			);
 		});
 
@@ -240,8 +266,13 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/register?error=password_too_short",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						password: expect.stringContaining("at least 6 characters"),
+					}),
+				}),
 			);
 		});
 
@@ -258,8 +289,13 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/register?error=password_invalid_format",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						password: expect.stringContaining("special character"),
+					}),
+				}),
 			);
 		});
 
@@ -276,8 +312,13 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/register?error=password_invalid_format",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						password: expect.stringContaining("number"),
+					}),
+				}),
 			);
 		});
 
@@ -376,8 +417,13 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/register?error=registration_failed",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errorMessage:
+						"Registration failed. This email may already be in use. Please try another email.",
+					formData: expect.objectContaining({ email: "existing@example.com" }),
+				}),
 			);
 		});
 
@@ -398,8 +444,11 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/register?error=server_error",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errorMessage: "A server error occurred. Please try again later.",
+				}),
 			);
 		});
 	});

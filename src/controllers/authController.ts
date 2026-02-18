@@ -1,6 +1,44 @@
 import type { NextFunction, Request, Response } from "express";
 import { loginUser, registerUser } from "../utils/apiClient";
+import type { AuthRequest } from "../utils/auth";
 import { clearAuthCookie, setAuthCookie } from "../utils/auth";
+
+/**
+ * Validate email format
+ */
+function isValidEmail(email: string): boolean {
+	const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	return emailPattern.test(email);
+}
+
+/**
+ * Validate password strength
+ */
+function validatePassword(password: string): {
+	valid: boolean;
+	error?: string;
+} {
+	if (!password) {
+		return { valid: false, error: "Password is required." };
+	}
+
+	if (password.length < 6) {
+		return { valid: false, error: "Password must be at least 6 characters." };
+	}
+
+	const hasNumber = /[0-9]/.test(password);
+	const hasSpecialChar = /[!@#$%^&*]/.test(password);
+
+	if (!hasNumber || !hasSpecialChar) {
+		return {
+			valid: false,
+			error:
+				"Password must include a number and a special character (!@#$%^&*).",
+		};
+	}
+
+	return { valid: true };
+}
 
 /**
  * Handle user login
@@ -8,32 +46,61 @@ import { clearAuthCookie, setAuthCookie } from "../utils/auth";
 export async function login(req: Request, res: Response, _next: NextFunction) {
 	try {
 		const { email, password } = req.body;
+		const authReq = req as AuthRequest;
 
-		// Validate input
+		// Validate input - redirect with error if validation fails
 		if (!email || !password) {
-			// Return error message for better UX - don't redirect
 			return res.redirect("/login?error=missing_credentials");
+		}
+
+		if (!isValidEmail(email)) {
+			const errors: Record<string, string> = {};
+			errors.email = "Enter a valid email address.";
+
+			return res.render("pages/login.njk", {
+				title: "Login - Kainos",
+				currentPage: "login",
+				user: authReq.user,
+				formData: { email },
+				errors,
+				errorMessage: "Please correct the errors below.",
+			});
 		}
 
 		// Call backend API through server-side client
 		const result = await loginUser(email, password);
 
 		if (!result.success) {
-			// Return error message instead of redirecting
+			// Return error message and restore form
 			console.error("Login failed:", result.error);
-			return res.redirect("/login?error=invalid_credentials");
+
+			return res.render("pages/login.njk", {
+				title: "Login - Kainos",
+				currentPage: "login",
+				user: authReq.user,
+				formData: { email },
+				errorMessage: "Invalid email or password. Please try again.",
+			});
 		}
 
 		// Set secure HTTP-only cookie with the token
 		// This prevents XSS attacks - token is not accessible to JavaScript
 		setAuthCookie(result.data.token, res);
 
-		// Return success response with redirect URL for client-side handling
+		// Redirect on success
 		return res.redirect("/jobs");
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
 		console.error("Login error:", error);
-		return res.redirect("/login?error=server_error");
+		const authReq = req as AuthRequest;
+
+		return res.render("pages/login.njk", {
+			title: "Login - Kainos",
+			currentPage: "login",
+			user: authReq.user,
+			formData: { email: req.body.email || "" },
+			errorMessage: "A server error occurred. Please try again later.",
+		});
 	}
 }
 
@@ -47,37 +114,85 @@ export async function register(
 ) {
 	try {
 		const { email, password, confirmPassword } = req.body;
+		const authReq = req as AuthRequest;
+
+		const errors: Record<string, string> = {};
 
 		// Validate required fields
 		if (!email || !password || !confirmPassword) {
-			// Return error message for better UX - don't redirect
-			return res.redirect("/register?error=missing_fields");
+			if (!email) errors.email = "Email is required.";
+			if (!password) errors.password = "Password is required.";
+			if (!confirmPassword)
+				errors.confirmPassword = "Please confirm your password.";
+
+			return res.render("pages/register.njk", {
+				title: "Register - Kainos",
+				currentPage: "register",
+				user: authReq.user,
+				formData: { email: email || "" },
+				errors,
+				errorMessage: "Please fill in all required fields.",
+			});
+		}
+
+		// Validate email format
+		if (!isValidEmail(email)) {
+			errors.email = "Enter a valid email address.";
+
+			return res.render("pages/register.njk", {
+				title: "Register - Kainos",
+				currentPage: "register",
+				user: authReq.user,
+				formData: { email },
+				errors,
+				errorMessage: "Please correct the errors below.",
+			});
 		}
 
 		// Validate passwords match
 		if (password !== confirmPassword) {
-			return res.redirect("/register?error=passwords_mismatch");
+			errors.confirmPassword = "Passwords do not match.";
+
+			return res.render("pages/register.njk", {
+				title: "Register - Kainos",
+				currentPage: "register",
+				user: authReq.user,
+				formData: { email },
+				errors,
+				errorMessage: "Please correct the errors below.",
+			});
 		}
 
 		// Validate password strength
-		if (password.length < 6) {
-			return res.redirect("/register?error=password_too_short");
-		}
+		const passwordValidation = validatePassword(password);
+		if (!passwordValidation.valid) {
+			errors.password = passwordValidation.error || "Invalid password.";
 
-		// Password must contain a number AND special character
-		const hasNumber = /[0-9]/.test(password);
-		const hasSpecialChar = /[!@#$%^&*]/.test(password);
-		if (!hasNumber || !hasSpecialChar) {
-			return res.redirect("/register?error=password_invalid_format");
+			return res.render("pages/register.njk", {
+				title: "Register - Kainos",
+				currentPage: "register",
+				user: authReq.user,
+				formData: { email },
+				errors,
+				errorMessage: "Please correct the errors below.",
+			});
 		}
 
 		// Call backend API through server-side client
 		const result = await registerUser(email, password);
 
 		if (!result.success) {
-			// Return error message instead of redirecting
+			// Return error message and restore form
 			console.error("Registration failed:", result.error);
-			return res.redirect("/register?error=registration_failed");
+
+			return res.render("pages/register.njk", {
+				title: "Register - Kainos",
+				currentPage: "register",
+				user: authReq.user,
+				formData: { email },
+				errorMessage:
+					"Registration failed. This email may already be in use. Please try another email.",
+			});
 		}
 
 		// Set secure HTTP-only cookie with the token if provided
@@ -90,7 +205,15 @@ export async function register(
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
 		console.error("Registration error:", error);
-		return res.redirect("/register?error=server_error");
+		const authReq = req as AuthRequest;
+
+		return res.render("pages/register.njk", {
+			title: "Register - Kainos",
+			currentPage: "register",
+			user: authReq.user,
+			formData: { email: req.body.email || "" },
+			errorMessage: "A server error occurred. Please try again later.",
+		});
 	}
 }
 
