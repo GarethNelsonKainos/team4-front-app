@@ -144,4 +144,106 @@
     {% endif %}
 {% endblock %}
 
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const errorMessageEl = document.querySelector('[data-error-message]');
+            const errorMessageText = errorMessageEl?.querySelector('span');
+
+            // Error message mapping
+            const errorMessages = {
+                'invalid_credentials': 'Invalid email or password. Please try again.',
+                'missing_credentials': 'Email and password are required.',
+                'server_error': 'A server error occurred. Please try again later.'
+            };
+
+            // Check for error query param on page load and restore email from localStorage
+            const params = new URLSearchParams(window.location.search);
+            const errorCode = params.get('error');
+            
+            // Restore email from localStorage if it exists
+            if (emailInput) {
+                const savedEmail = localStorage.getItem('loginEmail');
+                if (savedEmail) {
+                    emailInput.value = savedEmail;
+                    localStorage.removeItem('loginEmail');
+                }
+            }
+            
+            // Clear password for security
+            if (passwordInput) {
+                passwordInput.value = '';
+            }
+            
+            if (errorCode && errorMessageEl && errorMessageText) {
+                const message = errorMessages[errorCode] || 'An error occurred. Please try again.';
+                errorMessageText.textContent = message;
+                errorMessageEl.classList.remove('hidden');
+            }
+
+            // Clear error message when user starts typing
+            if (emailInput && errorMessageEl) {
+                emailInput.addEventListener('input', () => {
+                    errorMessageEl.classList.add('hidden');
+                });
+            }
+            if (passwordInput && errorMessageEl) {
+                passwordInput.addEventListener('input', () => {
+                    errorMessageEl.classList.add('hidden');
+                });
+            }
+
+            if (!form || !emailInput || !passwordInput) return;
+
+            form.addEventListener('submit', (event) => {
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                
+                // Save email to localStorage before form submission (in case server returns error)
+                if (email) {
+                    localStorage.setItem('loginEmail', email);
+                }
+                
+                if (emailError) {
+                    emailError.textContent = '';
+                    emailError.classList.add('hidden');
+                }
+                if (passwordError) {
+                    passwordError.textContent = '';
+                    passwordError.classList.add('hidden');
+                }
+
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                let hasErrors = false;
+
+                if (!emailPattern.test(email)) {
+                    if (emailError) {
+                        emailError.textContent = 'Enter a valid email address.';
+                        emailError.classList.remove('hidden');
+                    }
+                    hasErrors = true;
+                }
+
+                if (!password) {
+                    if (passwordError) {
+                        passwordError.textContent = 'Password is required.';
+                        passwordError.classList.remove('hidden');
+                    }
+                    hasErrors = true;
+                }
+
+                if (hasErrors) {
+                    event.preventDefault();
+                    alert('Invalid email or password.');
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
 

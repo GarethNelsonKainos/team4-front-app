@@ -80,7 +80,7 @@
                         </button>
                     </div>
                     <div id="passwordError" class="text-red-500 text-base mt-1 hidden"></div>
-                    <p class="text-base text-gray-500 mt-1">At least 6 characters and must include a number (0-9) or special character (!@#$%^&*)</p>
+                    <p class="text-base text-gray-500 mt-1">At least 6 characters and must include a number (0-9) and a special character (!@#$%^&*)</p>
                 </div>
 
                 <!-- Confirm Password Field -->
@@ -179,6 +179,133 @@
         </div>
     </div>
     {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('registerForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            const errorMessageEl = document.querySelector('[data-error-message]');
+            const errorMessageText = errorMessageEl?.querySelector('span');
+
+            // Error message mapping
+            const errorMessages = {
+                'registration_failed': 'Registration failed. This email may already be in use.',
+                'missing_fields': 'Please fill in all required fields.',
+                'passwords_mismatch': 'Passwords do not match.',
+                'password_too_short': 'Password must be at least 6 characters.',
+                'password_invalid_format': 'Password must include a number and a special character (!@#$%^&*).',
+                'server_error': 'A server error occurred. Please try again later.'
+            };
+
+            // Check for error query param on page load
+            const params = new URLSearchParams(window.location.search);
+            const errorCode = params.get('error');
+            
+            // Restore form data from localStorage if there was an error
+            if (errorCode) {
+                const savedEmail = localStorage.getItem('registerEmail');
+                const savedPassword = localStorage.getItem('registerPassword');
+                const savedConfirmPassword = localStorage.getItem('registerConfirmPassword');
+                
+                if (savedEmail && emailInput) emailInput.value = savedEmail;
+                if (savedPassword && passwordInput) passwordInput.value = savedPassword;
+                if (savedConfirmPassword && confirmPasswordInput) confirmPasswordInput.value = savedConfirmPassword;
+                
+                // Clean up localStorage
+                localStorage.removeItem('registerEmail');
+                localStorage.removeItem('registerPassword');
+                localStorage.removeItem('registerConfirmPassword');
+            }
+            
+            if (errorCode && errorMessageEl && errorMessageText) {
+                const message = errorMessages[errorCode] || 'An error occurred. Please try again.';
+                errorMessageText.textContent = message;
+                errorMessageEl.classList.remove('hidden');
+            }
+
+            // Clear error message when user starts typing
+            if (emailInput && errorMessageEl) {
+                emailInput.addEventListener('input', () => {
+                    errorMessageEl.classList.add('hidden');
+                });
+            }
+            if (passwordInput && errorMessageEl) {
+                passwordInput.addEventListener('input', () => {
+                    errorMessageEl.classList.add('hidden');
+                });
+            }
+            if (confirmPasswordInput && errorMessageEl) {
+                confirmPasswordInput.addEventListener('input', () => {
+                    errorMessageEl.classList.add('hidden');
+                });
+            }
+
+            if (!form || !emailInput || !passwordInput || !confirmPasswordInput) return;
+
+            form.addEventListener('submit', (event) => {
+                if (emailError) {
+                    emailError.textContent = '';
+                    emailError.classList.add('hidden');
+                }
+                if (passwordError) {
+                    passwordError.textContent = '';
+                    passwordError.classList.add('hidden');
+                }
+                if (confirmPasswordError) {
+                    confirmPasswordError.textContent = '';
+                    confirmPasswordError.classList.add('hidden');
+                }
+
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const hasNumber = /[0-9]/.test(password);
+                const hasSpecialChar = /[!@#$%^&*]/.test(password);
+                let hasErrors = false;
+
+                if (!emailPattern.test(email)) {
+                    if (emailError) {
+                        emailError.textContent = 'Enter a valid email address.';
+                        emailError.classList.remove('hidden');
+                    }
+                    hasErrors = true;
+                }
+
+                if (password.length < 6 || !hasNumber || !hasSpecialChar) {
+                    if (passwordError) {
+                        passwordError.textContent = 'Password must be at least 6 characters and include a number and a special character.';
+                        passwordError.classList.remove('hidden');
+                    }
+                    hasErrors = true;
+                }
+
+                if (password !== confirmPassword) {
+                    if (confirmPasswordError) {
+                        confirmPasswordError.textContent = 'Passwords do not match.';
+                        confirmPasswordError.classList.remove('hidden');
+                    }
+                    hasErrors = true;
+                }
+
+                if (hasErrors) {
+                    event.preventDefault();
+                } else {
+                    // Save form data to localStorage before submitting (in case server rejects)
+                    localStorage.setItem('registerEmail', email);
+                    localStorage.setItem('registerPassword', password);
+                    localStorage.setItem('registerConfirmPassword', confirmPassword);
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
 

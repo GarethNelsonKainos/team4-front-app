@@ -12,7 +12,7 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 		// Validate input
 		if (!email || !password) {
 			// Return error message for better UX - don't redirect
-			return res.redirect("/login");
+			return res.redirect("/login?error=missing_credentials");
 		}
 
 		// Call backend API through server-side client
@@ -21,7 +21,7 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 		if (!result.success) {
 			// Return error message instead of redirecting
 			console.error("Login failed:", result.error);
-			return res.redirect("/login");
+			return res.redirect("/login?error=invalid_credentials");
 		}
 
 		// Set secure HTTP-only cookie with the token
@@ -33,7 +33,7 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
 		console.error("Login error:", error);
-		return res.redirect("/login");
+		return res.redirect("/login?error=server_error");
 	}
 }
 
@@ -51,24 +51,24 @@ export async function register(
 		// Validate required fields
 		if (!email || !password || !confirmPassword) {
 			// Return error message for better UX - don't redirect
-			return res.redirect("/register");
+			return res.redirect("/register?error=missing_fields");
 		}
 
 		// Validate passwords match
 		if (password !== confirmPassword) {
-			return res.redirect("/register");
+			return res.redirect("/register?error=passwords_mismatch");
 		}
 
 		// Validate password strength
 		if (password.length < 6) {
-			return res.redirect("/register");
+			return res.redirect("/register?error=password_too_short");
 		}
 
 		// Password must contain a number AND special character
 		const hasNumber = /[0-9]/.test(password);
 		const hasSpecialChar = /[!@#$%^&*]/.test(password);
 		if (!hasNumber || !hasSpecialChar) {
-			return res.redirect("/register");
+			return res.redirect("/register?error=password_invalid_format");
 		}
 
 		// Call backend API through server-side client
@@ -77,7 +77,7 @@ export async function register(
 		if (!result.success) {
 			// Return error message instead of redirecting
 			console.error("Registration failed:", result.error);
-			return res.redirect("/register");
+			return res.redirect("/register?error=registration_failed");
 		}
 
 		// Set secure HTTP-only cookie with the token if provided
@@ -90,7 +90,7 @@ export async function register(
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
 		console.error("Registration error:", error);
-		return res.redirect("/login");
+		return res.redirect("/register?error=server_error");
 	}
 }
 
