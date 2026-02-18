@@ -103,12 +103,12 @@
                 {% endif %}
                 {% if features.jobApplyView %}
                     {% if user and user.isAuthenticated and user.role === "applicant" %}
-                <button class="flex items-center justify-center text-base bg-[#008933] hover:bg-[#007a2e] text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
+                <a href="/job-roles/{{ job.jobRoleId }}/apply" class="flex items-center justify-center text-base bg-[#008933] hover:bg-[#007a2e] text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
                     Apply Now
-                </button>
+                </a>
                     {% endif %}
                 {% endif %}
 

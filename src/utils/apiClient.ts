@@ -197,4 +197,32 @@ export async function deleteJobRole(id: number, token: string) {
 	}
 }
 
+/**
+ * Upload CV file for job application
+ * @param formData - FormData object containing the CV file and job role ID
+ * @returns Promise with upload result
+ */
+export async function uploadCV(formData: FormData) {
+	try {
+		const response = await apiClient.post("/api/uploads/cv", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		});
+		return {
+			success: true,
+			data: response.data,
+		};
+	} catch (error) {
+		const axiosError = error as AxiosError<{ message?: string }>;
+		return {
+			success: false,
+			error:
+				axiosError.response?.data?.message ||
+				"Failed to upload CV. Please try again.",
+			status: axiosError.response?.status,
+		};
+	}
+}
+
 export default apiClient;

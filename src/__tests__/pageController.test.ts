@@ -413,6 +413,182 @@ describe("PageController", () => {
 		});
 	});
 
+	describe("getApplyJobPage", () => {
+		it("should render apply job page with correct data for authenticated applicant", async () => {
+			mockRequest.params = { id: "1" };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/apply-job.njk",
+				expect.objectContaining({
+					title: expect.stringContaining("Apply for"),
+					job: expect.objectContaining({
+						jobRoleId: 1,
+					}),
+					userHasAppliedForJob: false,
+					currentPage: "jobs",
+					user: expect.objectContaining({
+						isAuthenticated: true,
+						role: "applicant",
+					}),
+				}),
+			);
+		});
+
+		it("should redirect to login for unauthenticated user", async () => {
+			(mockRequest as AuthRequest).user = {
+				email: "",
+				role: "applicant",
+				isAuthenticated: false,
+			};
+			mockRequest.params = { id: "1" };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+		});
+
+		it("should redirect to login for non-applicant user", async () => {
+			(mockRequest as AuthRequest).user = {
+				email: "admin@example.com",
+				role: "admin",
+				isAuthenticated: true,
+			};
+			mockRequest.params = { id: "1" };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+		});
+
+		it("should redirect to login when user is missing", async () => {
+			(mockRequest as AuthRequest).user = undefined;
+			mockRequest.params = { id: "1" };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+		});
+
+		it("should redirect to error page for invalid job ID", async () => {
+			mockRequest.params = { id: "abc" };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+
+		it("should redirect to error page for non-existent job", async () => {
+			mockRequest.params = { id: "999" };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+
+		it("should redirect to error page when API call fails", async () => {
+			mockRequest.params = { id: "1" };
+			vi.mocked(apiClient.getJobRole).mockResolvedValue({
+				success: false,
+				error: "API Error",
+				status: 500,
+			});
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+
+		it("should handle string array for route params", async () => {
+			mockRequest.params = { id: ["1"] };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/apply-job.njk",
+				expect.objectContaining({
+					job: expect.objectContaining({
+						jobRoleId: 1,
+					}),
+				}),
+			);
+		});
+
+		it("should redirect to error page on render exception", async () => {
+			mockRequest.params = { id: "1" };
+			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+				() => {
+					throw new Error("Template error");
+				},
+			);
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+
+		it("should log errors privately", async () => {
+			const consoleErrorSpy = vi
+				.spyOn(console, "error")
+				.mockImplementation(() => {});
+			mockRequest.params = { id: "1" };
+			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+				() => {
+					throw new Error("Template error");
+				},
+			);
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(consoleErrorSpy).toHaveBeenCalledWith(
+				"Error rendering apply job page:",
+				expect.any(Error),
+			);
+			consoleErrorSpy.mockRestore();
+		});
+	});
+
 	describe("getLoginFailedPage", () => {
 		it("should render login failed page with 401 status", () => {
 			pageController.getLoginFailedPage(

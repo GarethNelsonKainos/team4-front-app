@@ -38,6 +38,9 @@ app.get("/jobs", pageController.getJobsPage);
 // Job detail route - :id is a route parameter (e.g. /job-roles/123)
 app.get("/job-roles/:id", pageController.getJobDetailPage);
 
+// Job apply route - allows user to upload CV and apply for a job
+app.get("/job-roles/:id/apply", pageController.getApplyJobPage);
+
 // Login page route
 app.get("/login", pageController.getLoginPage);
 
