@@ -37,7 +37,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/login?error=missing_credentials",
+			);
 		});
 
 		it("should return error message when password is missing", async () => {
@@ -49,7 +51,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/login?error=missing_credentials",
+			);
 		});
 
 		it("should set auth cookie and redirect to jobs on successful login", async () => {
@@ -98,7 +102,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/login?error=invalid_credentials",
+			);
 		});
 
 		it("should return generic error message on exception", async () => {
@@ -117,7 +123,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/login?error=server_error",
+			);
 		});
 
 		it("should log errors privately without exposing them to user", async () => {
@@ -162,7 +170,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/register?error=missing_fields",
+			);
 		});
 
 		it("should return error message when password is missing", async () => {
@@ -177,7 +187,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/register?error=missing_fields",
+			);
 		});
 
 		it("should return error message when confirmPassword is missing", async () => {
@@ -192,7 +204,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/register?error=missing_fields",
+			);
 		});
 
 		it("should return error message when passwords do not match", async () => {
@@ -208,7 +222,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/register?error=passwords_mismatch",
+			);
 		});
 
 		it("should return error message when password is too short", async () => {
@@ -224,7 +240,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/register?error=password_too_short",
+			);
 		});
 
 		it("should return error message when password lacks a special character", async () => {
@@ -240,7 +258,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/register?error=password_invalid_format",
+			);
 		});
 
 		it("should return error message when password lacks number", async () => {
@@ -256,7 +276,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/register?error=password_invalid_format",
+			);
 		});
 
 		it("should accept password with number and special character", async () => {
@@ -354,7 +376,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/register?error=registration_failed",
+			);
 		});
 
 		it("should return generic error message on exception", async () => {
@@ -374,7 +398,9 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockResponse.redirect).toHaveBeenCalledWith(
+				"/register?error=server_error",
+			);
 		});
 	});
 

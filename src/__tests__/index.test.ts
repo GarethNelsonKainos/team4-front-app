@@ -175,7 +175,9 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/login");
+				expect(response.header.location).toBe(
+					"/login?error=missing_credentials",
+				);
 			});
 
 			it("should return error message when password is missing", async () => {
@@ -185,7 +187,9 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/login");
+				expect(response.header.location).toBe(
+					"/login?error=missing_credentials",
+				);
 			});
 
 			it("should set HTTP-only cookie and redirect on successful login", async () => {
@@ -219,7 +223,9 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/login");
+				expect(response.header.location).toBe(
+					"/login?error=invalid_credentials",
+				);
 			});
 
 			it("should return generic error message on exception", async () => {
@@ -233,7 +239,7 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/login");
+				expect(response.header.location).toBe("/login?error=server_error");
 			});
 		});
 
@@ -245,7 +251,7 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
+				expect(response.header.location).toBe("/register?error=missing_fields");
 			});
 
 			it("should return error message when password is missing", async () => {
@@ -255,7 +261,7 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
+				expect(response.header.location).toBe("/register?error=missing_fields");
 			});
 
 			it("should return error message when passwords do not match", async () => {
@@ -269,7 +275,9 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
+				expect(response.header.location).toBe(
+					"/register?error=passwords_mismatch",
+				);
 			});
 			it("should return error message when password is too short", async () => {
 				const response = await request(app)
@@ -282,7 +290,9 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
+				expect(response.header.location).toBe(
+					"/register?error=password_too_short",
+				);
 			});
 
 			it("should return error message when password lacks number and special character", async () => {
@@ -296,7 +306,9 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
+				expect(response.header.location).toBe(
+					"/register?error=password_invalid_format",
+				);
 			});
 			it("should set HTTP-only cookie and redirect on successful registration", async () => {
 				vi.mocked(apiClient.registerUser).mockResolvedValue({
@@ -337,7 +349,9 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
+				expect(response.header.location).toBe(
+					"/register?error=registration_failed",
+				);
 			});
 
 			it("should return generic error message on exception", async () => {
@@ -355,7 +369,7 @@ describe("Express App Routes", () => {
 					.set("Content-Type", "application/json");
 
 				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/login");
+				expect(response.header.location).toBe("/register?error=server_error");
 			});
 		});
 
