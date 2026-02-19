@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import FormData from "form-data";
 import { submitJobApplication } from "../utils/apiClient";
 import type { AuthRequest } from "../utils/auth";
 
@@ -51,10 +52,9 @@ export async function submitApplication(
 
 		// Create FormData with file and jobRoleId
 		const formData = new FormData();
-		const fileBuffer = new Uint8Array(req.file.buffer);
-		const blob = new Blob([fileBuffer], { type: req.file.mimetype });
-		formData.append("cv", blob, req.file.originalname);
-		formData.append("jobRoleId", jobRoleId);
+		const jobRoleIdStr = Array.isArray(jobRoleId) ? jobRoleId[0] : jobRoleId;
+		formData.append("cv", req.file.buffer, req.file.originalname);
+		formData.append("jobRoleId", jobRoleIdStr);
 
 		// Call backend API through server-side client
 		const result = await submitJobApplication(formData, req.cookies.authToken);
