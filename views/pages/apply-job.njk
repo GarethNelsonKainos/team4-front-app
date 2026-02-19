@@ -184,7 +184,15 @@
             e.preventDefault();
             dropZone.classList.remove('border-kainos-500', 'bg-kainos-50');
             if (e.dataTransfer.files?.length > 0) {
-                handleFileSelect(e.dataTransfer.files[0]);
+                const droppedFile = e.dataTransfer.files[0];
+                
+                // Update fileInput.files property with the dropped file
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(droppedFile);
+                fileInput.files = dataTransfer.files;
+                
+                // Validate and display the file
+                handleFileSelect(droppedFile);
             }
         });
         
@@ -234,20 +242,68 @@
             });
         }
         
-        // Form submission handler
+        // Form submission handler with AJAX
         if (form) {
-            form.addEventListener('submit', (e) => {
-                console.log('Form submitting');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                console.log('Form submitting via AJAX');
+                
+                // Validate file selection
                 if (!fileInput.files || fileInput.files.length === 0) {
-                    e.preventDefault();
                     console.error('No file selected');
                     document.getElementById('errorText').textContent = 'Please select a file before submitting.';
                     showMessage('errorMessage');
                     return false;
                 }
-                // Disable button to prevent double submission
+                
+                // Show loading state and disable button
+                showMessage('loadingState');
                 uploadBtn.disabled = true;
-                uploadBtn.textContent = 'Submitting...';
+                
+                try {
+                    // Create FormData with the file
+                    const formData = new FormData();
+                    formData.append('cv', fileInput.files[0]);
+                    
+                    // Submit via AJAX
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    console.log('Response status:', response.status);
+                    
+                    // Handle response
+                    if (response.ok) {
+                        console.log('Application submitted successfully');
+                        showMessage('successMessage');
+                        // Redirect to success page after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = '/application-success';
+                        }, 2000);
+                    } else {
+                        // Parse error response
+                        let errorMessage = 'An error occurred while submitting your application. Please try again.';
+                        try {
+                            const errorData = await response.json();
+                            if (errorData.message) {
+                                errorMessage = errorData.message;
+                            }
+                        } catch (_e) {
+                            console.error('Could not parse error response');
+                        }
+                        
+                        console.error('Application submission failed:', response.status);
+                        document.getElementById('errorText').textContent = errorMessage;
+                        showMessage('errorMessage');
+                        uploadBtn.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Network error during submission:', error);
+                    document.getElementById('errorText').textContent = 'Network error. Please check your connection and try again.';
+                    showMessage('errorMessage');
+                    uploadBtn.disabled = false;
+                }
             });
         }
         
@@ -257,8 +313,4 @@
         }
         {% endif %}
     </script>
-{% endblock %}
-
-{% block scripts %}
-    <script src="/js/applicationService.js"></script>
 {% endblock %}

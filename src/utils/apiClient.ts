@@ -203,7 +203,6 @@ export async function deleteJobRole(id: number, token: string) {
  * @param token - JWT token for authentication
  */
 export async function submitJobApplication(formData: FormData, token: string) {
-	console.log(token);
 	try {
 		const response = await apiClient.post("/api/apply", formData, {
 			headers: {

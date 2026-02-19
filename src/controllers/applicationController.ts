@@ -68,7 +68,10 @@ export async function submitApplication(
 		}
 
 		console.log(`✅ Application submitted successfully for job ${jobRoleId}`);
-		return res.redirect("/application-success");
+		return res.status(200).json({
+			success: true,
+			message: "Application submitted successfully",
+		});
 	} catch (error) {
 		console.error("❌ Application submission error:", error);
 		return res.status(500).json({
