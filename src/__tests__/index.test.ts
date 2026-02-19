@@ -174,10 +174,8 @@ describe("Express App Routes", () => {
 					.send({ password: "password123!" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe(
-					"/login?error=missing_credentials",
-				);
+				expect(response.status).toBe(200);
+				expect(response.text).toContain("Email is required");
 			});
 
 			it("should return error message when password is missing", async () => {
@@ -186,10 +184,8 @@ describe("Express App Routes", () => {
 					.send({ email: "test@example.com" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe(
-					"/login?error=missing_credentials",
-				);
+				expect(response.status).toBe(200);
+				expect(response.text).toContain("Password is required");
 			});
 
 			it("should set HTTP-only cookie and redirect on successful login", async () => {
@@ -281,8 +277,8 @@ describe("Express App Routes", () => {
 				.post("/api/register")
 				.send({
 					email: "test@example.com",
-					password: "pass1",
-					confirmPassword: "pass1",
+					password: "pa1!",
+					confirmPassword: "pa1!",
 				})
 				.set("Content-Type", "application/json");
 
@@ -342,7 +338,7 @@ describe("Express App Routes", () => {
 				.set("Content-Type", "application/json");
 
 			expect(response.status).toBe(200);
-			expect(response.text).toContain("already be in use");
+			expect(response.text).toContain("Error registering");
 		});
 
 		it("should return generic error message on exception", async () => {

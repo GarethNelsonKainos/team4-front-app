@@ -38,8 +38,11 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/login?error=missing_credentials",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/login.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({ email: "Email is required" }),
+				}),
 			);
 		});
 
@@ -52,8 +55,11 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith(
-				"/login?error=missing_credentials",
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/login.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({ password: "Password is required" }),
+				}),
 			);
 		});
 
@@ -181,7 +187,7 @@ describe("AuthController", () => {
 			expect(mockResponse.render).toHaveBeenCalledWith(
 				"pages/register.njk",
 				expect.objectContaining({
-					errors: expect.objectContaining({ email: "Email is required." }),
+					errors: expect.objectContaining({ email: "Email is required" }),
 				}),
 			);
 		});
@@ -202,7 +208,7 @@ describe("AuthController", () => {
 				"pages/register.njk",
 				expect.objectContaining({
 					errors: expect.objectContaining({
-						password: "Password is required.",
+						password: "Password is required",
 					}),
 				}),
 			);
@@ -224,7 +230,7 @@ describe("AuthController", () => {
 				"pages/register.njk",
 				expect.objectContaining({
 					errors: expect.objectContaining({
-						confirmPassword: "Please confirm your password.",
+						confirmPassword: "Please confirm your password",
 					}),
 				}),
 			);
@@ -247,7 +253,7 @@ describe("AuthController", () => {
 				"pages/register.njk",
 				expect.objectContaining({
 					errors: expect.objectContaining({
-						confirmPassword: "Passwords do not match.",
+						confirmPassword: "Passwords do not match",
 					}),
 				}),
 			);
@@ -256,8 +262,8 @@ describe("AuthController", () => {
 		it("should return error message when password is too short", async () => {
 			mockRequest.body = {
 				email: "test@example.com",
-				password: "pass1",
-				confirmPassword: "pass1",
+				password: "pa1!",
+				confirmPassword: "pa1!",
 			};
 
 			await authController.register(
@@ -420,8 +426,7 @@ describe("AuthController", () => {
 			expect(mockResponse.render).toHaveBeenCalledWith(
 				"pages/register.njk",
 				expect.objectContaining({
-					errorMessage:
-						"Registration failed. This email may already be in use. Please try another email.",
+					errorMessage: "Error registering.",
 					formData: expect.objectContaining({ email: "existing@example.com" }),
 				}),
 			);

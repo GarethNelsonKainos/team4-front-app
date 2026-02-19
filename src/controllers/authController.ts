@@ -1,74 +1,23 @@
 import type { NextFunction, Request, Response } from "express";
+import * as yup from "yup";
+import { loginSchema, registrationSchema } from "../schemas/validationSchemas";
 import { loginUser, registerUser } from "../utils/apiClient";
 import type { AuthRequest } from "../utils/auth";
 import { clearAuthCookie, setAuthCookie } from "../utils/auth";
 
 /**
- * Validate email format
- */
-function isValidEmail(email: string): boolean {
-	const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-	return emailPattern.test(email);
-}
-
-/**
- * Validate password strength
- */
-function validatePassword(password: string): {
-	valid: boolean;
-	error?: string;
-} {
-	if (!password) {
-		return { valid: false, error: "Password is required." };
-	}
-
-	if (password.length < 6) {
-		return { valid: false, error: "Password must be at least 6 characters." };
-	}
-
-	const hasNumber = /[0-9]/.test(password);
-	const hasSpecialChar = /[!@#$%^&*]/.test(password);
-
-	if (!hasNumber || !hasSpecialChar) {
-		return {
-			valid: false,
-			error:
-				"Password must include a number and a special character (!@#$%^&*).",
-		};
-	}
-
-	return { valid: true };
-}
-
-/**
  * Handle user login
  */
 export async function login(req: Request, res: Response, _next: NextFunction) {
+	const authReq = req as AuthRequest;
+
 	try {
-		const { email, password } = req.body;
-		const authReq = req as AuthRequest;
-
-		// Validate input - redirect with error if validation fails
-		if (!email || !password) {
-			return res.redirect("/login?error=missing_credentials");
-		}
-
-		if (!isValidEmail(email)) {
-			const errors: Record<string, string> = {};
-			errors.email = "Enter a valid email address.";
-
-			return res.render("pages/login.njk", {
-				title: "Login - Kainos",
-				currentPage: "login",
-				user: authReq.user,
-				formData: { email },
-				errors,
-				errorMessage: "Please correct the errors below.",
-			});
-		}
+		const validated = await loginSchema.validate(req.body, {
+			abortEarly: false,
+		});
 
 		// Call backend API through server-side client
-		const result = await loginUser(email, password);
+		const result = await loginUser(validated.email, validated.password);
 
 		if (!result.success) {
 			// Return error message and restore form
@@ -78,7 +27,7 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 				title: "Login - Kainos",
 				currentPage: "login",
 				user: authReq.user,
-				formData: { email },
+				formData: { email: validated.email },
 				errorMessage: "Invalid email or password. Please try again.",
 			});
 		}
@@ -91,9 +40,24 @@ export async function login(req: Request, res: Response, _next: NextFunction) {
 		return res.redirect("/jobs");
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
-		console.error("Login error:", error);
-		const authReq = req as AuthRequest;
+		if (error instanceof yup.ValidationError) {
+			const errors: Record<string, string> = {};
+			error.inner.forEach((err) => {
+				if (err.path) errors[err.path] = err.message;
+			});
 
+			return res.render("pages/login.njk", {
+				title: "Login - Kainos",
+				currentPage: "login",
+				user: authReq.user,
+				formData: { email: req.body.email || "" },
+				errors,
+				errorMessage: "Please correct the errors",
+			});
+		}
+
+		// Handle any other unexpected errors
+		console.error("Unexpected login error:", error);
 		return res.render("pages/login.njk", {
 			title: "Login - Kainos",
 			currentPage: "login",
@@ -112,86 +76,23 @@ export async function register(
 	res: Response,
 	_next: NextFunction,
 ) {
+	const authReq = req as AuthRequest;
+
 	try {
-		const { email, password, confirmPassword } = req.body;
-		const authReq = req as AuthRequest;
+		const validated = await registrationSchema.validate(req.body, {
+			abortEarly: false,
+		});
 
-		const errors: Record<string, string> = {};
-
-		// Validate required fields
-		if (!email || !password || !confirmPassword) {
-			if (!email) errors.email = "Email is required.";
-			if (!password) errors.password = "Password is required.";
-			if (!confirmPassword)
-				errors.confirmPassword = "Please confirm your password.";
-
-			return res.render("pages/register.njk", {
-				title: "Register - Kainos",
-				currentPage: "register",
-				user: authReq.user,
-				formData: { email: email || "" },
-				errors,
-				errorMessage: "Please fill in all required fields.",
-			});
-		}
-
-		// Validate email format
-		if (!isValidEmail(email)) {
-			errors.email = "Enter a valid email address.";
-
-			return res.render("pages/register.njk", {
-				title: "Register - Kainos",
-				currentPage: "register",
-				user: authReq.user,
-				formData: { email },
-				errors,
-				errorMessage: "Please correct the errors below.",
-			});
-		}
-
-		// Validate passwords match
-		if (password !== confirmPassword) {
-			errors.confirmPassword = "Passwords do not match.";
-
-			return res.render("pages/register.njk", {
-				title: "Register - Kainos",
-				currentPage: "register",
-				user: authReq.user,
-				formData: { email },
-				errors,
-				errorMessage: "Please correct the errors below.",
-			});
-		}
-
-		// Validate password strength
-		const passwordValidation = validatePassword(password);
-		if (!passwordValidation.valid) {
-			errors.password = passwordValidation.error || "Invalid password.";
-
-			return res.render("pages/register.njk", {
-				title: "Register - Kainos",
-				currentPage: "register",
-				user: authReq.user,
-				formData: { email },
-				errors,
-				errorMessage: "Please correct the errors below.",
-			});
-		}
-
-		// Call backend API through server-side client
-		const result = await registerUser(email, password);
-
+		const result = await registerUser(validated.email, validated.password);
 		if (!result.success) {
 			// Return error message and restore form
 			console.error("Registration failed:", result.error);
-
 			return res.render("pages/register.njk", {
 				title: "Register - Kainos",
 				currentPage: "register",
 				user: authReq.user,
-				formData: { email },
-				errorMessage:
-					"Registration failed. This email may already be in use. Please try another email.",
+				formData: { email: validated.email || "" },
+				errorMessage: "Error registering.",
 			});
 		}
 
@@ -204,9 +105,23 @@ export async function register(
 		}
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
-		console.error("Registration error:", error);
-		const authReq = req as AuthRequest;
+		if (error instanceof yup.ValidationError) {
+			const errors: Record<string, string> = {};
+			error.inner.forEach((err) => {
+				if (err.path) errors[err.path] = err.message;
+			});
+			return res.render("pages/register.njk", {
+				title: "Register - Kainos",
+				currentPage: "register",
+				user: authReq.user,
+				formData: { email: req.body.email || "" },
+				errors,
+				errorMessage: "Please correct the errors",
+			});
+		}
 
+		// Handle any other unexpected errors
+		console.error("Unexpected registration error:", error);
 		return res.render("pages/register.njk", {
 			title: "Register - Kainos",
 			currentPage: "register",

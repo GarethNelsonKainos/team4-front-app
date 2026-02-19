@@ -40,10 +40,11 @@
 		"@types/node": "^25.2.2",
 		"@types/nunjucks": "^3.2.6",
 		"@types/supertest": "^6.0.3",
+		"@types/yup": "^0.29.14",
 		"@vitest/coverage-v8": "^4.0.18",
 		"@vitest/ui": "^4.0.18",
 		"autoprefixer": "^10.4.24",
-		"pa11y-ci": "^3.1.0",
+		"pa11y-ci": "^4.0.1",
 		"pa11y-runner-axe": "^2.0.1",
 		"pa11y-runner-htmlcs": "^2.0.1",
 		"postcss": "^8.5.6",
@@ -60,6 +61,7 @@
 		"dotenv": "^17.2.4",
 		"express": "^5.2.1",
 		"jsonwebtoken": "^9.0.3",
-		"nunjucks": "^3.2.4"
+		"nunjucks": "^3.2.4",
+		"yup": "^1.7.1"
 	}
 }
