@@ -1,76 +1,80 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-    <div class="max-w-6xl mx-auto py-8">
+    <div class="max-w-6xl mx-auto">
         <!-- Admin Header -->
-        <div class="mb-12">
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
-            <p class="text-lg text-gray-600">Manage job listings and administrator accounts</p>
+        <div class="text-center mb-8 md:mb-12 bg-blue-50 rounded-3xl p-6 md:p-12 shadow-2xl border-4 border-green-600">
+            <h1 class="text-4xl md:text-6xl font-bold text-blue-900 mb-4 drop-shadow-md">Admin Dashboard</h1>
+            <p class="text-lg md:text-2xl text-gray-900 mb-4 max-w-2xl mx-auto">Manage job listings and administrator accounts</p>
+            <div class="bg-green-600 rounded-lg p-3 inline-block">
+                <span class="text-white font-semibold text-base">Administrator Access</span>
+            </div>
         </div>
 
         <!-- Admin Actions Grid -->
-        <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <div class="grid md:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
             <!-- Job Management Card -->
-            <div class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-600 hover:shadow-xl transition-shadow">
-                <div class="flex items-center mb-6">
-                    <div class="bg-blue-100 rounded-full p-3 mr-4">
-                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-800">Job Listings</h2>
+            <div class="bg-blue-50 rounded-xl shadow-lg p-6 md:p-8 hover:shadow-2xl focus-visible:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 focus-visible:-translate-y-2 border-l-8 border-green-600 hover:border-blue-600 focus-visible:border-blue-600 group" tabindex="0">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 group-hover:from-blue-600 group-focus-visible:from-blue-600 group-hover:to-blue-700 group-focus-visible:to-blue-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 group-focus-visible:scale-110 transition-all duration-300">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
                 </div>
-                <p class="text-gray-600 mb-6">Create, edit, or delete job postings.</p>
+                <h2 class="text-xl md:text-2xl font-bold text-green-900 group-hover:text-blue-600 group-focus-visible:text-blue-600 transition-colors duration-300 mb-4">Job Listings</h2>
+                <p class="text-gray-950 mb-6 text-base md:text-xl font-semibold leading-relaxed">Create, edit, or delete job postings.</p>
                 <div class="flex flex-col gap-3">
-                    <a href="/admin/create-job" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center">
+                    <a href="/admin/create-job" class="inline-flex items-center justify-center bg-white hover:bg-blue-600 focus-visible:bg-blue-600 text-blue-600 hover:text-white focus-visible:text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-md hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 focus-visible:-translate-y-1 text-base">
                         Create New Job
                     </a>
-                    <a href="/admin/jobs" class="bg-blue-100 hover:bg-blue-200 text-blue-600 font-bold py-3 px-6 rounded-lg transition-colors text-center">
+                    <a href="/admin/jobs" class="inline-flex items-center justify-center bg-white hover:bg-blue-600 focus-visible:bg-blue-600 text-blue-600 hover:text-white focus-visible:text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-md hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 focus-visible:-translate-y-1 text-base">
                         Manage Jobs
                     </a>
                 </div>
             </div>
 
             <!-- Admin Management Card -->
-            <div class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-green-600 hover:shadow-xl transition-shadow">
-                <div class="flex items-center mb-6">
-                    <div class="bg-green-100 rounded-full p-3 mr-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-800">Administrators</h2>
+            <div class="bg-blue-50 rounded-xl shadow-lg p-6 md:p-8 hover:shadow-2xl focus-visible:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 focus-visible:-translate-y-2 border-l-8 border-green-600 hover:border-blue-600 focus-visible:border-blue-600 group" tabindex="0">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 group-hover:from-blue-600 group-focus-visible:from-blue-600 group-hover:to-blue-700 group-focus-visible:to-blue-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 group-focus-visible:scale-110 transition-all duration-300">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                    </svg>
                 </div>
-                <p class="text-gray-600 mb-6">Create new administrator accounts.</p>
-                <a href="/admin/create-admin" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center block">
-                    Create Admin Account
-                </a>
+                <h2 class="text-xl md:text-2xl font-bold text-green-900 group-hover:text-blue-600 group-focus-visible:text-blue-600 transition-colors duration-300 mb-4">Administrators</h2>
+                <p class="text-gray-950 mb-6 text-base md:text-xl font-semibold leading-relaxed">Create and manage administrator accounts.</p>
+                <div class="flex flex-col gap-3">
+                    <a href="/admin/create-admin" class="inline-flex items-center justify-center bg-white hover:bg-blue-600 focus-visible:bg-blue-600 text-blue-600 hover:text-white focus-visible:text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-md hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 focus-visible:-translate-y-1 text-base">
+                        Create Admin Account
+                    </a>
+                    <a href="/admin/admins" class="inline-flex items-center justify-center bg-white hover:bg-blue-600 focus-visible:bg-blue-600 text-blue-600 hover:text-white focus-visible:text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-md hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 focus-visible:-translate-y-1 text-base">
+                        Manage Admins
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Quick Stats Section -->
-        <div class="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-8 border border-blue-200">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Dashboard Overview</h3>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-white rounded-lg p-4 shadow">
-                    <p class="text-gray-600 text-sm mb-2">Signed in as</p>
-                    <p class="text-lg font-bold text-gray-800">{{ user.email }}</p>
+        <div class="bg-blue-50 rounded-3xl p-6 md:p-12 shadow-2xl border-4 border-green-600 mb-8 md:mb-12">
+            <h3 class="text-xl md:text-3xl font-bold text-blue-900 mb-6 text-center">Dashboard Overview</h3>
+            <div class="grid md:grid-cols-3 gap-4 md:gap-6">
+                <div class="bg-white rounded-lg p-6 shadow-lg border border-gray-200">
+                    <p class="text-gray-600 text-sm mb-2 font-semibold">Signed in as</p>
+                    <p class="text-lg font-bold text-gray-900">{{ user.email }}</p>
                 </div>
-                <div class="bg-white rounded-lg p-4 shadow">
-                    <p class="text-gray-600 text-sm mb-2">Role</p>
+                <div class="bg-white rounded-lg p-6 shadow-lg border border-gray-200">
+                    <p class="text-gray-600 text-sm mb-2 font-semibold">Role</p>
                     <p class="text-lg font-bold text-green-600">ADMINISTRATOR</p>
                 </div>
-                <div class="bg-white rounded-lg p-4 shadow">
-                    <p class="text-gray-600 text-sm mb-2">Access Level</p>
+                <div class="bg-white rounded-lg p-6 shadow-lg border border-gray-200">
+                    <p class="text-gray-600 text-sm mb-2 font-semibold">Access Level</p>
                     <p class="text-lg font-bold text-blue-600">Full Control</p>
                 </div>
             </div>
         </div>
 
         <!-- Help Section -->
-        <div class="mt-12 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-6">
-            <h3 class="text-lg font-bold text-yellow-800 mb-2">Need Help?</h3>
-            <p class="text-yellow-700">
+        <div class="bg-blue-50 rounded-3xl p-6 md:p-12 shadow-2xl border-4 border-green-600">
+            <h3 class="text-lg md:text-xl font-bold text-blue-900 mb-3">Need Help?</h3>
+            <p class="text-gray-900 text-base leading-relaxed">
                 Use the options above to manage your job listings and administrator accounts. 
                 Select "Manage Jobs" to view, edit, or delete existing job postings.
             </p>
