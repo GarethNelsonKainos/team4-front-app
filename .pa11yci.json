@@ -85,8 +85,117 @@
         "height": 667
       }
     },
-    "http://localhost:3000/error",
-    "http://localhost:3000/login-failed",
-    "http://localhost:3000/register-failed"
+    {
+      "url": "http://localhost:3000/error#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/error#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
+    {
+      "url": "http://localhost:3000/login-failed#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/login-failed#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
+    {
+      "url": "http://localhost:3000/register-failed#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/register-failed#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
+    {
+      "url": "http://localhost:3000/admin#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/admin#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
+    {
+      "url": "http://localhost:3000/admin/jobs#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/admin/jobs#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
+    {
+      "url": "http://localhost:3000/admin/admins#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/admin/admins#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
+    {
+      "url": "http://localhost:3000/admin/create-job#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/admin/create-job#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    },
+    {
+      "url": "http://localhost:3000/admin/create-admin#desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 1024
+      }
+    },
+    {
+      "url": "http://localhost:3000/admin/create-admin#mobile",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      }
+    }
   ]
 }

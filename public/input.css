@@ -1,3 +1,174 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ========================================
+   COMPONENT STYLES
+   ======================================== */
+
+/* Mobile Navigation */
+.mobile-nav-overlay {
+    @apply fixed inset-0 bg-gray-900 bg-opacity-50 z-40 hidden;
+}
+
+.mobile-nav-drawer {
+    @apply fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transition-transform duration-300 ease-in-out overflow-y-auto;
+}
+
+/* Navigation Links - Desktop */
+.nav-link-desktop-active {
+    @apply bg-[#008933] text-white font-semibold px-3 py-2 rounded-md hover:bg-[#007a2e] focus-visible:bg-[#007a2e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 transition-all duration-300;
+}
+
+.nav-link-desktop-inactive {
+    @apply text-gray-900 hover:text-blue-600 hover:bg-blue-50 focus-visible:text-blue-600 focus-visible:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 transition-all duration-300 font-medium px-3 py-2 rounded-md;
+}
+
+/* Navigation Links - Mobile */
+.nav-link-mobile-active {
+    @apply block px-4 py-3 bg-[#008933] text-white font-semibold rounded-md hover:bg-[#007a2e] focus-visible:bg-[#007a2e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 transition-all duration-300;
+}
+
+.nav-link-mobile-inactive {
+    @apply block px-4 py-3 text-gray-900 hover:text-blue-600 hover:bg-blue-50 focus-visible:text-blue-600 focus-visible:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 transition-all duration-300 rounded-md font-medium;
+}
+
+/* Mobile Menu Items */
+.menu-item {
+    animation: slideInLeft 0.3s ease-out forwards;
+}
+
+/* SVG Icons */
+.svg-lg {
+    @apply w-5 h-5;
+}
+
+/* Badges */
+.badge-warning-sm {
+    @apply inline-block px-2 py-1 text-xs font-bold text-yellow-800 bg-yellow-100 border border-yellow-600 rounded;
+}
+
+/* Dashboard Icon Animation */
+.dashboard-icon-fill {
+    overflow: visible;
+}
+
+.dashboard-icon-fill path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.dashboard-link:hover .dashboard-icon-fill path {
+    animation: fillBarLeftToRight 0.3s ease-out forwards;
+}
+
+.dashboard-link:hover .dashboard-icon-fill path:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.dashboard-link:hover .dashboard-icon-fill path:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.dashboard-link:hover .dashboard-icon-fill path:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+@keyframes fillBarLeftToRight {
+    0% {
+        fill: none;
+    }
+    100% {
+        fill: #86efac;
+        opacity: 0.7;
+    }
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes wiggleBurger {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(-8deg);
+    }
+    75% {
+        transform: rotate(8deg);
+    }
+}
+
+@keyframes fillFromLeft {
+    0% {
+        background: linear-gradient(90deg, #008933 0%, #008933 0%, transparent 0%, transparent 100%);
+    }
+    100% {
+        background: linear-gradient(90deg, #008933 0%, #008933 100%, transparent 100%, transparent 100%);
+    }
+}
+
+/* ========================================
+   FORM INPUTS & DATE PICKERS
+   ======================================== */
+
+/* Date picker calendar popup styling */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 200ms;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+/* Firefox date picker styling */
+input[type="date"]::-moz-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 200ms;
+}
+
+input[type="date"]::-moz-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* ========================================
+   NAVIGATION SPECIFIC
+   ======================================== */
+
+#hamburger-icon {
+    transition: transform 0.3s ease-out;
+}
+
+#mobile-menu-button:hover #hamburger-icon,
+#mobile-menu-button:focus-visible #hamburger-icon {
+    animation: wiggleBurger 0.6s ease-in-out 1;
+}
+
+/* Dashboard bar animations (hidden for now) */
+.dashboard-bar-1,
+.dashboard-bar-2,
+.dashboard-bar-3 {
+    display: none;
+}

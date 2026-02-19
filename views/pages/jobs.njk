@@ -1,10 +1,11 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-    <div class="text-center mb-8 md:mb-12 bg-blue-50 rounded-2xl p-6 md:p-8 shadow-md">
+    <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-8 md:mb-12 bg-blue-50 rounded-3xl p-6 md:p-12 shadow-2xl border-4 border-green-600">
         <h2 class="text-3xl md:text-5xl font-bold text-blue-900 mb-6">Available Job Roles</h2>
         <p class="text-lg md:text-xl text-gray-900 mb-8 max-w-2xl mx-auto">Discover exciting opportunities to join our innovative team</p>
-        <div class="bg-kainos-500 hover:bg-kainos-600 rounded-lg p-4 inline-block transition-colors duration-300">
+        <div class="bg-green-600 rounded-lg p-4 inline-block">
             <span class="text-white font-semibold text-base">{{ jobRoles.length }} Open Positions</span>
         </div>
     </div>
@@ -13,10 +14,10 @@
         <!-- Mobile Card Layout (visible on small screens) -->
         <div class="lg:hidden">
             {% for job in jobRoles %}
-            <div class="border-b border-gray-200 p-6 hover:bg-gray-50 transition-colors duration-200">
+            <div class="border-b border-gray-200 p-6 hover:bg-gray-50 focus-visible:bg-gray-50 transition-colors duration-200">
                 <!-- Role Name -->
                 <div class="mb-4">
-                    <a href="/job-roles/{{ job.jobRoleId }}" class="text-xl font-bold text-kainos-500 hover:text-kainos-700 hover:underline transition-colors">
+                    <a href="/job-roles/{{ job.id }}" class="text-xl font-bold text-kainos-500 hover:text-kainos-700 focus-visible:text-kainos-700 hover:underline focus-visible:underline transition-colors">
                         {{ job.roleName }}
                     </a>
                 </div>
@@ -71,15 +72,8 @@
 
                 <!-- Actions -->
                 <div class="flex flex-col sm:flex-row gap-2">
-                    <a href="/job-roles/{{ job.jobRoleId }}" class="bg-kainos-500 hover:bg-kainos-600 text-white px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200 flex items-center justify-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                        </svg>
-                        View Details
-                    </a>
-                    <button class="save-btn group bg-white hover:bg-gray-50 text-kainos-500 px-4 py-2 rounded-lg border border-kainos-500 text-base font-medium transition-colors duration-200 flex items-center justify-center" data-job-id="{{ job.jobRoleId }}">
-                        <svg class="w-4 h-4 mr-1 group-hover:fill-kainos-600 transition-all duration-200 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button class="save-btn group bg-white hover:bg-gray-50 focus-visible:bg-gray-50 text-kainos-500 px-4 py-2 rounded-lg border border-kainos-500 text-base font-medium transition-colors duration-200 flex items-center justify-center" data-job-id="{{ job.id }}">
+                        <svg class="w-4 h-4 mr-1 group-hover:fill-kainos-600 group-focus-visible:fill-kainos-600 transition-all duration-200 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                         </svg>
                         <span class="save-text">Save</span>
@@ -94,38 +88,38 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-kainos-500">
                     <tr>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
                             Role Name
                         </th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
                             Location
                         </th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
                             Capability
                         </th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
                             Band
                         </th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
                             Closing Date
                         </th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
                             Status
                         </th>
-                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
                             Actions
                         </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for job in jobRoles %}
-                    <tr class="hover:bg-gray-50 transition-colors duration-200">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="/job-roles/{{ job.jobRoleId }}" class="text-lg font-semibold text-kainos-500 hover:text-kainos-700 hover:underline transition-colors">
+                    <tr class="hover:bg-gray-50 focus-visible:bg-gray-50 transition-colors duration-200">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <a href="/job-roles/{{ job.id }}" class="text-lg font-semibold text-kainos-500 hover:text-kainos-700  focus-visible:text-kainos-700 hover:underline focus-visible:underline transition-colors">
                                 {{ job.roleName }}
                             </a>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <svg class="w-4 h-4 text-kainos-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -134,15 +128,15 @@
                                 <span class="text-base font-medium text-gray-900">{{ job.location }}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
                             <div class="text-base text-gray-900">{{ job.capability }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-medium bg-gray-100 text-gray-800">
                                 {{ job.band }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <svg class="w-4 h-4 text-kainos-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -150,40 +144,28 @@
                                 <span class="text-base text-gray-900">{{ job.closingDate | formatDate }}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-bold bg-green-100 text-green-800">
                                 {{ job.status | upper }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-base font-medium">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap text-base font-medium">
                             <div class="flex space-x-2">
-                                <a href="/job-roles/{{ job.jobRoleId }}" class="bg-kainos-500 hover:bg-kainos-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center">
+                                {% if features.jobDetailView %}
+                                <a href="/job-roles/{{ job.id }}" class="bg-kainos-500 hover:bg-kainos-600 text-white px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200 flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                     </svg>
                                     View
                                 </a>
-                                <button class="save-btn group bg-white hover:bg-gray-50 text-kainos-500 px-4 py-2 rounded-lg border border-kainos-500 text-sm font-medium transition-colors duration-200 flex items-center" data-job-id="{{ job.jobRoleId }}">
-                                    <svg class="w-4 h-4 mr-1 group-hover:fill-kainos-600 transition-all duration-200 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {% endif %}
+                                <button class="save-btn group bg-white hover:bg-gray-50 focus-visible:bg-gray-50 text-kainos-500 px-4 py-2 rounded-lg border border-kainos-500 text-base font-medium transition-colors duration-200 flex items-center" data-job-id="{{ job.id }}">
+                                    <svg class="w-4 h-4 mr-1 group-hover:fill-kainos-600 group-focus-visible:fill-kainos transition-all duration-200 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                                     </svg>
                                     <span class="save-text">Save</span>
                                 </button>
-                                {% if user and user.isAuthenticated and user.role === "admin" %}
-                                <a href="/job-roles/{{ job.id }}/edit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                    Edit
-                                </a>
-                                <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center" data-job-id="{{ job.id }}">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                    Delete
-                                </button>
-                                {% endif %}
                             </div>
                         </td>
                     </tr>
@@ -193,14 +175,15 @@
         </div>
     </div>
     
-    <div class="mt-6 md:mt-8 text-center bg-blue-50 rounded-2xl shadow-md p-6 md:p-8">
-        <p class="text-base md:text-lg text-gray-900 mb-4">Don't see the role you're looking for?</p>
-        <a href="/contact" class="bg-kainos-500 hover:bg-kainos-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300 inline-flex items-center text-base">
+    <div class="mt-8 md:mt-12 text-center bg-blue-50 rounded-3xl shadow-2xl p-6 md:p-12 border-4 border-green-600">
+        <p class="text-xl md:text-2xl font-semibold text-gray-900 mb-8">Don't see the role you're looking for?</p>
+        <a href="/contact" class="bg-white hover:bg-blue-600 focus-visible:bg-blue-600 text-blue-600 hover:text-white focus-visible:text-white font-semibold py-4 px-8 md:px-10 rounded-full transition-all duration-300 shadow-md hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 focus-visible:-translate-y-1 inline-flex items-center text-base md:text-lg">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
             </svg>
             Get in Touch
         </a>
+    </div>
     </div>
 
     <script>
