@@ -285,8 +285,8 @@ describe("AuthController", () => {
 		it("should return error message when password lacks a special character", async () => {
 			mockRequest.body = {
 				email: "test@example.com",
-				password: "password",
-				confirmPassword: "password",
+				password: "password123",
+				confirmPassword: "password123",
 			};
 
 			await authController.register(
@@ -308,8 +308,8 @@ describe("AuthController", () => {
 		it("should return error message when password lacks number", async () => {
 			mockRequest.body = {
 				email: "test@example.com",
-				password: "password",
-				confirmPassword: "password",
+				password: "password!",
+				confirmPassword: "password!",
 			};
 
 			await authController.register(
