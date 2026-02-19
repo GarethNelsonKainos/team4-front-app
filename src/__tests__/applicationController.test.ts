@@ -21,7 +21,7 @@ describe("ApplicationController", () => {
 				originalname: "cv.pdf",
 				size: 12,
 			} as Express.Multer.File,
-		} as AuthRequest;
+		} as unknown as AuthRequest;
 
 		(mockRequest as AuthRequest).user = {
 			email: "applicant@example.com",
