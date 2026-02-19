@@ -438,3 +438,47 @@ export function getAdminCreateAdminPage(
 		res.redirect("/error");
 	}
 }
+
+/**
+ * Render admin management page - list all admins for editing/deleting
+ */
+export async function getAdminAdminsPage(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+
+		// TODO: Fetch admins from API when endpoint is available
+		// For now, using mock data
+		const mockAdmins = [
+			{
+				id: 1,
+				firstName: "John",
+				lastName: "Doe",
+				email: "john.doe@kainos.com",
+				username: "johndoe",
+				role: "admin",
+			},
+			{
+				id: 2,
+				firstName: "Jane",
+				lastName: "Smith",
+				email: "jane.smith@kainos.com",
+				username: "janesmith",
+				role: "admin",
+			},
+		];
+
+		res.render("pages/admin-admins.njk", {
+			title: "Manage Administrators - Kainos",
+			currentPage: "admin",
+			admins: mockAdmins,
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering admin admins page:", error);
+		res.redirect("/error");
+	}
+}

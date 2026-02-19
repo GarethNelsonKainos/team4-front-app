@@ -1,30 +1,27 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-    <div class="max-w-md mx-auto py-12">
-        <!-- Page Header -->
-        <div class="mb-8 text-center">
-            <a href="/admin" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold mb-6">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                Back to Dashboard
-            </a>
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Create Admin Account</h1>
-            <p class="text-gray-600">Add a new administrator to your team</p>
-        </div>
-
-        <!-- Form Container -->
-        <div class="bg-white rounded-xl shadow-lg p-8">
+    <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-6">
+        <div class="mx-auto w-full max-w-md">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-kainos-500 mb-2">
+                    Create Admin Account
+                </h1>
+                <p class="text-kainos-grey-500 text-base">Add a new administrator to your team</p>
+            </div>
+        
+            <!-- Form Container -->
+            <div class="bg-white py-6 px-6 md:py-8 md:px-8 shadow-lg rounded-lg border-t-4 border-kainos-green-500">
             <form id="createAdminForm" action="/api/admin/create" method="post" class="space-y-6">
                 <!-- Email -->
                 <div>
-                    <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label for="email" class="block text-base font-semibold text-gray-700 mb-2">
                         Email Address
                     </label>
-                    <div class="relative">
+                    <div class="relative group">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-600 group-focus-within:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
                             </svg>
                         </div>
@@ -32,20 +29,20 @@
                                id="email" 
                                name="email" 
                                required 
-                               class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                               placeholder="admin@example.com">
+                               class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kainos-500 focus:border-kainos-500 hover:ring-2 hover:ring-kainos-500 hover:border-kainos-500 transition-all duration-300"
+                               placeholder="Enter admin email">
                     </div>
-                    <div id="emailError" class="text-red-500 text-sm mt-1 hidden"></div>
+                    <div id="emailError" class="text-red-500 text-base mt-1 hidden"></div>
                 </div>
 
                 <!-- Password -->
                 <div>
-                    <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label for="password" class="block text-base font-semibold text-gray-700 mb-2">
                         Password
                     </label>
-                    <div class="relative">
+                    <div class="relative group">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-600 group-focus-within:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                             </svg>
                         </div>
@@ -54,11 +51,12 @@
                                name="password" 
                                required 
                                minlength="8"
-                               class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                               placeholder="Create a strong password (min. 8 characters)">
+                               class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kainos-500 focus:border-kainos-500 hover:ring-2 hover:ring-kainos-500 hover:border-kainos-500 transition-all duration-300"
+                               placeholder="Create a strong password">
                         <button type="button" 
-                                id="togglePassword" 
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                            id="togglePassword" 
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus-visible:text-gray-600"
+                            aria-label="Show password">
                             <svg id="eyeIcon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -66,17 +64,17 @@
                         </button>
                     </div>
                     <p class="text-xs text-gray-500 mt-1">At least 8 characters</p>
-                    <div id="passwordError" class="text-red-500 text-sm mt-1 hidden"></div>
+                    <div id="passwordError" class="text-red-500 text-base mt-1 hidden"></div>
                 </div>
 
                 <!-- Confirm Password -->
                 <div>
-                    <label for="confirmPassword" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label for="confirmPassword" class="block text-base font-semibold text-gray-700 mb-2">
                         Confirm Password
                     </label>
-                    <div class="relative">
+                    <div class="relative group">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-600 group-focus-within:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                             </svg>
                         </div>
@@ -85,32 +83,49 @@
                                name="confirmPassword" 
                                required 
                                minlength="8"
-                               class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                               class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kainos-500 focus:border-kainos-500 hover:ring-2 hover:ring-kainos-500 hover:border-kainos-500 transition-all duration-300"
                                placeholder="Re-enter your password">
+                        <button type="button" 
+                            id="toggleConfirmPassword" 
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus-visible:text-gray-600"
+                            aria-label="Show password">
+                            <svg id="eyeIconConfirm" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
                     </div>
-                    <div id="confirmPasswordError" class="text-red-500 text-sm mt-1 hidden"></div>
+                    <div id="confirmPasswordError" class="text-red-500 text-base mt-1 hidden"></div>
                 </div>
 
-                <!-- Submit Buttons -->
-                <div class="flex gap-4 pt-6">
+                <!-- Submit Button -->
+                <div class="pt-6">
                     <button type="submit" 
-                            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                            class="w-full flex justify-center items-center bg-kainos-500 hover:bg-kainos-600 focus-visible:bg-kainos-600 focus:ring-4 focus:ring-kainos-200 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg focus-visible:shadow-lg text-base">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
                         Create Admin
                     </button>
-                    <a href="/admin" 
-                       class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-lg transition-colors text-center">
-                        Cancel
-                    </a>
                 </div>
             </form>
+        </div>
 
-            <!-- Info Box -->
-            <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 rounded p-4">
-                <p class="text-blue-800 text-sm">
-                    <strong>Important:</strong> Make sure the admin password is strong and secure. 
-                    Share it with the new admin securely.
-                </p>
-            </div>
+        <!-- Info Box -->
+        <div class="mt-8 md:mt-12 text-center bg-blue-50 rounded-3xl shadow-2xl p-6 md:p-12 border-4 border-green-600">
+            <p class="text-base md:text-lg text-gray-900">
+                <strong>Important:</strong> Make sure the admin password is strong and secure. Share it with the new admin securely.
+            </p>
+        </div>
+
+        <!-- Back to Dashboard -->
+        <div class="mt-8 text-center">
+            <a href="/admin" class="inline-flex items-center bg-white hover:bg-blue-600 focus-visible:bg-blue-600 text-blue-600 hover:text-white focus-visible:text-white font-semibold py-3 px-6 md:px-8 rounded-full transition-all duration-300 shadow-md hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 focus-visible:-translate-y-1 text-base">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
         </div>
     </div>
 
@@ -119,11 +134,57 @@
         const toggleBtn = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
         const eyeIcon = document.getElementById('eyeIcon');
+        const iconPaths = {
+            open: {
+                first: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+                second: 'M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'
+            },
+            off: {
+                first: 'M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z',
+                second: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'
+            }
+        };
+
+        const setEyeIcon = (svgEl, mode) => {
+            if (!svgEl) return;
+            const paths = svgEl.querySelectorAll('path');
+            if (paths.length < 2) return;
+            const { first, second } = iconPaths[mode];
+            paths[0].setAttribute('d', first);
+            paths[1].setAttribute('d', second);
+        };
 
         toggleBtn.addEventListener('click', () => {
             const isPassword = passwordInput.type === 'password';
             passwordInput.type = isPassword ? 'text' : 'password';
-            eyeIcon.classList.toggle('hidden', !isPassword);
+            
+            // Update icon based on visibility state
+            if (isPassword) {
+                // Showing password - switch to eye-off icon
+                setEyeIcon(eyeIcon, 'off');
+            } else {
+                // Hiding password - switch back to eye icon
+                setEyeIcon(eyeIcon, 'open');
+            }
+        });
+
+        // Toggle confirm password visibility
+        const toggleConfirmBtn = document.getElementById('toggleConfirmPassword');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const eyeIconConfirm = document.getElementById('eyeIconConfirm');
+
+        toggleConfirmBtn.addEventListener('click', () => {
+            const isPassword = confirmPasswordInput.type === 'password';
+            confirmPasswordInput.type = isPassword ? 'text' : 'password';
+            
+            // Update icon based on visibility state
+            if (isPassword) {
+                // Showing password - switch to eye-off icon
+                setEyeIcon(eyeIconConfirm, 'off');
+            } else {
+                // Hiding password - switch back to eye icon
+                setEyeIcon(eyeIconConfirm, 'open');
+            }
         });
 
         // Form submission

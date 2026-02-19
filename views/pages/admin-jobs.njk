@@ -1,116 +1,220 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-    <div class="max-w-6xl mx-auto py-8">
-        <!-- Page Header -->
-        <div class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-4xl font-bold text-gray-800 mb-2">Manage Job Listings</h1>
-                <p class="text-lg text-gray-600">Edit or delete existing job postings</p>
+    <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-8 md:mb-12 bg-blue-50 rounded-3xl p-6 md:p-12 shadow-2xl border-4 border-green-600">
+        <h2 class="text-3xl md:text-5xl font-bold text-blue-900 mb-6">Manage Job Listings</h2>
+        <p class="text-lg md:text-xl text-gray-900 mb-8 max-w-2xl mx-auto">Edit or delete existing job postings</p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="/admin/create-job" class="bg-white hover:bg-blue-600 focus-visible:bg-blue-600 text-blue-600 hover:text-white focus-visible:text-white font-semibold py-3 px-6 md:px-8 rounded-full transition-all duration-300 shadow-md hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 focus-visible:-translate-y-1 inline-flex items-center text-base">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                New Job
+            </a>
+            <a href="/admin" class="bg-white hover:bg-blue-600 focus-visible:bg-blue-600 text-blue-600 hover:text-white focus-visible:text-white font-semibold py-3 px-6 md:px-8 rounded-full transition-all duration-300 shadow-md hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 focus-visible:-translate-y-1 inline-flex items-center text-base">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Mobile Card Layout (visible on small screens) -->
+        <div class="lg:hidden">
+            {% if jobRoles.length > 0 %}
+            {% for job in jobRoles %}
+            <div class="border-b border-gray-200 p-6 hover:bg-gray-50 focus-visible:bg-gray-50 transition-colors duration-200">
+                <!-- Role Name -->
+                <div class="mb-4">
+                    <span class="text-xl font-bold text-kainos-500">{{ job.roleName }}</span>
+                </div>
+
+                <!-- Job Details Grid -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <!-- Location -->
+                    <div>
+                        <div class="text-base font-semibold text-gray-500 mb-1">Location</div>
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 text-kainos-500 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span class="text-base text-gray-900">{{ job.location }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Capability -->
+                    <div>
+                        <div class="text-base font-semibold text-gray-500 mb-1">Capability</div>
+                        <div class="text-base text-gray-900">{{ job.capability }}</div>
+                    </div>
+
+                    <!-- Band -->
+                    <div>
+                        <div class="text-base font-semibold text-gray-500 mb-1">Band</div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-medium bg-gray-100 text-gray-800">
+                            {{ job.band }}
+                        </span>
+                    </div>
+
+                    <!-- Closing Date -->
+                    <div>
+                        <div class="text-base font-semibold text-gray-500 mb-1">Closing Date</div>
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 text-kainos-500 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span class="text-base text-gray-900">{{ job.closingDate | formatDate }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="mb-4">
+                    <div class="text-base font-semibold text-gray-500 mb-1">Status</div>
+                    {% if job.status | lower === "open" %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-bold bg-green-100 text-green-800">{{ job.status | upper }}</span>
+                    {% elif job.status | lower === "closed" %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-bold bg-red-100 text-red-800">{{ job.status | upper }}</span>
+                    {% else %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-bold bg-yellow-100 text-yellow-800">{{ job.status | upper }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <a href="/job-roles/{{ job.id }}" class="bg-white hover:bg-yellow-500 focus-visible:bg-yellow-500 text-yellow-600 hover:text-white focus-visible:text-white px-4 py-2 rounded-lg border border-yellow-600 text-base font-medium transition-colors duration-200 flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Edit
+                    </a>
+                    <button class="delete-job-btn bg-white hover:bg-red-500 focus-visible:bg-red-500 text-red-600 hover:text-white focus-visible:text-white px-4 py-2 rounded-lg border border-red-600 text-base font-medium transition-colors duration-200 flex items-center justify-center" data-job-id="{{ job.id }}">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Delete
+                    </button>
+                </div>
             </div>
-            <div class="flex gap-4">
-                <a href="/admin/create-job" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    New Job
-                </a>
-                <a href="/admin" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    Back
-                </a>
+            {% endfor %}
+            {% else %}
+            <div class="p-6 text-center text-gray-500">
+                <p class="text-lg mb-4">No job listings found</p>
+                <a href="/admin/create-job" class="text-kainos-600 hover:text-kainos-700 focus-visible:text-kainos-700 hover:underline focus-visible:underline font-semibold">Create your first job posting</a>
             </div>
+            {% endif %}
         </div>
 
-        <!-- Jobs Table -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gradient-to-r from-blue-600 to-blue-700">
-                        <tr>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                Role Name
-                            </th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                Location
-                            </th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                Capability
-                            </th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                Status
-                            </th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                Closing Date
-                            </th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        {% if jobRoles.length > 0 %}
-                        {% for job in jobRoles %}
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-lg font-semibold text-gray-800">{{ job.roleName }}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-gray-700">{{ job.location }}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-gray-700">{{ job.capability }}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                {% if job.status | lower === "open" %}
-                                <span class="inline-block bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">{{ job.status | upper }}</span>
-                                {% elif job.status | lower === "closed" %}
-                                <span class="inline-block bg-red-100 text-red-800 text-xs font-bold px-3 py-1 rounded-full">{{ job.status | upper }}</span>
-                                {% else %}
-                                <span class="inline-block bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full">{{ job.status | upper }}</span>
-                                {% endif %}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-gray-700">{{ job.closingDate }}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap space-x-2">
-                                <a href="/job-roles/{{ job.jobRoleId }}" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">
+        <!-- Desktop Table Layout (hidden on small screens) -->
+        <div class="hidden lg:block overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-kainos-500">
+                    <tr>
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                            Role Name
+                        </th>
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                            Location
+                        </th>
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                            Capability
+                        </th>
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                            Band
+                        </th>
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                            Closing Date
+                        </th>
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% if jobRoles.length > 0 %}
+                    {% for job in jobRoles %}
+                    <tr class="hover:bg-gray-50 focus-visible:bg-gray-50 transition-colors duration-200">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <span class="text-base font-semibold text-kainos-500">{{ job.roleName }}</span>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-kainos-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span class="text-base text-gray-900">{{ job.location }}</span>
+                            </div>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <span class="text-base text-gray-900">{{ job.capability }}</span>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-medium bg-gray-100 text-gray-800">
+                                {{ job.band }}
+                            </span>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-kainos-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span class="text-base text-gray-900">{{ job.closingDate | formatDate }}</span>
+                            </div>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            {% if job.status | lower === "open" %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-bold bg-green-100 text-green-800">{{ job.status | upper }}</span>
+                            {% elif job.status | lower === "closed" %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-bold bg-red-100 text-red-800">{{ job.status | upper }}</span>
+                            {% else %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-bold bg-yellow-100 text-yellow-800">{{ job.status | upper }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <div class="flex space-x-2">
+                                <a href="/job-roles/{{ job.id }}" class="bg-white hover:bg-yellow-500 focus-visible:bg-yellow-500 text-yellow-600 hover:text-white focus-visible:text-white px-4 py-2 rounded-lg border border-yellow-600 text-base font-medium transition-colors duration-200 flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                     </svg>
                                     Edit
                                 </a>
-                                <button class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors delete-job-btn" data-job-id="{{ job.jobRoleId }}">
+                                <button class="delete-job-btn bg-white hover:bg-red-500 focus-visible:bg-red-500 text-red-600 hover:text-white focus-visible:text-white px-4 py-2 rounded-lg border border-red-600 text-base font-medium transition-colors duration-200 flex items-center" data-job-id="{{ job.id }}">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                     </svg>
                                     Delete
                                 </button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                                <p class="text-lg">No job listings found</p>
-                                <a href="/admin/create-job" class="text-blue-600 hover:text-blue-800 font-semibold mt-2 inline-block">Create your first job posting</a>
-                            </td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="px-4 md:px-6 py-8 text-center text-gray-500">
+                            <p class="text-lg mb-4">No job listings found</p>
+                            <a href="/admin/create-job" class="text-kainos-600 hover:text-kainos-700 focus-visible:text-kainos-700 hover:underline focus-visible:underline font-semibold">Create your first job posting</a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <!-- Info Box -->
-        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <p class="text-blue-800">
-                <strong>Note:</strong> Click "Edit" to navigate to the job detail page where you can make changes. 
-                Use the "Delete" button to remove job postings.
-            </p>
-        </div>
+    <!-- Info Box -->
+    <div class="mt-8 md:mt-12 text-center bg-blue-50 rounded-3xl shadow-2xl p-6 md:p-12 border-4 border-green-600">
+        <p class="text-base md:text-lg text-gray-900">
+            <strong>Note:</strong> Click "Edit" to modify job details or use "Delete" to remove job postings permanently.
+        </p>
+    </div>
     </div>
 
     <script>
