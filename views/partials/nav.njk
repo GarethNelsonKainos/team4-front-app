@@ -403,6 +403,7 @@
             );
         }
 
+
         function openMenu(focusOnOpen = true) {
             mobileMenu.classList.remove('translate-x-full');
             mobileMenu.classList.add('translate-x-0');
@@ -481,10 +482,14 @@
             // Remove keyboard trap
             document.removeEventListener('keydown', trapFocus);
 
-            if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+            if (
+                lastFocusedElement &&
+                typeof lastFocusedElement.focus === 'function' &&
+                (lastFocusedElement.isConnected || document.contains(lastFocusedElement))
+            ) {
                 lastFocusedElement.focus();
-                lastFocusedElement = null;
             }
+            lastFocusedElement = null;
         }
         
         // Focus trap handler
@@ -527,14 +532,13 @@
             }
         });
         
-        // Only enable hover-to-open on larger screens (tablet/desktop)
-        function isLargeScreen() {
-            const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-            return window.innerWidth >= 768 && canHover; // md breakpoint + hover capable
+        // Only enable hover-to-open on hover-capable pointers
+        function canUseHover() {
+            return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
         }
         
         mobileMenuButton.addEventListener('mouseenter', function() {
-            if (!mobileMenuWasClicked && isLargeScreen()) {
+            if (!mobileMenuWasClicked && canUseHover()) {
                 clearTimeout(hoverCloseTimeout);
                 clearTimeout(hoverOpenTimeout);
                 if (mobileMenu.classList.contains('translate-x-full')) {
@@ -544,20 +548,20 @@
         });
         
         mobileMenuButton.addEventListener('mouseleave', function() {
-            if (!mobileMenuWasClicked && isLargeScreen()) {
+            if (!mobileMenuWasClicked && canUseHover()) {
                 clearTimeout(hoverOpenTimeout);
                 hoverCloseTimeout = setTimeout(closeMenu, 500); // Increased from 200ms
             }
         });
         
         mobileMenu.addEventListener('mouseenter', function() {
-            if (!mobileMenuWasClicked) {
+            if (!mobileMenuWasClicked && canUseHover()) {
                 clearTimeout(hoverCloseTimeout);
             }
         });
         
         mobileMenu.addEventListener('mouseleave', function() {
-            if (!mobileMenuWasClicked) {
+            if (!mobileMenuWasClicked && canUseHover()) {
                 closeMenu();
             }
         });

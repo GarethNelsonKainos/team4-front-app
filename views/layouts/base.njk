@@ -21,29 +21,20 @@
     {% block scripts %}{% endblock %}
     
     <script>
-        // Prevent browser from restoring scroll position
-        if ('scrollRestoration' in window.history) {
-            window.history.scrollRestoration = 'manual';
-        }
-        
-        // Scroll to top on page load
-        function scrollToTop() {
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-        }
-        
-        // Scroll immediately
-        scrollToTop();
-        
-        // Scroll after DOMContentLoaded with slight delay
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(scrollToTop, 0);
-        });
-        
-        // Scroll on load event
         window.addEventListener('load', function() {
-            setTimeout(scrollToTop, 0);
+            const navigationEntry = performance.getEntriesByType('navigation')[0];
+            const isBackForward = navigationEntry && navigationEntry.type === 'back_forward';
+
+            // Only force scroll-to-top on fresh navigations.
+            if ('scrollRestoration' in window.history) {
+                window.history.scrollRestoration = isBackForward ? 'auto' : 'manual';
+            }
+
+            if (!isBackForward) {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            }
         });
     </script>
 </body>
