@@ -4,6 +4,11 @@ Team 4 Frontend Application Feb/March 2026
 
 A modern frontend application built with Node.js, Express, Nunjucks templating, TypeScript, and Tailwind CSS.
 
+## ✅ Requirements
+
+- Node.js >= 20 (required for pa11y-ci 4.x)
+- npm (bundled with Node.js)
+
 ## 🚀 Quick Start
 
 ```bash

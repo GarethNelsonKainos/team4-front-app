@@ -27,6 +27,9 @@
 	"author": "",
 	"license": "ISC",
 	"type": "module",
+	"engines": {
+		"node": ">=20"
+	},
 	"bugs": {
 		"url": "https://github.com/GarethNelsonKainos/team4-front-app/issues"
 	},
