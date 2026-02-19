@@ -1,37 +1,45 @@
 import type { NextFunction, Request, Response } from "express";
+import multer, { type FileFilterCallback } from "multer";
 import { loginUser, registerUser } from "../utils/apiClient";
 import { clearAuthCookie, setAuthCookie } from "../utils/auth";
-import multer, { type FileFilterCallback } from "multer";
 
 // Configure multer for file upload
 const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB limit
-    },
-    fileFilter: (_req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-        const allowedTypes = [
-            'application/pdf',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        ];
-        if (allowedTypes.includes(file.mimetype)) {
-            cb(null, true);
-        } else {
-            cb(new Error('Invalid file type. Only PDF, DOC, DOCX allowed.'));
+	storage: multer.memoryStorage(),
+	limits: {
+		fileSize: 5 * 1024 * 1024, // 5MB limit
+	},
+	fileFilter: (
+		_req: Request,
+		file: Express.Multer.File,
+		cb: FileFilterCallback,
+	) => {
+		const allowedTypes = [
+			"application/pdf",
+			"application/msword",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		];
+		if (allowedTypes.includes(file.mimetype)) {
+			cb(null, true);
+		} else {
+			cb(new Error("Invalid file type. Only PDF, DOC, DOCX allowed."));
 		}
-	}
+	},
 });
 
 /**
  * Handle CV upload
  */
-export const uploadCVMiddleware = upload.single('cv');
+export const uploadCVMiddleware = upload.single("cv");
 
 /**
  * Handle CV upload controller
  */
-export async function uploadCV(req: Request & { file?: Express.Multer.File }, res: Response, _next: NextFunction) {
+export async function uploadCV(
+	req: Request & { file?: Express.Multer.File },
+	res: Response,
+	_next: NextFunction,
+) {
 	try {
 		const { jobRoleId } = req.body;
 		const file = req.file;
@@ -40,14 +48,14 @@ export async function uploadCV(req: Request & { file?: Express.Multer.File }, re
 		if (!jobRoleId) {
 			return res.status(400).json({
 				success: false,
-				error: 'Job role ID is required'
+				error: "Job role ID is required",
 			});
 		}
 
 		if (!file) {
 			return res.status(400).json({
 				success: false,
-				error: 'CV file is required'
+				error: "CV file is required",
 			});
 		}
 
@@ -56,15 +64,14 @@ export async function uploadCV(req: Request & { file?: Express.Multer.File }, re
 		if (!token) {
 			return res.status(401).json({
 				success: false,
-				error: 'Authentication required'
+				error: "Authentication required",
 			});
 		}
-
 	} catch (error) {
-		console.error('CV upload error:', error);
+		console.error("CV upload error:", error);
 		res.status(500).json({
 			success: false,
-			error: 'Internal server error during CV upload'
+			error: "Internal server error during CV upload",
 		});
 	}
 }

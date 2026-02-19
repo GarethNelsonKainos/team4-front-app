@@ -1,5 +1,5 @@
 import axios, { type AxiosError, type AxiosInstance } from "axios";
-import FormData from "form-data";
+import type FormData from "form-data";
 
 /**
  * Server-side API client for communicating with the backend API
@@ -208,7 +208,7 @@ export async function submitJobApplication(formData: FormData, token: string) {
 		const response = await apiClient.post("/api/apply", formData, {
 			headers: {
 				"Content-Type": "multipart/form-data",
-				"Authorization": `Bearer ${token}`,
+				Authorization: `Bearer ${token}`,
 			},
 		});
 		return {

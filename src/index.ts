@@ -89,7 +89,11 @@ app.post("/api/register", authController.register);
 app.post("/api/logout", authController.logout);
 app.get("/api/logout", authController.logout);
 app.get("/api/auth-status", authController.checkAuthStatus);
-app.post("/api/uploads/cv", authController.uploadCVMiddleware, authController.uploadCV);
+app.post(
+	"/api/uploads/cv",
+	authController.uploadCVMiddleware,
+	authController.uploadCV,
+);
 
 // Application submission route
 app.post(

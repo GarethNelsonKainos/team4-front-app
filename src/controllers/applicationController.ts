@@ -21,7 +21,8 @@ export async function submitApplication(
 		) {
 			return res.status(401).json({
 				success: false,
-				message: "You must be logged in as an applicant to submit an application",
+				message:
+					"You must be logged in as an applicant to submit an application",
 			});
 		}
 
@@ -67,7 +68,7 @@ export async function submitApplication(
 		}
 
 		console.log(`✅ Application submitted successfully for job ${jobRoleId}`);
-		return res.redirect('/application-success');
+		return res.redirect("/application-success");
 	} catch (error) {
 		console.error("❌ Application submission error:", error);
 		return res.status(500).json({
