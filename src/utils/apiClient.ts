@@ -199,7 +199,6 @@ export async function deleteJobRole(id: number, token: string) {
 }
 
 /**
- * Submit job application with CV file
  * @param formData - FormData object containing the CV file and job role ID
  * @param token - JWT token for authentication
  */
