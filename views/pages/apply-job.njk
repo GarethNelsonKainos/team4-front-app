@@ -35,7 +35,7 @@
             </div>
             {% else %}
             <!-- Upload form -->
-            <form id="cvUploadForm" class="space-y-6">
+            <form action="/apply/{{ job.jobRoleId }}" method="post" enctype="multipart/form-data" id="cvUploadForm" class="space-y-6">
                 <!-- Drag and drop zone -->
                 <div id="dropZone" class="border-3 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-kainos-500 hover:bg-kainos-50 transition-colors duration-300" style="min-height: 200px;">
                     <input type="file" id="fileInput" name="cv" accept=".pdf,.doc,.docx" style="display: none;">
@@ -112,41 +112,37 @@
     </div>
 
     <script>
-        // Only initialize if user hasn't already applied
         {% if not userHasAppliedForJob %}
+        const form = document.getElementById('cvUploadForm');
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const previewSection = document.getElementById('previewSection');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
-        const removeFileBtn = document.getElementById('removeFile');
-        const uploadForm = document.getElementById('cvUploadForm');
         const uploadBtn = document.getElementById('uploadBtn');
-        const errorMessage = document.getElementById('errorMessage');
-        const errorText = document.getElementById('errorText');
-        const successMessage = document.getElementById('successMessage');
-        const loadingState = document.getElementById('loadingState');
-        
-        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB in bytes
-        const ALLOWED_FORMATS = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx'];
-        
-        let selectedFile = null;
         const jobId = {{ job.jobRoleId }};
         
-        // Click to browse files
-        dropZone.addEventListener('click', () => fileInput.click());
+        // File selection handler
+        function handleFileSelect(file) {
+            const data = {
+                name: document.getElementById('fileName'),
+                size: document.getElementById('fileSize')
+            };
+            data.name.textContent = file.name;
+            data.size.textContent = (file.size / 1024).toFixed(2) + ' KB';
+            previewSection.classList.remove('hidden');
+            uploadBtn.disabled = false;
+            hideMessages();
+        }
         
-        // Handle file input change
-        fileInput.addEventListener('change', (e) => {
-            const files = e.target.files;
-            if (files && files.length > 0) {
-                handleFileSelect(files[0]);
-            }
-        });
+        // Message display
+        function showMessage(type) {
+            document.getElementById('errorMessage')?.classList.add('hidden');
+            document.getElementById('successMessage')?.classList.add('hidden');
+            document.getElementById('loadingState')?.classList.add('hidden');
+            if (type) document.getElementById(type).classList.remove('hidden');
+        }
         
-        // Drag and drop handlers
-        dropZone.addEventListener('dragover', (e) => {
+        // Drag and drop
+        dropZone.addEventListener('dragover', e => {
             e.preventDefault();
             dropZone.classList.add('border-kainos-500', 'bg-kainos-50');
         });
@@ -155,143 +151,36 @@
             dropZone.classList.remove('border-kainos-500', 'bg-kainos-50');
         });
         
-        dropZone.addEventListener('drop', (e) => {
+        dropZone.addEventListener('drop', e => {
             e.preventDefault();
             dropZone.classList.remove('border-kainos-500', 'bg-kainos-50');
-            
-            const files = e.dataTransfer.files;
-            if (files && files.length > 0) {
-                handleFileSelect(files[0]);
+            if (e.dataTransfer.files?.length > 0) {
+                handleFileSelect(e.dataTransfer.files[0]);
             }
         });
         
-        // Handle file selection
-        function handleFileSelect(file) {
-            hideAllMessages();
-            
-            // Validate file
-            const validation = validateFile(file);
-            if (!validation.valid) {
-                showError(validation.error);
-                return;
-            }
-            
-            selectedFile = file;
-            displayFilePreview(file);
-        }
-        
-        // Validate file
-        function validateFile(file) {
-            // Check file size
-            if (file.size > MAX_FILE_SIZE) {
-                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                return {
-                    valid: false,
-                    error: `File is too large (${sizeMB} MB). Maximum size is 5 MB.`
-                };
-            }
-            
-            // Check file type by MIME type and extension
-            const ext = file.name.split('.').pop().toLowerCase();
-            if (!ALLOWED_EXTENSIONS.includes(ext)) {
-                return {
-                    valid: false,
-                    error: 'Invalid file format. Please upload a PDF or Word document (DOC/DOCX).'
-                };
-            }
-            
-            if (!ALLOWED_FORMATS.includes(file.type) && file.type !== '') {
-                return {
-                    valid: false,
-                    error: 'Invalid file format. Please upload a PDF or Word document (DOC/DOCX).'
-                };
-            }
-            
-            return { valid: true };
-        }
-        
-        // Display file preview
-        function displayFilePreview(file) {
-            fileName.textContent = file.name;
-            fileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
-            previewSection.classList.remove('hidden');
-            uploadBtn.disabled = false;
-        }
+        // File input
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => {
+            if (e.target.files?.length > 0) handleFileSelect(e.target.files[0]);
+        });
         
         // Remove file
-        removeFileBtn.addEventListener('click', () => {
-            selectedFile = null;
+        document.getElementById('removeFile').addEventListener('click', () => {
             fileInput.value = '';
             previewSection.classList.add('hidden');
-            hideAllMessages();
-            uploadBtn.disabled = false;
+            uploadBtn.disabled = true;
+            hideMessages();
         });
         
-        // Hide all messages
-        function hideAllMessages() {
-            errorMessage.classList.add('hidden');
-            successMessage.classList.add('hidden');
-            loadingState.classList.add('hidden');
+        // Helper
+        function hideMessages() {
+            showMessage(null);
         }
-        
-        // Show error message
-        function showError(message) {
-            hideAllMessages();
-            errorText.textContent = message;
-            errorMessage.classList.remove('hidden');
-        }
-        
-        // Show success message
-        function showSuccess() {
-            hideAllMessages();
-            successMessage.classList.remove('hidden');
-            uploadForm.reset();
-            previewSection.classList.add('hidden');
-            uploadBtn.disabled = true;
-        }
-        
-        // Show loading state
-        function showLoading() {
-            hideAllMessages();
-            loadingState.classList.remove('hidden');
-        }
-        
-        // Handle form submission
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!selectedFile) {
-                showError('Please select a file to upload.');
-                return;
-            }
-            
-            showLoading();
-            uploadBtn.disabled = true;
-            
-            try {
-                const formData = new FormData();
-                formData.append('cv', selectedFile);
-                formData.append('jobRoleId', jobId);
-                
-                const response = await fetch('/api/uploads/cv', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (response.ok) {
-                    showSuccess();
-                } else {
-                    const data = await response.json();
-                    const errorMsg = data.message || 'An error occurred during upload. Please try again.';
-                    showError(errorMsg);
-                    uploadBtn.disabled = false;
-                }
-            } catch (error) {
-                console.error('Upload error:', error);
-                showError('Network error. Please check your connection and try again.');
-                uploadBtn.disabled = false;
-            }
-        });
         {% endif %}
     </script>
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/applicationService.js"></script>
 {% endblock %}

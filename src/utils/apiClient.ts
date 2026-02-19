@@ -199,61 +199,17 @@ export async function deleteJobRole(id: number, token: string) {
 }
 
 /**
- * Upload CV file for job application (Server-side only)
- * @param fileBuffer - File buffer from multer
- * @param filename - Original filename
- * @param mimetype - File mimetype
- * @param jobRoleId - Job role ID to apply for
- * @param token - JWT auth token
- * @returns Promise with upload result
- */
-export async function uploadCVToBackend(
-	fileBuffer: Buffer, 
-	filename: string, 
-	mimetype: string, 
-	jobRoleId: string, 
-	token: string
-) {
-	try {
-		const formData = new FormData();
-		formData.append('jobRoleId', jobRoleId);
-		formData.append('cv', fileBuffer, {
-			filename,
-			contentType: mimetype
-		});
-
-		const response = await apiClient.post("/api/applications/apply", formData, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-				...formData.getHeaders()
-			},
-		});
-		return {
-			success: true,
-			data: response.data,
-		};
-	} catch (error) {
-		const axiosError = error as AxiosError<{ message?: string }>;
-		return {
-			success: false,
-			error:
-				axiosError.response?.data?.message ||
-				"Failed to upload CV. Please try again.",
-			status: axiosError.response?.status,
-		};
-	}
-}
-
-/**
- * Upload CV file for job application
+ * Submit job application with CV file
  * @param formData - FormData object containing the CV file and job role ID
- * @returns Promise with upload result
+ * @param token - JWT token for authentication
  */
-export async function uploadCV(formData: FormData) {
+export async function submitJobApplication(formData: FormData, token: string) {
+	console.log(token);
 	try {
-		const response = await apiClient.post("/api/uploads/cv", formData, {
+		const response = await apiClient.post("/api/apply", formData, {
 			headers: {
 				"Content-Type": "multipart/form-data",
+				"Authorization": `Bearer ${token}`,
 			},
 		});
 		return {
@@ -266,7 +222,7 @@ export async function uploadCV(formData: FormData) {
 			success: false,
 			error:
 				axiosError.response?.data?.message ||
-				"Failed to upload CV. Please try again.",
+				"Failed to submit application. Please try again.",
 			status: axiosError.response?.status,
 		};
 	}

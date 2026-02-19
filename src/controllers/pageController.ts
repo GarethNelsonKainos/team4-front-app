@@ -5,6 +5,27 @@ import type { AuthRequest } from "../utils/auth";
 const showAdminFeatures = process.env.FEATURE_ADMIN_DASHBOARD === "true";
 
 /**
+ * Render application success page
+ */
+export function getApplicationSuccessPage(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+
+		res.render("pages/application-success.njk", {
+			title: "Application Submitted",
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering template:", error);
+		res.redirect("/error");
+	}
+}
+
+/**
  * Render home page
  */
 export function getHomePage(req: Request, res: Response, _next: NextFunction) {
