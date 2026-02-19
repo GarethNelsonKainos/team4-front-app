@@ -66,6 +66,7 @@ app.get(
 	requireAdmin,
 	pageController.getAdminCreateAdminPage,
 );
+app.get("/admin/admins", requireAdmin, pageController.getAdminAdminsPage);
 
 // API Routes
 app.post("/api/login", authController.login);
