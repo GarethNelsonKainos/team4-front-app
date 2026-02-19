@@ -7,17 +7,7 @@
         <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8">
             <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
                 <div class="flex-1">
-                    <div class="flex items-center justify-between gap-4 mb-4 md:hidden">
-                        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 max-w-4xl">{{ job.roleName }}</h1>
-                        <button class="save-btn group flex items-center bg-white hover:bg-gray-50 focus-visible:bg-gray-50 text-kainos-500 font-semibold py-2 px-4 rounded-lg border border-kainos-500 transition-colors duration-300 whitespace-nowrap flex-shrink-0 text-sm" data-job-id="{{ job.id }}">
-                            <svg class="w-4 h-4 mr-1 group-hover:fill-kainos-600 group-focus-visible:fill-kainos-600 transition-all duration-200 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                            </svg>
-                            <span class="save-text">Save for Later</span>
-                        </button>
-                    </div>
-                    
-                    <h1 class="hidden md:block text-3xl md:text-4xl font-bold text-gray-800 mb-4 max-w-4xl">{{ job.roleName }}</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 max-w-4xl">{{ job.roleName }}</h1>
                     <div class="flex flex-wrap gap-4 mb-6">
                         <div class="flex items-center bg-kainos-50 px-4 py-2 rounded-lg">
                             <svg class="w-5 h-5 text-kainos-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,12 +27,25 @@
                         </div>
                     </div>
                     
-                    <button class="save-btn group hidden md:flex items-center bg-white hover:bg-gray-50 focus-visible:bg-gray-50 text-kainos-500 font-semibold py-2 px-4 rounded-lg border border-kainos-500 transition-colors duration-300 w-fit" data-job-id="{{ job.id }}">
-                        <svg class="w-4 h-4 mr-1 group-hover:fill-kainos-600 group-focus-visible:fill-kainos-600 transition-all duration-200 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
-                        <span class="save-text">Save for Later</span>
-                    </button>
+                    <div class="flex gap-3 items-center">
+                        <button class="save-btn group flex items-center bg-white hover:bg-gray-50 focus-visible:bg-gray-50 text-kainos-500 font-semibold py-2 px-4 rounded-lg border border-kainos-500 transition-colors duration-300 whitespace-nowrap flex-shrink-0 text-sm" data-job-id="{{ job.jobRoleId }}">
+                            <svg class="w-4 h-4 mr-1 group-hover:fill-kainos-600 group-focus-visible:fill-kainos-600 transition-all duration-200 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                            <span class="save-text">Save for Later</span>
+                        </button>
+                        
+                        {% if features.jobApplyView %}
+                            {% if user and user.isAuthenticated and user.role === "applicant" %}
+                        <a href="/job-roles/{{ job.jobRoleId }}/apply" class="apply-btn flex items-center justify-center text-base bg-kainos-500 hover:bg-kainos-600 focus-visible:bg-kainos-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300 whitespace-nowrap">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Apply Now
+                        </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="space-y-4">
@@ -78,17 +81,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                     </svg>
                 </a>
-                {% endif %}
-
-                {% if features.jobApplyView %}
-                    {% if user and user.isAuthenticated and user.role === "applicant" %}
-                <button class="flex items-center justify-center text-base bg-kainos-500 hover:bg-kainos-600 focus-visible:bg-kainos-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    Apply Now
-                </button>
-                    {% endif %}
                 {% endif %}
             </div>
         </div>
@@ -149,7 +141,7 @@
         // Initialize save button
         function initializeSaveButton() {
             const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-            const jobId = {{ job.id }};
+            const jobId = {{ job.jobRoleId }};
             const btn = document.querySelector('.save-btn');
 
             // Load saved state on page load
@@ -192,6 +184,8 @@
         }
 
         // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', initializeSaveButton);
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSaveButton();
+        });
     </script>
 {% endblock %}

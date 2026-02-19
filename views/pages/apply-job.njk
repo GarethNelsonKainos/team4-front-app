@@ -2,22 +2,12 @@
 
 {% block content %}
     <div class="max-w-2xl mx-auto">
-        <!-- Back button -->
-        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-            <a href="/job-roles/{{ job.jobRoleId }}" class="inline-flex items-center text-base text-kainos-500 hover:text-kainos-700 font-semibold transition-colors">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                Back to Job Details
-            </a>
-        </div>
-
         <!-- Main content -->
         <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
             <!-- Job header -->
             <div class="mb-8 pb-6 border-b border-gray-200">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Apply for {{ job.roleName }}</h1>
-                <p class="text-base text-gray-600">{{ job.location }} • {{ job.capability }}</p>
+                <p class="text-base text-gray-600">{{ job.location }} - {{ job.capability }}</p>
             </div>
 
             <!-- Already applied message -->
@@ -45,8 +35,8 @@
                     </svg>
                     
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Upload Your CV</h3>
-                    <p class="text-base text-gray-600 mb-2">Drag and drop your file here, or <span class="text-kainos-500 font-semibold cursor-pointer">browse files</span></p>
-                    <p class="text-sm text-gray-500">Accepted formats: PDF, DOC, DOCX • Max size: 5 MB</p>
+                    <p class="text-base text-gray-600 mb-2">Drag and drop your file here, or <button type="button" id="browseBtn" class="text-kainos-500 font-semibold cursor-pointer hover:underline bg-transparent border-none p-0">browse files</button></p>
+                    <p class="text-sm text-gray-500">Accepted formats: PDF, DOC, DOCX - Max size: 5 MB</p>
                 </div>
 
                 <!-- File preview section -->
@@ -100,7 +90,7 @@
                 </div>
 
                 <!-- Upload button -->
-                <button type="submit" id="uploadBtn" class="w-full flex items-center justify-center bg-kainos-500 hover:bg-kainos-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
+                <button type="submit" id="uploadBtn" disabled class="w-full flex items-center justify-center bg-kainos-500 hover:bg-kainos-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
                     </svg>
@@ -108,6 +98,16 @@
                 </button>
             </form>
             {% endif %}
+        </div>
+
+        <!-- Back to Job Details -->
+        <div class="mt-8 text-center">
+            <a href="/job-roles/{{ job.jobRoleId }}" class="inline-flex items-center bg-white hover:bg-blue-600 focus-visible:bg-blue-600 text-blue-600 hover:text-white focus-visible:text-white font-semibold py-3 px-6 md:px-8 rounded-full transition-all duration-300 shadow-md hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 focus-visible:-translate-y-1 text-base">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Job Details
+            </a>
         </div>
     </div>
 
@@ -118,27 +118,56 @@
         const fileInput = document.getElementById('fileInput');
         const previewSection = document.getElementById('previewSection');
         const uploadBtn = document.getElementById('uploadBtn');
-        const jobId = {{ job.jobRoleId }};
+        
+        // Initialize upload button as disabled (no file selected yet)
+        uploadBtn.disabled = true;
+        
+        console.log('Apply-job page initialized', {
+            form: !!form,
+            dropZone: !!dropZone,
+            fileInput: !!fileInput,
+            previewSection: !!previewSection,
+            uploadBtn: !!uploadBtn
+        });
         
         // File selection handler
         function handleFileSelect(file) {
-            const data = {
-                name: document.getElementById('fileName'),
-                size: document.getElementById('fileSize')
-            };
-            data.name.textContent = file.name;
-            data.size.textContent = (file.size / 1024).toFixed(2) + ' KB';
-            previewSection.classList.remove('hidden');
-            uploadBtn.disabled = false;
-            hideMessages();
+            console.log('File selected:', file.name, file.size);
+            
+            // Validate file size (5 MB = 5242880 bytes)
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                console.error('File too large:', file.size);
+                showMessage('errorMessage');
+                document.getElementById('errorText').textContent = 'File size exceeds 5 MB limit. Please select a smaller file.';
+                return;
+            }
+            
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            
+            if (fileName && fileSize) {
+                fileName.textContent = file.name;
+                fileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
+                previewSection.classList.remove('hidden');
+                uploadBtn.disabled = false;
+                hideMessages();
+                console.log('Preview updated');
+            } else {
+                console.error('Preview elements not found');
+            }
         }
         
         // Message display
         function showMessage(type) {
+            console.log('Showing message:', type);
             document.getElementById('errorMessage')?.classList.add('hidden');
             document.getElementById('successMessage')?.classList.add('hidden');
             document.getElementById('loadingState')?.classList.add('hidden');
-            if (type) document.getElementById(type).classList.remove('hidden');
+            if (type) {
+                const el = document.getElementById(type);
+                if (el) el.classList.remove('hidden');
+            }
         }
         
         // Drag and drop
@@ -159,19 +188,68 @@
             }
         });
         
-        // File input
-        dropZone.addEventListener('click', () => fileInput.click());
+        // File input - trigger file dialog
+        const browseBtn = document.getElementById('browseBtn');
+        
+        if (browseBtn) {
+            browseBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Browse button clicked, opening file dialog');
+                fileInput.click();
+            });
+        }
+        
+        dropZone.addEventListener('click', (e) => {
+            // Trigger unless clicking on specific elements to exclude
+            const isClickable = e.target.tagName === 'A' || e.target.id === 'fileInput' || e.target.id === 'browseBtn';
+            if (!isClickable) {
+                console.log('Dropzone clicked, opening file dialog', e.target.tagName);
+                fileInput.click();
+            }
+        });
+        
         fileInput.addEventListener('change', e => {
-            if (e.target.files?.length > 0) handleFileSelect(e.target.files[0]);
+            console.log('File input change event fired', {
+                files: e.target.files ? e.target.files.length : 0,
+                target: e.target
+            });
+            if (e.target.files && e.target.files.length > 0) {
+                console.log('Processing file...');
+                handleFileSelect(e.target.files[0]);
+            } else {
+                console.log('No files selected');
+            }
         });
         
         // Remove file
-        document.getElementById('removeFile').addEventListener('click', () => {
-            fileInput.value = '';
-            previewSection.classList.add('hidden');
-            uploadBtn.disabled = true;
-            hideMessages();
-        });
+        const removeFileBtn = document.getElementById('removeFile');
+        if (removeFileBtn) {
+            removeFileBtn.addEventListener('click', () => {
+                console.log('Remove file clicked');
+                fileInput.value = '';
+                previewSection.classList.add('hidden');
+                uploadBtn.disabled = true;
+                hideMessages();
+            });
+        }
+        
+        // Form submission handler
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                console.log('Form submitting');
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    e.preventDefault();
+                    console.error('No file selected');
+                    document.getElementById('errorText').textContent = 'Please select a file before submitting.';
+                    showMessage('errorMessage');
+                    return false;
+                }
+                // Disable button to prevent double submission
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = 'Submitting...';
+            });
+        }
         
         // Helper
         function hideMessages() {
