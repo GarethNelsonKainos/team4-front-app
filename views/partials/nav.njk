@@ -1,46 +1,126 @@
+<!-- Navigation macro to reduce duplication -->
+{% macro navLink(href, label, currentPage, pageKey) %}
+  <a href="{{ href }}" class="{% if currentPage == pageKey %}nav-link-mobile-active{% else %}nav-link-mobile-inactive{% endif %}"{% if currentPage == pageKey %} aria-current="page"{% endif %}>{{ label }}</a>
+{% endmacro %}
+
+{% macro navLinkDesktop(href, label, currentPage, pageKey) %}
+  <a href="{{ href }}" class="{% if currentPage == pageKey %}nav-link-desktop-active{% else %}nav-link-desktop-inactive{% endif %}"{% if currentPage == pageKey %} aria-current="page"{% endif %}>{{ label }}</a>
+{% endmacro %}
+
 <nav class="sticky top-0 z-50 bg-white backdrop-blur-sm shadow-lg border-b-2 border-blue-200 transition-all duration-300">
     <div class="container mx-auto px-4 py-4">
         <div class="flex justify-between items-center">
-            <a href="/" class="flex items-center hover:opacity-80 transition-opacity duration-200" aria-label="Go to homepage">
+            <a href="/" class="ml-2 mr-4 flex items-center" aria-label="Go to homepage">
                 <img src="/images/kainos_logo.png" alt="Kainos Logo" class="h-10 w-auto">
             </a>
             
             <!-- Desktop Navigation -->
-            <ul class="hidden md:flex space-x-8">
-                <li><a href="/" class="{% if currentPage == 'home' %}bg-[#008933] text-white hover:bg-[#007a2e]{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-2 rounded-md text-base">Home</a></li>
-                <li><a href="/jobs" class="{% if currentPage == 'jobs' %}bg-[#008933] text-white hover:bg-[#007a2e]{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-2 rounded-md text-base">Jobs</a></li>
-                <li><a href="/about" class="{% if currentPage == 'about' %}bg-[#008933] text-white hover:bg-[#007a2e]{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-2 rounded-md text-base">About</a></li>
-                <li><a href="/contact" class="{% if currentPage == 'contact' %}bg-[#008933] text-white hover:bg-[#007a2e]{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-2 rounded-md text-base">Contact</a></li>
+            <div class="hidden md:flex items-center w-full">
+                <ul class="flex space-x-6">
+                    <li>{{ navLinkDesktop('/', 'Home', currentPage, 'home') }}</li>
+                    <li>{{ navLinkDesktop('/jobs', 'Jobs', currentPage, 'jobs') }}</li>
+                    <li>{{ navLinkDesktop('/about', 'About', currentPage, 'about') }}</li>
+                    <li>{{ navLinkDesktop('/contact', 'Contact', currentPage, 'contact') }}</li>
+                </ul>
                 {% if user and user.isAuthenticated %}
-                {% if user.role === "admin" %}
-                <li><a href="/admin" class="{% if currentPage == 'admin' %}bg-purple-600 text-white hover:bg-purple-700{% else %}text-gray-600 hover:text-purple-600 hover:bg-purple-50{% endif %} transition-colors font-medium px-3 py-2 rounded-md">Admin</a></li>
-                {% endif %}
-                <li class="flex items-center gap-3">
-                    <span class="text-gray-700 font-medium">{{ user.email }}</span>
-                    {% if user.role === "admin" %}
-                    <span class="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-1 rounded">ADMIN</span>
-                    {% endif %}
-                    <form action="/api/logout" method="post" class="inline">
-                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">Logout</button>
-                    </form>
-                </li>
+                <div class="ml-auto flex items-center gap-2 pl-4 -mr-6 border-l border-gray-300 relative">
+                    <button 
+                        id="user-menu-button"
+                        class="flex items-center gap-2 group {% if currentPage == 'admin' %}bg-[#008933] text-white hover:bg-[#007a2e] focus-visible:bg-[#007a2e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50 focus-visible:text-blue-600 focus-visible:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1{% endif %} transition-all duration-300 font-medium px-2 py-2 rounded-md"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-label="User menu"
+                    >
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 {% if currentPage == 'admin' %}border border-white text-white{% else %}border border-gray-300 text-gray-600 group-hover:border-blue-600 group-hover:text-blue-600 group-focus-visible:border-blue-600 group-focus-visible:text-blue-600{% endif %}">
+                            <svg class="svg-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="4"></circle>
+                                <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
+                            </svg>
+                        </span>
+                        <span>Account</span>
+                        <svg class="w-4 h-4 transition-transform duration-200" id="user-menu-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div 
+                        id="user-dropdown-menu"
+                        class="hidden absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
+                        role="menu"
+                        aria-orientation="vertical"
+                        aria-labelledby="user-menu-button"
+                    >
+                        <div class="px-4 py-3 border-b border-gray-200">
+                            <p class="text-sm text-gray-500">Signed in as</p>
+                            <p class="text-sm font-semibold text-gray-900 truncate">{{ user.email }}</p>
+                            {% if user.role === "admin" %}
+                            <span class="badge-warning-sm">ADMIN</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="py-1">
+                            {% if user.role === "admin" %}
+                            <a 
+                                href="/admin" 
+                                class="group block px-4 py-2 text-sm text-gray-700 hover:bg-[#008933] hover:text-white focus-visible:bg-[#008933] focus-visible:text-white focus-visible:outline-none transition-colors duration-200 dashboard-link"
+                                role="menuitem"
+                            >
+                                <div class="flex items-center gap-2 w-full h-full">
+                                    <svg class="svg-lg dashboard-icon-fill" viewBox="0 0 24 24" fill="none" stroke="currentColor" preserveAspectRatio="xMidYMid meet">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="none" stroke="currentColor" d="M3 13v6a2 2 0 002 2h2a2 2 0 002-2v-6a2 2 0 00-2-2H5a2 2 0 00-2 2z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="none" stroke="currentColor" d="M9 9v10a2 2 0 002 2h2a2 2 0 002-2V9a2 2 0 00-2-2h-2a2 2 0 00-2 2z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="none" stroke="currentColor" d="M15 5v14a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2h-2a2 2 0 00-2 2z"></path>
+                                    </svg>
+                                    <span>View Dashboard</span>
+                                </div>
+                            </a>
+                            {% endif %}
+                            <form action="/api/logout" method="post">
+                                <button 
+                                    type="submit" 
+                                    class="group w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 focus-visible:bg-red-50 focus-visible:text-red-600 focus-visible:outline-none transition-colors duration-200"
+                                    role="menuitem"
+                                >
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1 group-focus-visible:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                        </svg>
+                                        <span>Logout</span>
+                                    </div>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
                 {% else %}
-                <li><a href="/login" class="{% if currentPage == 'login' %}bg-[#008933] text-white hover:bg-[#007a2e]{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-2 rounded-md text-base">Login</a></li>
+                <div class="ml-auto pl-4 -mr-6 border-l border-gray-300">
+                    <a href="/login" class="flex items-center gap-2 group {% if currentPage == 'login' or currentPage == 'register' %}bg-[#008933] text-white hover:bg-[#007a2e] hover:underline focus-visible:bg-[#007a2e] focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50 hover:underline focus-visible:text-blue-600 focus-visible:bg-blue-50 focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1{% endif %} transition-all duration-300 font-medium px-3 py-3 rounded-md text-base"{% if currentPage == 'login' or currentPage == 'register' %} aria-current="page"{% endif %}>
+                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full border transition-all duration-300 {% if currentPage == 'login' or currentPage == 'register' %}border-white text-white{% else %}border-current text-current group-hover:text-blue-600 group-hover:border-blue-600 group-focus-visible:border-blue-600 group-focus-visible:text-blue-600 group-focus-visible:border-blue-600{% endif %}" aria-hidden="true">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="4"></circle>
+                                <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
+                            </svg>
+                        </span>
+                        <span>Login</span>
+                    </a>
+                </div>
                 {% endif %}
-            </ul>
+            </div>
 
             <!-- Mobile Menu Button -->
             <button 
                 id="mobile-menu-button" 
-                class="md:hidden flex items-center justify-center w-10 h-10 rounded-md text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200 relative z-50"
+                class="md:hidden flex items-center justify-center w-10 h-10 rounded-md text-gray-600 hover:text-blue-600 hover:scale-110 transition-all duration-300 relative z-50 focus-visible:text-blue-600 focus-visible:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
                 aria-label="Open mobile menu"
                 aria-expanded="false"
                 aria-controls="mobile-menu"
+                title="Menu"
             >
-                <svg id="hamburger-icon" class="w-6 h-6 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg id="hamburger-icon" class="w-6 h-6 block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
-                <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
@@ -49,42 +129,96 @@
 </nav>
 
 <!-- Overlay for mobile menu (covers entire screen) - Outside nav for proper layering -->
-<div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40 md:hidden" aria-hidden="true"></div>
+<div id="menu-overlay" class="mobile-nav-overlay" aria-hidden="true"></div>
 
 <!-- Mobile Navigation Menu - Side Drawer - Outside nav for proper layering -->
-<div id="mobile-menu" class="fixed top-0 right-0 h-screen w-64 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out z-50 md:hidden" role="dialog" aria-modal="true" aria-label="Mobile navigation menu" inert>
+<div id="mobile-menu" class="mobile-nav-drawer translate-x-full" role="dialog" aria-modal="true" aria-label="Mobile navigation menu" inert>
     <!-- Close button inside drawer -->
     <div class="flex justify-end p-4">
-        <button id="close-menu-btn" class="flex items-center justify-center w-10 h-10 rounded-md text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200" aria-label="Close menu">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button id="close-menu-btn" class="flex items-center justify-center w-10 h-10 rounded-md text-gray-600 hover:text-blue-600 transition-all duration-300 focus-visible:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1" aria-label="Close menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
     </div>
     <div class="px-4 pb-8">
-        <ul class="flex flex-col space-y-2">
-            <li><a href="/" class="block {% if currentPage == 'home' %}bg-[#008933] text-white hover:bg-[#007a2e]{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-3 rounded-md text-base">Home</a></li>
-            <li><a href="/jobs" class="block {% if currentPage == 'jobs' %}bg-[#008933] text-white hover:bg-[#007a2e]{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-3 rounded-md text-base">Jobs</a></li>
-            <li><a href="/about" class="block {% if currentPage == 'about' %}bg-[#008933] text-white hover:bg-[#007a2e]{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-3 rounded-md text-base">About</a></li>
-            <li><a href="/contact" class="block {% if currentPage == 'contact' %}bg-[#008933] text-white hover:bg-[#007a2e]{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-3 rounded-md text-base">Contact</a></li>
-                {% if user and user.isAuthenticated %}
-                {% if user.role === "admin" %}
-                <li><a href="/admin" class="block {% if currentPage == 'admin' %}bg-purple-600 text-white hover:bg-purple-700{% else %}text-gray-600 hover:text-purple-600 hover:bg-purple-50{% endif %} transition-colors font-medium px-3 py-3 rounded-md">Admin</a></li>
-                {% endif %}
-                <li class="pt-2 border-t border-blue-100">
-                    <div class="text-gray-700 font-medium px-3 py-3">{{ user.email }}</div>
+        <ul class="flex flex-col space-y-4">
+            <li class="menu-item">{{ navLink('/', 'Home', currentPage, 'home') }}</li>
+            <li class="menu-item">{{ navLink('/jobs', 'Jobs', currentPage, 'jobs') }}</li>
+            <li class="menu-item">{{ navLink('/about', 'About', currentPage, 'about') }}</li>
+            <li class="menu-item">{{ navLink('/contact', 'Contact', currentPage, 'contact') }}</li>
+            {% if user and user.isAuthenticated %}
+            <li class="pt-3 border-t border-blue-100"></li>
+            <li class="menu-item">
+                <button 
+                    id="mobile-user-menu-button"
+                    class="flex items-center gap-2 w-full group {% if currentPage == 'admin' %}bg-[#008933] text-white hover:bg-[#007a2e] focus-visible:bg-[#007a2e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50 focus-visible:text-blue-600 focus-visible:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1{% endif %} transition-all duration-300 font-medium px-4 py-3 rounded-md text-base"
+                    aria-expanded="false"
+                    aria-controls="mobile-user-submenu"
+                >
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 {% if currentPage == 'admin' %}border border-current text-white{% else %}border border-gray-300 text-gray-600 group-hover:border-blue-600 group-hover:text-blue-600 group-focus-visible:border-blue-600 group-focus-visible:text-blue-600{% endif %}">
+                        <svg class="svg-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="4"></circle>
+                            <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
+                        </svg>
+                    </span>
+                    <span class="flex-1 text-left">Account</span>
+                    <svg class="w-4 h-4 transition-transform duration-200" id="mobile-user-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                
+                <!-- Collapsible submenu -->
+                <div id="mobile-user-submenu" class="hidden mt-2 ml-4 space-y-2 border-l-2 border-blue-200 pl-4">
+                    <div class="px-3 py-2">
+                        <p class="text-sm text-gray-500">Signed in as</p>
+                        <p class="text-sm font-semibold text-gray-900 truncate">{{ user.email }}</p>
+                        {% if user.role === "admin" %}
+                        <span class="badge-warning-sm">ADMIN</span>
+                        {% endif %}
+                    </div>
+                    
                     {% if user.role === "admin" %}
-                    <div class="bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-2 rounded inline-block mx-3">ADMIN</div>
+                    <a 
+                        href="/admin" 
+                        class="group flex items-center gap-2 text-gray-700 hover:bg-[#008933] hover:text-white focus-visible:bg-[#008933] focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 transition-colors duration-200 px-3 py-2 rounded-md text-sm dashboard-link"
+                    >
+                        <svg class="svg-lg dashboard-icon-fill" viewBox="0 0 24 24" fill="none" stroke="currentColor" preserveAspectRatio="xMidYMid meet">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="none" stroke="currentColor" d="M3 13v6a2 2 0 002 2h2a2 2 0 002-2v-6a2 2 0 00-2-2H5a2 2 0 00-2 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="none" stroke="currentColor" d="M9 9v10a2 2 0 002 2h2a2 2 0 002-2V9a2 2 0 00-2-2h-2a2 2 0 00-2 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="none" stroke="currentColor" d="M15 5v14a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2h-2a2 2 0 00-2 2z"></path>
+                        </svg>
+                        <span>View Dashboard</span>
+                    </a>
                     {% endif %}
-                </li>
-                <li>
+                    
                     <form action="/api/logout" method="post">
-                        <button type="submit" class="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-3 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">Logout</button>
+                        <button 
+                            type="submit" 
+                            class="group flex items-center gap-2 w-full text-left text-gray-700 hover:bg-red-50 hover:text-red-600 focus-visible:bg-red-50 focus-visible:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 transition-colors duration-200 px-3 py-2 rounded-md text-sm"
+                        >
+                            <svg class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1 group-focus-visible:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                            <span>Logout</span>
+                        </button>
                     </form>
-                </li>
-                {% else %}
-            <li><a href="/login" class="block {% if currentPage == 'login' %}bg-[#008933] text-white hover:bg-[#007a2e]{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50{% endif %} transition-colors font-medium px-3 py-3 rounded-md text-base">Login</a></li>
-                {% endif %}
+                </div>
+            </li>
+            {% else %}
+            <li class="pt-3 border-t border-blue-100"></li>
+            <li class="menu-item">
+                <a href="/login" class="flex items-center gap-2 group {% if currentPage == 'login' or currentPage == 'register' %}bg-[#008933] text-white hover:bg-[#007a2e] hover:underline focus-visible:bg-[#007a2e] focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1{% else %}text-gray-900 hover:text-blue-600 hover:bg-blue-50 hover:underline focus-visible:text-blue-600 focus-visible:bg-blue-50 focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1{% endif %} transition-all duration-300 font-medium px-4 py-3 rounded-md text-base"{% if currentPage == 'login' or currentPage == 'register' %} aria-current="page"{% endif %}>
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full border transition-all duration-300 {% if currentPage == 'login' or currentPage == 'register' %}border-white text-white{% else %}border-current text-current group-hover:text-blue-600 group-hover:border-blue-600 group-focus-visible:border-blue-600 group-focus-visible:text-blue-600 group-focus-visible:border-blue-600{% endif %}" aria-hidden="true">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="4"></circle>
+                            <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
+                        </svg>
+                    </span>
+                    <span>Login</span>
+                </a>
+            </li>
+            {% endif %}
         </ul>
     </div>
 </div>
@@ -99,6 +233,165 @@
         const hamburgerIcon = document.getElementById('hamburger-icon');
         const closeIcon = document.getElementById('close-icon');
         const mainContent = document.getElementById('main-content');
+        let lastFocusedElement = null;
+        
+        // User dropdown menu functionality
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userDropdownMenu = document.getElementById('user-dropdown-menu');
+        const userMenuChevron = document.getElementById('user-menu-chevron');
+        let userDropdownCloseTimeout;
+        let userDropdownOpenTimeout;
+        let userDropdownWasClicked = false;
+        
+        if (userMenuButton && userDropdownMenu) {
+            function openUserDropdown(fromClick = false) {
+                clearTimeout(userDropdownCloseTimeout);
+                userDropdownMenu.classList.remove('hidden');
+                userMenuButton.setAttribute('aria-expanded', 'true');
+                userMenuChevron.style.transform = 'rotate(180deg)';
+                if (fromClick) {
+                    userDropdownWasClicked = true;
+                }
+            }
+            
+            function closeUserDropdown() {
+                userDropdownMenu.classList.add('hidden');
+                userMenuButton.setAttribute('aria-expanded', 'false');
+                userMenuChevron.style.transform = 'rotate(0deg)';
+                userDropdownWasClicked = false;
+            }
+            
+            // Hover to open
+            userMenuButton.addEventListener('mouseenter', function() {
+                if (!userDropdownWasClicked) {
+                    clearTimeout(userDropdownCloseTimeout);
+                    clearTimeout(userDropdownOpenTimeout);
+                    userDropdownOpenTimeout = setTimeout(() => openUserDropdown(false), 1000);
+                }
+            });
+            
+            // Delay close when leaving button
+            userMenuButton.addEventListener('mouseleave', function() {
+                if (!userDropdownWasClicked) {
+                    clearTimeout(userDropdownOpenTimeout);
+                    userDropdownCloseTimeout = setTimeout(closeUserDropdown, 300);
+                }
+            });
+            
+            // Keep open when hovering dropdown
+            userDropdownMenu.addEventListener('mouseenter', function() {
+                if (!userDropdownWasClicked) {
+                    clearTimeout(userDropdownCloseTimeout);
+                }
+            });
+            
+            // Close when leaving dropdown
+            userDropdownMenu.addEventListener('mouseleave', function() {
+                if (!userDropdownWasClicked) {
+                    closeUserDropdown();
+                }
+            });
+            
+            // Click to toggle (for accessibility/touch devices)
+            userMenuButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                clearTimeout(userDropdownOpenTimeout);
+                clearTimeout(userDropdownCloseTimeout);
+                const isExpanded = userMenuButton.getAttribute('aria-expanded') === 'true';
+                
+                if (isExpanded) {
+                    closeUserDropdown();
+                } else {
+                    openUserDropdown(true);
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!userMenuButton.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+                    closeUserDropdown();
+                }
+            });
+            
+            // Close dropdown on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && userMenuButton.getAttribute('aria-expanded') === 'true') {
+                    closeUserDropdown();
+                    userMenuButton.focus();
+                }
+            });
+        }
+        
+        // Mobile user menu functionality
+        const mobileUserMenuButton = document.getElementById('mobile-user-menu-button');
+        const mobileUserSubmenu = document.getElementById('mobile-user-submenu');
+        const mobileUserChevron = document.getElementById('mobile-user-chevron');
+        let mobileSubmenuCloseTimeout;
+        let mobileSubmenuOpenTimeout;
+        let mobileSubmenuWasClicked = false;
+        
+        if (mobileUserMenuButton && mobileUserSubmenu) {
+            function openMobileSubmenu(fromClick = false) {
+                clearTimeout(mobileSubmenuCloseTimeout);
+                mobileUserSubmenu.classList.remove('hidden');
+                mobileUserMenuButton.setAttribute('aria-expanded', 'true');
+                mobileUserChevron.style.transform = 'rotate(180deg)';
+                if (fromClick) {
+                    mobileSubmenuWasClicked = true;
+                }
+            }
+            
+            function closeMobileSubmenu() {
+                mobileUserSubmenu.classList.add('hidden');
+                mobileUserMenuButton.setAttribute('aria-expanded', 'false');
+                mobileUserChevron.style.transform = 'rotate(0deg)';
+                mobileSubmenuWasClicked = false;
+            }
+            
+            // Hover to open
+            mobileUserMenuButton.addEventListener('mouseenter', function() {
+                if (!mobileSubmenuWasClicked) {
+                    clearTimeout(mobileSubmenuCloseTimeout);
+                    clearTimeout(mobileSubmenuOpenTimeout);
+                    mobileSubmenuOpenTimeout = setTimeout(() => openMobileSubmenu(false), 1000);
+                }
+            });
+            
+            // Delay close when leaving button
+            mobileUserMenuButton.addEventListener('mouseleave', function() {
+                if (!mobileSubmenuWasClicked) {
+                    clearTimeout(mobileSubmenuOpenTimeout);
+                    mobileSubmenuCloseTimeout = setTimeout(closeMobileSubmenu, 300);
+                }
+            });
+            
+            // Keep open when hovering submenu
+            mobileUserSubmenu.addEventListener('mouseenter', function() {
+                if (!mobileSubmenuWasClicked) {
+                    clearTimeout(mobileSubmenuCloseTimeout);
+                }
+            });
+            
+            // Close when leaving submenu
+            mobileUserSubmenu.addEventListener('mouseleave', function() {
+                if (!mobileSubmenuWasClicked) {
+                    closeMobileSubmenu();
+                }
+            });
+            
+            // Click to toggle (for touch devices)
+            mobileUserMenuButton.addEventListener('click', function() {
+                clearTimeout(mobileSubmenuOpenTimeout);
+                clearTimeout(mobileSubmenuCloseTimeout);
+                const isExpanded = mobileUserMenuButton.getAttribute('aria-expanded') === 'true';
+                
+                if (isExpanded) {
+                    closeMobileSubmenu();
+                } else {
+                    openMobileSubmenu(true);
+                }
+            });
+        }
         
         // Set initial state
         mobileMenu.setAttribute('inert', '');
@@ -110,13 +403,16 @@
             );
         }
 
-        function openMenu() {
+
+        function openMenu(focusOnOpen = true) {
             mobileMenu.classList.remove('translate-x-full');
             mobileMenu.classList.add('translate-x-0');
             menuOverlay.classList.remove('hidden');
             hamburgerIcon.classList.add('hidden');
             closeIcon.classList.remove('hidden');
+            hamburgerIcon.style.transform = 'rotate(90deg)';
             document.body.style.overflow = 'hidden';
+            lastFocusedElement = document.activeElement;
             
             // Update ARIA attributes
             mobileMenuButton.setAttribute('aria-expanded', 'true');
@@ -131,11 +427,21 @@
                 mainContent.setAttribute('aria-hidden', 'true');
             }
             
-            // Move focus to close button
-            setTimeout(() => closeMenuBtn.focus(), 100);
-            
-            // Add keyboard trap
-            document.addEventListener('keydown', trapFocus);
+            // Stagger menu items animation
+            const menuItems = mobileMenu.querySelectorAll('.menu-item');
+            menuItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 50}ms`;
+            });
+
+            if (focusOnOpen) {
+                const focusableElements = getFocusableElements();
+                if (focusableElements.length > 0) {
+                    setTimeout(() => focusableElements[0].focus(), 0);
+                }
+
+                // Add keyboard trap only when focus management is enabled
+                document.addEventListener('keydown', trapFocus);
+            }
         }
 
         function closeMenu() {
@@ -144,6 +450,7 @@
             menuOverlay.classList.add('hidden');
             hamburgerIcon.classList.remove('hidden');
             closeIcon.classList.add('hidden');
+            hamburgerIcon.style.transform = 'rotate(0deg)';
             document.body.style.overflow = '';
             
             // Update ARIA attributes
@@ -159,11 +466,30 @@
                 mainContent.removeAttribute('aria-hidden');
             }
             
-            // Return focus to hamburger button
-            mobileMenuButton.focus();
+            // Reset mobile user submenu when closing main menu
+            if (mobileUserSubmenu && mobileUserMenuButton) {
+                mobileUserSubmenu.classList.add('hidden');
+                mobileUserMenuButton.setAttribute('aria-expanded', 'false');
+                if (mobileUserChevron) {
+                    mobileUserChevron.style.transform = 'rotate(0deg)';
+                }
+                mobileSubmenuWasClicked = false;
+            }
+            
+            // Reset click flags
+            mobileMenuWasClicked = false;
             
             // Remove keyboard trap
             document.removeEventListener('keydown', trapFocus);
+
+            if (
+                lastFocusedElement &&
+                typeof lastFocusedElement.focus === 'function' &&
+                (lastFocusedElement.isConnected || document.contains(lastFocusedElement))
+            ) {
+                lastFocusedElement.focus();
+            }
+            lastFocusedElement = null;
         }
         
         // Focus trap handler
@@ -171,6 +497,7 @@
             if (e.key !== 'Tab') return;
             
             const focusableElements = getFocusableElements();
+            if (!focusableElements.length) return;
             const firstElement = focusableElements[0];
             const lastElement = focusableElements[focusableElements.length - 1];
             
@@ -189,11 +516,63 @@
             }
         }
 
+        // Hover-to-open functionality for desktop screens only
+        let hoverCloseTimeout;
+        let hoverOpenTimeout;
+        let mobileMenuWasClicked = false;
+
         mobileMenuButton.addEventListener('click', function() {
+            clearTimeout(hoverOpenTimeout);
+            clearTimeout(hoverCloseTimeout);
             if (mobileMenu.classList.contains('translate-x-full')) {
-                openMenu();
+                mobileMenuWasClicked = true;
+                openMenu(true);
             } else {
                 closeMenu();
+            }
+        });
+        
+        // Only enable hover-to-open on hover-capable pointers
+        function canUseHover() {
+            return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        }
+        
+        mobileMenuButton.addEventListener('mouseenter', function() {
+            if (!mobileMenuWasClicked && canUseHover()) {
+                clearTimeout(hoverCloseTimeout);
+                clearTimeout(hoverOpenTimeout);
+                if (mobileMenu.classList.contains('translate-x-full')) {
+                    hoverOpenTimeout = setTimeout(() => openMenu(false), 300); // Reduced from 1000ms
+                }
+            }
+        });
+        
+        mobileMenuButton.addEventListener('mouseleave', function() {
+            if (!mobileMenuWasClicked && canUseHover()) {
+                clearTimeout(hoverOpenTimeout);
+                hoverCloseTimeout = setTimeout(closeMenu, 500); // Increased from 200ms
+            }
+        });
+        
+        mobileMenu.addEventListener('mouseenter', function() {
+            if (!mobileMenuWasClicked && canUseHover()) {
+                clearTimeout(hoverCloseTimeout);
+            }
+        });
+        
+        mobileMenu.addEventListener('mouseleave', function() {
+            if (!mobileMenuWasClicked && canUseHover()) {
+                closeMenu();
+            }
+        });
+        
+        // Scroll-aware navbar shadow enhancement
+        const navbar = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 0) {
+                navbar.classList.add('shadow-xl');
+            } else {
+                navbar.classList.remove('shadow-xl');
             }
         });
 
@@ -202,6 +581,14 @@
 
         // Close menu when overlay is clicked
         menuOverlay.addEventListener('click', closeMenu);
+
+        // Close menu when clicking outside the drawer
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth >= 768) return;
+            if (mobileMenu.classList.contains('translate-x-full')) return;
+            if (mobileMenu.contains(e.target) || mobileMenuButton.contains(e.target)) return;
+            closeMenu();
+        });
 
         // Close menu when a link is clicked
         const menuLinks = mobileMenu.querySelectorAll('a');
