@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { loginUser, registerUser, uploadCVToBackend } from "../utils/apiClient";
+import { loginUser, registerUser } from "../utils/apiClient";
 import { clearAuthCookie, setAuthCookie } from "../utils/auth";
 import multer, { type FileFilterCallback } from "multer";
 
@@ -60,17 +60,6 @@ export async function uploadCV(req: Request & { file?: Express.Multer.File }, re
 			});
 		}
 
-		// Forward to backend API
-		const result = await uploadCVToBackend(
-			file.buffer, 
-			file.originalname, 
-			file.mimetype, 
-			jobRoleId, 
-			token
-		);
-
-		// Return backend response with appropriate status code
-		return res.status(result.success ? 200 : (result.status || 500)).json(result);
 	} catch (error) {
 		console.error('CV upload error:', error);
 		res.status(500).json({
