@@ -22,6 +22,7 @@ describe("AuthController", () => {
 			json: vi.fn().mockReturnThis(),
 			status: vi.fn().mockReturnThis(),
 			redirect: vi.fn().mockReturnThis(),
+			render: vi.fn().mockReturnThis(),
 		};
 		mockNext = vi.fn();
 		vi.clearAllMocks();
@@ -37,7 +38,12 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/login.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({ email: "Email is required" }),
+				}),
+			);
 		});
 
 		it("should return error message when password is missing", async () => {
@@ -49,7 +55,12 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/login.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({ password: "Password is required" }),
+				}),
+			);
 		});
 
 		it("should set auth cookie and redirect to jobs on successful login", async () => {
@@ -98,7 +109,13 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/login.njk",
+				expect.objectContaining({
+					errorMessage: "Invalid email or password. Please try again.",
+					formData: expect.objectContaining({ email: "test@example.com" }),
+				}),
+			);
 		});
 
 		it("should return generic error message on exception", async () => {
@@ -117,7 +134,12 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/login.njk",
+				expect.objectContaining({
+					errorMessage: "A server error occurred. Please try again later.",
+				}),
+			);
 		});
 
 		it("should log errors privately without exposing them to user", async () => {
@@ -162,7 +184,12 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({ email: "Email is required" }),
+				}),
+			);
 		});
 
 		it("should return error message when password is missing", async () => {
@@ -177,7 +204,14 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						password: "Password is required",
+					}),
+				}),
+			);
 		});
 
 		it("should return error message when confirmPassword is missing", async () => {
@@ -192,7 +226,14 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						confirmPassword: "Please confirm your password",
+					}),
+				}),
+			);
 		});
 
 		it("should return error message when passwords do not match", async () => {
@@ -208,14 +249,21 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						confirmPassword: "Passwords do not match",
+					}),
+				}),
+			);
 		});
 
 		it("should return error message when password is too short", async () => {
 			mockRequest.body = {
 				email: "test@example.com",
-				password: "pass1",
-				confirmPassword: "pass1",
+				password: "pa1!",
+				confirmPassword: "pa1!",
 			};
 
 			await authController.register(
@@ -224,14 +272,21 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						password: expect.stringContaining("at least 6 characters"),
+					}),
+				}),
+			);
 		});
 
 		it("should return error message when password lacks a special character", async () => {
 			mockRequest.body = {
 				email: "test@example.com",
-				password: "password",
-				confirmPassword: "password",
+				password: "password123",
+				confirmPassword: "password123",
 			};
 
 			await authController.register(
@@ -240,14 +295,21 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						password: expect.stringContaining("special character"),
+					}),
+				}),
+			);
 		});
 
 		it("should return error message when password lacks number", async () => {
 			mockRequest.body = {
 				email: "test@example.com",
-				password: "password",
-				confirmPassword: "password",
+				password: "password!",
+				confirmPassword: "password!",
 			};
 
 			await authController.register(
@@ -256,7 +318,14 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errors: expect.objectContaining({
+						password: expect.stringContaining("number"),
+					}),
+				}),
+			);
 		});
 
 		it("should accept password with number and special character", async () => {
@@ -354,7 +423,13 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/register");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errorMessage: "Error registering.",
+					formData: expect.objectContaining({ email: "existing@example.com" }),
+				}),
+			);
 		});
 
 		it("should return generic error message on exception", async () => {
@@ -374,7 +449,12 @@ describe("AuthController", () => {
 				mockNext,
 			);
 
-			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/register.njk",
+				expect.objectContaining({
+					errorMessage: "A server error occurred. Please try again later.",
+				}),
+			);
 		});
 	});
 

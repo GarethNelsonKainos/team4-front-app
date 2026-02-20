@@ -1,39 +1,70 @@
 import type { NextFunction, Request, Response } from "express";
+import * as yup from "yup";
+import { loginSchema, registrationSchema } from "../schemas/validationSchemas";
 import { loginUser, registerUser } from "../utils/apiClient";
+import type { AuthRequest } from "../utils/auth";
 import { clearAuthCookie, setAuthCookie } from "../utils/auth";
 
 /**
  * Handle user login
  */
 export async function login(req: Request, res: Response, _next: NextFunction) {
-	try {
-		const { email, password } = req.body;
+	const authReq = req as AuthRequest;
 
-		// Validate input
-		if (!email || !password) {
-			// Return error message for better UX - don't redirect
-			return res.redirect("/login");
-		}
+	try {
+		const validated = await loginSchema.validate(req.body, {
+			abortEarly: false,
+		});
 
 		// Call backend API through server-side client
-		const result = await loginUser(email, password);
+		const result = await loginUser(validated.email, validated.password);
 
 		if (!result.success) {
-			// Return error message instead of redirecting
+			// Return error message and restore form
 			console.error("Login failed:", result.error);
-			return res.redirect("/login");
+
+			return res.render("pages/login.njk", {
+				title: "Login - Kainos",
+				currentPage: "login",
+				user: authReq.user,
+				formData: { email: validated.email },
+				errorMessage: "Invalid email or password. Please try again.",
+			});
 		}
 
 		// Set secure HTTP-only cookie with the token
 		// This prevents XSS attacks - token is not accessible to JavaScript
 		setAuthCookie(result.data.token, res);
 
-		// Return success response with redirect URL for client-side handling
+		// Redirect on success
 		return res.redirect("/jobs");
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
-		console.error("Login error:", error);
-		return res.redirect("/login");
+		if (error instanceof yup.ValidationError) {
+			const errors: Record<string, string> = {};
+			error.inner.forEach((err) => {
+				if (err.path) errors[err.path] = err.message;
+			});
+
+			return res.render("pages/login.njk", {
+				title: "Login - Kainos",
+				currentPage: "login",
+				user: authReq.user,
+				formData: { email: req.body.email || "" },
+				errors,
+				errorMessage: "Please correct the errors",
+			});
+		}
+
+		// Handle any other unexpected errors
+		console.error("Unexpected login error:", error);
+		return res.render("pages/login.njk", {
+			title: "Login - Kainos",
+			currentPage: "login",
+			user: authReq.user,
+			formData: { email: req.body.email || "" },
+			errorMessage: "A server error occurred. Please try again later.",
+		});
 	}
 }
 
@@ -45,39 +76,24 @@ export async function register(
 	res: Response,
 	_next: NextFunction,
 ) {
+	const authReq = req as AuthRequest;
+
 	try {
-		const { email, password, confirmPassword } = req.body;
+		const validated = await registrationSchema.validate(req.body, {
+			abortEarly: false,
+		});
 
-		// Validate required fields
-		if (!email || !password || !confirmPassword) {
-			// Return error message for better UX - don't redirect
-			return res.redirect("/register");
-		}
-
-		// Validate passwords match
-		if (password !== confirmPassword) {
-			return res.redirect("/register");
-		}
-
-		// Validate password strength
-		if (password.length < 6) {
-			return res.redirect("/register");
-		}
-
-		// Password must contain a number AND special character
-		const hasNumber = /[0-9]/.test(password);
-		const hasSpecialChar = /[!@#$%^&*]/.test(password);
-		if (!hasNumber || !hasSpecialChar) {
-			return res.redirect("/register");
-		}
-
-		// Call backend API through server-side client
-		const result = await registerUser(email, password);
-
+		const result = await registerUser(validated.email, validated.password);
 		if (!result.success) {
-			// Return error message instead of redirecting
+			// Return error message and restore form
 			console.error("Registration failed:", result.error);
-			return res.redirect("/register");
+			return res.render("pages/register.njk", {
+				title: "Register - Kainos",
+				currentPage: "register",
+				user: authReq.user,
+				formData: { email: validated.email },
+				errorMessage: "Error registering.",
+			});
 		}
 
 		// Set secure HTTP-only cookie with the token if provided
@@ -89,8 +105,30 @@ export async function register(
 		}
 	} catch (error) {
 		// Production: log error privately, return generic error message to user
-		console.error("Registration error:", error);
-		return res.redirect("/login");
+		if (error instanceof yup.ValidationError) {
+			const errors: Record<string, string> = {};
+			error.inner.forEach((err) => {
+				if (err.path) errors[err.path] = err.message;
+			});
+			return res.render("pages/register.njk", {
+				title: "Register - Kainos",
+				currentPage: "register",
+				user: authReq.user,
+				formData: { email: req.body.email || "" },
+				errors,
+				errorMessage: "Please correct the errors",
+			});
+		}
+
+		// Handle any other unexpected errors
+		console.error("Unexpected registration error:", error);
+		return res.render("pages/register.njk", {
+			title: "Register - Kainos",
+			currentPage: "register",
+			user: authReq.user,
+			formData: { email: req.body.email || "" },
+			errorMessage: "A server error occurred. Please try again later.",
+		});
 	}
 }
 
