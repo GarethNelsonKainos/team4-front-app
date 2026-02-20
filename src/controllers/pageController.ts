@@ -5,6 +5,27 @@ import type { AuthRequest } from "../utils/auth";
 const showAdminFeatures = process.env.FEATURE_ADMIN_DASHBOARD === "true";
 
 /**
+ * Render application success page
+ */
+export function getApplicationSuccessPage(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+
+		res.render("pages/application-success.njk", {
+			title: "Application Submitted",
+			user: authReq.user,
+		});
+	} catch (error) {
+		console.error("Error rendering template:", error);
+		res.redirect("/error");
+	}
+}
+
+/**
  * Render home page
  */
 export function getHomePage(req: Request, res: Response, _next: NextFunction) {
@@ -199,6 +220,81 @@ export function getErrorPage(req: Request, res: Response, _next: NextFunction) {
 		res
 			.status(500)
 			.send("An unexpected error occurred. Please try again later.");
+	}
+}
+
+/**
+ * Render apply job page - allows user to upload CV for a job application
+ */
+export async function getApplyJobPage(
+	req: Request,
+	res: Response,
+	_next: NextFunction,
+) {
+	try {
+		const authReq = req as AuthRequest;
+
+		// Check if user is authenticated and is an applicant
+		if (
+			!authReq.user ||
+			!authReq.user.isAuthenticated ||
+			authReq.user.role !== "applicant"
+		) {
+			return res.redirect("/login");
+		}
+
+		// Handle route parameter - could be string or array, convert to number
+		const jobId = parseInt(
+			Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
+			10,
+		);
+
+		// Validate that the ID is a valid number
+		if (Number.isNaN(jobId)) {
+			console.error(`❌ Invalid job ID: ${req.params.id}`);
+			return res.redirect("/error");
+		}
+
+		console.log(
+			`🔍 PageController: Fetching job role with ID ${jobId} for apply page`,
+		);
+
+		// Fetch specific job from API
+		const result = await getJobRole(jobId);
+
+		if (!result.success) {
+			console.error("❌ PageController: Error fetching job:", {
+				error: result.error,
+				status: result.status,
+				jobId: jobId,
+			});
+			return res.redirect("/error");
+		}
+
+		const job = result.data;
+		console.log(`✅ PageController: Successfully got job data:`, job);
+
+		if (!job) {
+			return res.redirect("/error");
+		}
+
+		// TODO: Check if user has already applied for this job
+		// This will call an API endpoint to check if a record exists in the applications table
+		// for this userId + jobRoleId combination
+		// For now, we'll default userHasAppliedForJob to false
+		const userHasAppliedForJob = false; // Replace with actual API call when backend endpoint is ready
+
+		res.render("pages/apply-job.njk", {
+			title: `Apply for ${job.roleName} - Kainos`,
+			job: job,
+			userHasAppliedForJob: userHasAppliedForJob,
+			currentPage: "jobs",
+			user: authReq.user,
+		});
+	} catch (error) {
+		// Production: log error privately, redirect to generic error page
+		console.error("Error rendering apply job page:", error);
+		res.redirect("/error");
 	}
 }
 

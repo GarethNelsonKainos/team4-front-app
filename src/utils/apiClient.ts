@@ -1,4 +1,5 @@
 import axios, { type AxiosError, type AxiosInstance } from "axios";
+import type FormData from "form-data";
 
 /**
  * Server-side API client for communicating with the backend API
@@ -192,6 +193,34 @@ export async function deleteJobRole(id: number, token: string) {
 		return {
 			success: false,
 			error: axiosError.response?.data?.message || "Failed to delete job role",
+			status: axiosError.response?.status,
+		};
+	}
+}
+
+/**
+ * @param formData - FormData object containing the CV file and job role ID
+ * @param token - JWT token for authentication
+ */
+export async function submitJobApplication(formData: FormData, token: string) {
+	try {
+		const response = await apiClient.post("/api/apply", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		return {
+			success: true,
+			data: response.data,
+		};
+	} catch (error) {
+		const axiosError = error as AxiosError<{ message?: string }>;
+		return {
+			success: false,
+			error:
+				axiosError.response?.data?.message ||
+				"Failed to submit application. Please try again.",
 			status: axiosError.response?.status,
 		};
 	}

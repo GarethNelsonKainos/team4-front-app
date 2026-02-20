@@ -79,6 +79,14 @@ describe("Express App Routes", () => {
 		});
 	});
 
+	describe("GET /job-roles/:id/apply", () => {
+		it("should redirect to login for unauthenticated user", async () => {
+			const response = await request(app).get("/job-roles/1/apply");
+			expect(response.status).toBe(302);
+			expect(response.headers.location).toBe("/login");
+		});
+	});
+
 	describe("GET /login", () => {
 		it("should return login page with 200 status", async () => {
 			const response = await request(app).get("/login");

@@ -2,9 +2,11 @@ import "dotenv/config";
 import cookieParser from "cookie-parser";
 import express from "express";
 import nunjucks from "nunjucks";
+import * as applicationController from "./controllers/applicationController";
 import * as authController from "./controllers/authController";
 import * as pageController from "./controllers/pageController";
 import { authMiddleware, requireAdmin } from "./utils/auth";
+import { cvUploadConfig } from "./utils/multerConfig";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -38,6 +40,9 @@ app.get("/jobs", pageController.getJobsPage);
 // Job detail route - :id is a route parameter (e.g. /job-roles/123)
 app.get("/job-roles/:id", pageController.getJobDetailPage);
 
+// Job apply route - allows user to upload CV and apply for a job
+app.get("/job-roles/:id/apply", pageController.getApplyJobPage);
+
 // Login page route
 app.get("/login", pageController.getLoginPage);
 
@@ -49,6 +54,9 @@ app.get("/login-failed", pageController.getLoginFailedPage);
 
 // Register failed page route
 app.get("/register-failed", pageController.getRegisterFailedPage);
+
+// Application success page route
+app.get("/application-success", pageController.getApplicationSuccessPage);
 
 // Error page route
 app.get("/error", pageController.getErrorPage);
@@ -74,6 +82,13 @@ app.post("/api/register", authController.register);
 app.post("/api/logout", authController.logout);
 app.get("/api/logout", authController.logout);
 app.get("/api/auth-status", authController.checkAuthStatus);
+
+// Application submission route
+app.post(
+	"/apply/:id",
+	cvUploadConfig.single("cv"),
+	applicationController.submitApplication,
+);
 
 export { app };
 
