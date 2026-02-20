@@ -174,8 +174,8 @@ describe("Express App Routes", () => {
 					.send({ password: "password123!" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/login");
+				expect(response.status).toBe(200);
+				expect(response.text).toContain("Email is required");
 			});
 
 			it("should return error message when password is missing", async () => {
@@ -184,8 +184,8 @@ describe("Express App Routes", () => {
 					.send({ email: "test@example.com" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/login");
+				expect(response.status).toBe(200);
+				expect(response.text).toContain("Password is required");
 			});
 
 			it("should set HTTP-only cookie and redirect on successful login", async () => {
@@ -218,176 +218,176 @@ describe("Express App Routes", () => {
 					.send({ email: "test@example.com", password: "wrongpassword" })
 					.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/login");
-			});
-
-			it("should return generic error message on exception", async () => {
-				vi.mocked(apiClient.loginUser).mockRejectedValue(
-					new Error("Network error"),
-				);
-
-				const response = await request(app)
-					.post("/api/login")
-					.send({ email: "test@example.com", password: "password123!" })
-					.set("Content-Type", "application/json");
-
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/login");
-			});
-		});
-
-		describe("POST /api/register", () => {
-			it("should return error message when email is missing", async () => {
-				const response = await request(app)
-					.post("/api/register")
-					.send({ password: "password123!", confirmPassword: "password123!" })
-					.set("Content-Type", "application/json");
-
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
-			});
-
-			it("should return error message when password is missing", async () => {
-				const response = await request(app)
-					.post("/api/register")
-					.send({ email: "test@example.com", confirmPassword: "password123!" })
-					.set("Content-Type", "application/json");
-
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
-			});
-
-			it("should return error message when passwords do not match", async () => {
-				const response = await request(app)
-					.post("/api/register")
-					.send({
-						email: "test@example.com",
-						password: "password123!",
-						confirmPassword: "password456",
-					})
-					.set("Content-Type", "application/json");
-
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
-			});
-			it("should return error message when password is too short", async () => {
-				const response = await request(app)
-					.post("/api/register")
-					.send({
-						email: "test@example.com",
-						password: "pass1",
-						confirmPassword: "pass1",
-					})
-					.set("Content-Type", "application/json");
-
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
-			});
-
-			it("should return error message when password lacks number and special character", async () => {
-				const response = await request(app)
-					.post("/api/register")
-					.send({
-						email: "test@example.com",
-						password: "password",
-						confirmPassword: "password",
-					})
-					.set("Content-Type", "application/json");
-
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
-			});
-			it("should set HTTP-only cookie and redirect on successful registration", async () => {
-				vi.mocked(apiClient.registerUser).mockResolvedValue({
-					success: true,
-					data: { token: "test-jwt-token" },
-				});
-
-				const response = await request(app)
-					.post("/api/register")
-					.send({
-						email: "newuser@example.com",
-						password: "password123!",
-						confirmPassword: "password123!",
-					})
-					.set("Content-Type", "application/json");
-
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/jobs");
-				expect(response.headers["set-cookie"]).toBeDefined();
-				expect(response.headers["set-cookie"][0]).toContain("authToken");
-				expect(response.headers["set-cookie"][0]).toContain("HttpOnly");
-			});
-
-			it("should return error message on API error", async () => {
-				vi.mocked(apiClient.registerUser).mockResolvedValue({
-					success: false,
-					error: "Email already exists",
-					status: 400,
-				});
-
-				const response = await request(app)
-					.post("/api/register")
-					.send({
-						email: "existing@example.com",
-						password: "password123!",
-						confirmPassword: "password123!",
-					})
-					.set("Content-Type", "application/json");
-
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/register");
-			});
-
-			it("should return generic error message on exception", async () => {
-				vi.mocked(apiClient.registerUser).mockRejectedValue(
-					new Error("Database error"),
-				);
-
-				const response = await request(app)
-					.post("/api/register")
-					.send({
-						email: "newuser@example.com",
-						password: "password123!",
-						confirmPassword: "password123!",
-					})
-					.set("Content-Type", "application/json");
-
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/login");
-			});
-		});
-
-		describe("POST /api/logout", () => {
-			it("should clear auth cookie and redirect to home", async () => {
-				const response = await request(app)
-					.post("/api/logout")
-					.set("Cookie", ["authToken=test-token"]);
-
-				expect(response.status).toBe(302);
-				expect(response.header.location).toBe("/");
-				expect(response.headers["set-cookie"]).toBeDefined();
-				expect(response.headers["set-cookie"][0]).toContain("authToken=;");
-			});
-		});
-
-		describe("GET /api/auth-status", () => {
-			it("should return authenticated true when cookie is present", async () => {
-				const response = await request(app)
-					.get("/api/auth-status")
-					.set("Cookie", ["authToken=test-token"]);
-
 				expect(response.status).toBe(200);
-				expect(response.body.isAuthenticated).toBe(true);
+				expect(response.text).toContain("Invalid email or password");
+			});
+		});
+
+		it("should return generic error message on exception", async () => {
+			vi.mocked(apiClient.loginUser).mockRejectedValue(
+				new Error("Network error"),
+			);
+
+			const response = await request(app)
+				.post("/api/login")
+				.send({ email: "test@example.com", password: "password123!" })
+				.set("Content-Type", "application/json");
+
+			expect(response.status).toBe(200);
+			expect(response.text).toContain("server error");
+		});
+	});
+
+	describe("POST /api/register", () => {
+		it("should return error message when email is missing", async () => {
+			const response = await request(app)
+				.post("/api/register")
+				.send({ password: "password123!", confirmPassword: "password123!" })
+				.set("Content-Type", "application/json");
+
+			expect(response.status).toBe(200);
+			expect(response.text).toContain("required");
+		});
+
+		it("should return error message when password is missing", async () => {
+			const response = await request(app)
+				.post("/api/register")
+				.send({ email: "test@example.com", confirmPassword: "password123!" })
+				.set("Content-Type", "application/json");
+
+			expect(response.status).toBe(200);
+			expect(response.text).toContain("required");
+		});
+
+		it("should return error message when passwords do not match", async () => {
+			const response = await request(app)
+				.post("/api/register")
+				.send({
+					email: "test@example.com",
+					password: "password123!",
+					confirmPassword: "password456",
+				})
+				.set("Content-Type", "application/json");
+
+			expect(response.status).toBe(200);
+			expect(response.text).toContain("Passwords do not match");
+		});
+		it("should return error message when password is too short", async () => {
+			const response = await request(app)
+				.post("/api/register")
+				.send({
+					email: "test@example.com",
+					password: "pa1!",
+					confirmPassword: "pa1!",
+				})
+				.set("Content-Type", "application/json");
+
+			expect(response.status).toBe(200);
+			expect(response.text).toContain("at least 6 characters");
+		});
+
+		it("should return error message when password lacks number and special character", async () => {
+			const response = await request(app)
+				.post("/api/register")
+				.send({
+					email: "test@example.com",
+					password: "password",
+					confirmPassword: "password",
+				})
+				.set("Content-Type", "application/json");
+
+			expect(response.status).toBe(200);
+			expect(response.text).toContain("special character");
+		});
+		it("should set HTTP-only cookie and redirect on successful registration", async () => {
+			vi.mocked(apiClient.registerUser).mockResolvedValue({
+				success: true,
+				data: { token: "test-jwt-token" },
 			});
 
-			it("should return authenticated false when cookie is missing", async () => {
-				const response = await request(app).get("/api/auth-status");
+			const response = await request(app)
+				.post("/api/register")
+				.send({
+					email: "newuser@example.com",
+					password: "password123!",
+					confirmPassword: "password123!",
+				})
+				.set("Content-Type", "application/json");
 
-				expect(response.status).toBe(200);
-				expect(response.body.isAuthenticated).toBe(false);
+			expect(response.status).toBe(302);
+			expect(response.header.location).toBe("/jobs");
+			expect(response.headers["set-cookie"]).toBeDefined();
+			expect(response.headers["set-cookie"][0]).toContain("authToken");
+			expect(response.headers["set-cookie"][0]).toContain("HttpOnly");
+		});
+
+		it("should return error message on API error", async () => {
+			vi.mocked(apiClient.registerUser).mockResolvedValue({
+				success: false,
+				error: "Email already exists",
+				status: 400,
 			});
+
+			const response = await request(app)
+				.post("/api/register")
+				.send({
+					email: "existing@example.com",
+					password: "password123!",
+					confirmPassword: "password123!",
+				})
+				.set("Content-Type", "application/json");
+
+			expect(response.status).toBe(200);
+			expect(response.text).toContain("Error registering");
+		});
+
+		it("should return generic error message on exception", async () => {
+			vi.mocked(apiClient.registerUser).mockRejectedValue(
+				new Error("Database error"),
+			);
+
+			const response = await request(app)
+				.post("/api/register")
+				.send({
+					email: "newuser@example.com",
+					password: "password123!",
+					confirmPassword: "password123!",
+				})
+				.set("Content-Type", "application/json");
+
+			expect(response.status).toBe(200);
+			expect(response.text).toContain("server error");
+		});
+	});
+
+	describe("POST /api/logout", () => {
+		it("should clear auth cookie and redirect to home", async () => {
+			const response = await request(app)
+				.post("/api/logout")
+				.set("Cookie", ["authToken=test-token"]);
+
+			expect(response.status).toBe(302);
+			expect(response.header.location).toBe("/");
+			expect(response.headers["set-cookie"]).toBeDefined();
+			expect(response.headers["set-cookie"][0]).toContain("authToken=;");
+		});
+	});
+
+	describe("GET /api/auth-status", () => {
+		it("should return authenticated true when cookie is present", async () => {
+			const response = await request(app)
+				.get("/api/auth-status")
+				.set("Cookie", ["authToken=test-token"]);
+
+			expect(response.status).toBe(200);
+			expect(response.body.isAuthenticated).toBe(true);
+		});
+
+		it("should return authenticated false when cookie is missing", async () => {
+			const response = await request(app).get("/api/auth-status");
+
+			expect(response.status).toBe(200);
+			expect(response.body.isAuthenticated).toBe(false);
 		});
 	});
 });

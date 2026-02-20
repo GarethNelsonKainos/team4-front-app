@@ -45,10 +45,13 @@
                                id="email" 
                                name="email" 
                                required 
-                               class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kainos-500 focus:border-kainos-500 hover:ring-2 hover:ring-kainos-500 hover:border-kainos-500 transition-all duration-300"
+                               value="{{ formData.email if formData else '' }}"
+                               class="w-full pl-10 pr-3 py-3 border {% if errors and errors.email %}border-red-500{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-kainos-500 focus:border-kainos-500 transition-all duration-300"
                                placeholder="Enter your email">
                     </div>
-                    <div id="emailError" class="text-red-500 text-base mt-1 hidden"></div>
+                    {% if errors and errors.email %}
+                    <div class="text-red-500 text-base mt-1">{{ errors.email }}</div>
+                    {% endif %}
                 </div>
 
                 <!-- Password Field -->
@@ -67,7 +70,7 @@
                                name="password" 
                                required 
                                minlength="6"
-                               class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kainos-500 focus:border-kainos-500 hover:ring-2 hover:ring-kainos-500 hover:border-kainos-500 transition-all duration-300"
+                               class="w-full pl-10 pr-10 py-3 border {% if errors and errors.password %}border-red-500{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-kainos-500 focus:border-kainos-500 transition-all duration-300"
                                placeholder="Enter your password">
                         <button type="button" 
                             id="togglePassword" 
@@ -79,7 +82,9 @@
                             </svg>
                         </button>
                     </div>
-                    <div id="passwordError" class="text-red-500 text-base mt-1 hidden"></div>
+                    {% if errors and errors.password %}
+                    <div class="text-red-500 text-base mt-1">{{ errors.password }}</div>
+                    {% endif %}
                 </div>
 
                 <!-- Remember Me & Forgot Password -->
@@ -112,14 +117,16 @@
                 </div>
 
                 <!-- Error Message Display -->
-                <div id="errorMessage" data-error-message class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                {% if errorMessage %}
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                     <div class="flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                         </svg>
-                        <span></span>
+                        <span>{{ errorMessage }}</span>
                     </div>
                 </div>
+                {% endif %}
             </form>
 
                 <!-- Sign Up Link -->
@@ -192,6 +199,10 @@
             }
         });
     </script>
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/login.js"></script>
 {% endblock %}
 
 
