@@ -55,32 +55,6 @@
                     </div>
                 </div>
 
-                <!-- Error message -->
-                <div id="errorMessage" class="hidden bg-red-50 border-2 border-red-400 rounded-lg p-4">
-                    <div class="flex items-start">
-                        <svg class="w-6 h-6 text-red-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <div>
-                            <h3 class="font-bold text-red-800 mb-1">Upload Failed</h3>
-                            <p class="text-base text-red-700" id="errorText"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Success message -->
-                <div id="successMessage" class="hidden bg-green-50 border-2 border-green-400 rounded-lg p-4">
-                    <div class="flex items-start">
-                        <svg class="w-6 h-6 text-green-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <div>
-                            <h3 class="font-bold text-green-800 mb-1">Application Submitted</h3>
-                            <p class="text-base text-green-700">Your CV has been successfully uploaded. Thank you for applying!</p>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Loading state -->
                 <div id="loadingState" class="hidden flex items-center justify-center space-x-3 bg-blue-50 rounded-lg p-6">
                     <svg class="w-6 h-6 text-kainos-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,33 +250,14 @@
                     // Handle response
                     if (response.ok) {
                         console.log('Application submitted successfully');
-                        showMessage('successMessage');
-                        // Redirect to success page after 2 seconds
-                        setTimeout(() => {
-                            window.location.href = '/application-success';
-                        }, 2000);
+                        window.location.href = '/application-success';
                     } else {
-                        // Parse error response
-                        let errorMessage = 'An error occurred while submitting your application. Please try again.';
-                        try {
-                            const errorData = await response.json();
-                            if (errorData.message) {
-                                errorMessage = errorData.message;
-                            }
-                        } catch (_e) {
-                            console.error('Could not parse error response');
-                        }
-                        
                         console.error('Application submission failed:', response.status);
-                        document.getElementById('errorText').textContent = errorMessage;
-                        showMessage('errorMessage');
-                        uploadBtn.disabled = false;
+                        window.location.href = '/error';
                     }
                 } catch (error) {
                     console.error('Network error during submission:', error);
-                    document.getElementById('errorText').textContent = 'Network error. Please check your connection and try again.';
-                    showMessage('errorMessage');
-                    uploadBtn.disabled = false;
+                    window.location.href = '/error';
                 }
             });
         }

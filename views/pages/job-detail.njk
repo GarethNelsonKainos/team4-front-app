@@ -49,9 +49,6 @@
                 </div>
 
                 <div class="space-y-4">
-                    <div class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full text-base font-bold">
-                        {{ job.status | upper }}
-                    </div>
                     {% if job.numberOfOpenPositions %}
                     <div class="text-base text-gray-600">
                         <strong>{{ job.numberOfOpenPositions }}</strong> position{{ 's' if job.numberOfOpenPositions > 1 else '' }} available
@@ -141,7 +138,7 @@
         // Initialize save button
         function initializeSaveButton() {
             const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-            const jobId = {{ job.jobRoleId }};
+            const jobId = parseInt({{ job.jobRoleId }});
             const btn = document.querySelector('.save-btn');
 
             // Load saved state on page load

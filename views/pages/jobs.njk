@@ -68,14 +68,6 @@
                     </div>
                 </div>
 
-                <!-- Status -->
-                <div class="mb-4">
-                    <div class="text-base font-semibold text-gray-500 mb-1">Status</div>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-bold bg-green-100 text-green-800">
-                        {{ job.status | upper }}
-                    </span>
-                </div>
-
             </div>
             {% endfor %}
         </div>
@@ -99,9 +91,6 @@
                         </th>
                         <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
                             Closing Date
-                        </th>
-                        <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
-                            Status
                         </th>
                         <th scope="col" class="px-4 md:px-6 py-4 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
                             Actions
@@ -140,11 +129,6 @@
                                 </svg>
                                 <span class="text-base text-gray-900">{{ job.closingDate | formatDate }}</span>
                             </div>
-                        </td>
-                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-base font-bold bg-green-100 text-green-800">
-                                {{ job.status | upper }}
-                            </span>
                         </td>
                         <td class="px-4 md:px-6 py-4 whitespace-nowrap text-base font-medium">
                             <div class="flex space-x-2">
@@ -188,10 +172,10 @@
         function initializeSaveButtons() {
             const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
             
-            // Load saved state on page load
-            savedJobs.forEach(jobId => {
-                const btn = document.querySelector(`[data-job-id="${jobId}"]`);
-                if (btn) {
+            // Load saved state on page load - iterate through all buttons and check if they're in savedJobs
+            document.querySelectorAll('.save-btn').forEach(btn => {
+                const jobId = parseInt(btn.dataset.jobId);
+                if (savedJobs.includes(jobId)) {
                     updateButtonState(btn, true);
                 }
             });
@@ -200,17 +184,17 @@
             document.querySelectorAll('.save-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const jobId = this.dataset.jobId;
-                    const isCurrentlySaved = savedJobs.includes(parseInt(jobId));
+                    const jobId = parseInt(this.dataset.jobId);
+                    const isCurrentlySaved = savedJobs.includes(jobId);
                     
                     if (isCurrentlySaved) {
                         // Remove from saved
-                        const index = savedJobs.indexOf(parseInt(jobId));
+                        const index = savedJobs.indexOf(jobId);
                         savedJobs.splice(index, 1);
                         updateButtonState(this, false);
                     } else {
                         // Add to saved
-                        savedJobs.push(parseInt(jobId));
+                        savedJobs.push(jobId);
                         updateButtonState(this, true);
                     }
                     
