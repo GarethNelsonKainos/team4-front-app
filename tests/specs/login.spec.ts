@@ -1,4 +1,6 @@
 import { test, expect } from '../fixtures/fixture';
+import "dotenv/config";
+
 
 test.describe('Login Page', () => {
   test.beforeEach(async ({ loginPage }) => {
@@ -10,7 +12,7 @@ test.describe('Login Page', () => {
   });
 
   test('should successfully login with valid credentials', async ({ loginPage}) => {
-    await loginPage.login('applicant@example.com', 'ChangeMe123!');
+    await loginPage.login('applicant@example.com', process.env.PLAYWRIGHT_PASSWORD!);
     // Add assertion for successful login redirect
   });
 

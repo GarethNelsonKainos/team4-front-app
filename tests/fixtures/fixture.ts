@@ -1,6 +1,6 @@
 import { test as base, Page } from '@playwright/test';
 import { BasePage } from '../pages/basePage';
-import { LoginPage } from '../pages/loginPage';
+import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/registerPage';
 import { JobsPage } from '../pages/jobsPage';
 import { JobDetailPage } from '../pages/jobDetailPage';
