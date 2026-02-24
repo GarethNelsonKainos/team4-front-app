@@ -1,4 +1,5 @@
 import { expect, Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
 export type RegisterUser = {
   email: string;
@@ -7,8 +8,10 @@ export type RegisterUser = {
   acceptTerms?: boolean;
 };
 
-export class RegisterPage {
-  constructor(private readonly page: Page) {}
+export class RegisterPage extends BasePage {
+  constructor(page: Page) {
+    super(page);
+  }
 
   async goto() {
     await this.page.goto('/register');
