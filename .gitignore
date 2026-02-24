@@ -62,3 +62,10 @@ jspm_packages/
 
 # Generated Tailwind CSS build artifacts
 public/css/styles.css
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
