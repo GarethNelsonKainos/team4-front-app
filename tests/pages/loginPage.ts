@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { BasePage } from './basePage';
 
 export class LoginPage extends BasePage {
   // Selectors
@@ -42,10 +42,7 @@ export class LoginPage extends BasePage {
       await this.checkRememberMe();
     }
     await this.clickSignIn();
-    await Promise.race([
-      this.page.waitForNavigation().catch(() => {}),
-      this.waitForLoadState('networkidle'),
-    ]);
+    await this.waitForLoadState();
   }
 
   async togglePasswordVisibility() {
