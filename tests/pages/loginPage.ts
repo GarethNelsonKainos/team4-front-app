@@ -42,7 +42,7 @@ export class LoginPage extends BasePage {
       await this.checkRememberMe();
     }
     await this.clickSignIn();
-    await this.waitForLoadState();
+    await this.waitForLoadState('networkidle');
   }
 
   async togglePasswordVisibility() {
