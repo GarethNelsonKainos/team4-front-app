@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { RegisterPage } from '../pages/register.page';
+import { test, expect } from '../fixtures/fixture';
+import { RegisterPage } from '../pages/registerPage';
 import { registerUsers } from '../fixtures/register-users';
 
 test.describe('Register', () => {

@@ -1,4 +1,4 @@
-import type { RegisterUser } from '../pages/register.page';
+import type { RegisterUser } from '../pages/registerPage';
 
 const uniqueEmail = () => `pw-user-${Date.now()}-${Math.floor(Math.random() * 10000)}@example.com`;
 
