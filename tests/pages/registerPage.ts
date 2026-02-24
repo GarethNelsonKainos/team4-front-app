@@ -13,29 +13,37 @@ export class RegisterPage extends BasePage {
     super(page);
   }
 
+  readonly emailInput = this.page.locator('#email');
+  readonly passwordInputField = this.page.locator('#password');
+  readonly confirmPasswordInputField = this.page.locator('#confirmPassword');
+  readonly termsCheckbox = this.page.locator('#terms');
+  readonly createAccountButton = this.page.getByRole('button', { name: 'Create Account' });
+  readonly togglePasswordButton = this.page.locator('#togglePassword');
+  readonly toggleConfirmPasswordButton = this.page.locator('#toggleConfirmPassword');
+
   async goto() {
     await this.page.goto('/register');
     await expect(this.page.getByRole('heading', { name: 'Create Your Account' })).toBeVisible();
   }
 
   async fillEmail(email: string) {
-    await this.page.locator('#email').fill(email);
+    await this.emailInput.fill(email);
   }
 
   async fillPassword(password: string) {
-    await this.page.locator('#password').fill(password);
+    await this.passwordInputField.fill(password);
   }
 
   async fillConfirmPassword(confirmPassword: string) {
-    await this.page.locator('#confirmPassword').fill(confirmPassword);
+    await this.confirmPasswordInputField.fill(confirmPassword);
   }
 
   async acceptTerms() {
-    await this.page.locator('#terms').check();
+    await this.termsCheckbox.check();
   }
 
   async submit() {
-    await this.page.getByRole('button', { name: 'Create Account' }).click();
+    await this.createAccountButton.click();
   }
 
   async register(user: RegisterUser) {
@@ -52,19 +60,19 @@ export class RegisterPage extends BasePage {
   }
 
   async togglePasswordVisibility() {
-    await this.page.locator('#togglePassword').click();
+    await this.togglePasswordButton.click();
   }
 
   async toggleConfirmPasswordVisibility() {
-    await this.page.locator('#toggleConfirmPassword').click();
+    await this.toggleConfirmPasswordButton.click();
   }
 
   passwordInput() {
-    return this.page.locator('#password');
+    return this.passwordInputField;
   }
 
   confirmPasswordInput() {
-    return this.page.locator('#confirmPassword');
+    return this.confirmPasswordInputField;
   }
 
   async expectAlreadyRegisteredBanner() {
@@ -84,6 +92,6 @@ export class RegisterPage extends BasePage {
 
   async expectTermsRequiredError() {
     await expect(this.page).toHaveURL(/\/register/);
-    await expect(this.page.getByRole('button', { name: 'Create Account' })).toBeVisible();
+    await expect(this.createAccountButton).toBeVisible();
   }
 }
