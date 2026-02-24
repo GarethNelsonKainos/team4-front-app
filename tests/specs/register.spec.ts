@@ -7,6 +7,7 @@ test.describe('Register', () => {
     const registerPage = new RegisterPage(page);
     const user = registerUsers.valid();
 
+    await registerPage.navigateToRegister();
     await registerPage.register(user);
 
     await registerPage.expectSuccessRedirect();

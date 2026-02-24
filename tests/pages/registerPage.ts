@@ -9,9 +9,7 @@ export type RegisterUser = {
 };
 
 export class RegisterPage extends BasePage {
-  constructor(page: Page) {
-    super(page);
-  }
+
 
   readonly emailInput = this.page.locator('#email');
   readonly passwordInputField = this.page.locator('#password');
@@ -21,11 +19,11 @@ export class RegisterPage extends BasePage {
   readonly togglePasswordButton = this.page.locator('#togglePassword');
   readonly toggleConfirmPasswordButton = this.page.locator('#toggleConfirmPassword');
 
-  async goto() {
-    await this.page.goto('/register');
+  async navigateToRegister() {
+    await this.goto('/register');
+    await this.waitForLoadState('networkidle');
     await expect(this.page.getByRole('heading', { name: 'Create Your Account' })).toBeVisible();
   }
-
   async fillEmail(email: string) {
     await this.emailInput.fill(email);
   }
@@ -47,7 +45,7 @@ export class RegisterPage extends BasePage {
   }
 
   async register(user: RegisterUser) {
-    await this.goto();
+    await this.navigateToRegister();
     await this.fillEmail(user.email);
     await this.fillPassword(user.password);
     await this.fillConfirmPassword(user.confirmPassword ?? user.password);
@@ -57,6 +55,8 @@ export class RegisterPage extends BasePage {
     }
 
     await this.submit();
+    await this.waitForLoadState('networkidle');
+
   }
 
   async togglePasswordVisibility() {
