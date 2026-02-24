@@ -45,7 +45,7 @@ export class JobDetailPage extends BasePage {
    */
   async navigate(jobId: number) {
     await this.goto(`/job-roles/${jobId}`);
-    await this.waitForLoadState();
+    await this.waitForLoadState('networkidle');
   }
 
   /**

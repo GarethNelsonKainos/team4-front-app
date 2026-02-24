@@ -23,7 +23,7 @@ export class JobsPage extends BasePage {
    */
   async navigate() {
     await this.goto('/job-roles');
-    await this.waitForLoadState();
+    await this.waitForLoadState('networkidle');
   }
 
   /**
