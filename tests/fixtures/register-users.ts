@@ -1,6 +1,12 @@
 import type { RegisterUser } from '../pages/registerPage';
+import "dotenv/config";
 
 const uniqueEmail = () => `pw-user-${Date.now()}-${Math.floor(Math.random() * 10000)}@example.com`;
+
+const VALID_PASSWORD = process.env.TEST_USER_PASSWORD_VALID!;
+const WEAK_PASSWORD = process.env.TEST_USER_PASSWORD_WEAK!;
+const MISMATCH_PASSWORD_1 = process.env.TEST_USER_MISMATCH_PASSWORD1!;
+const MISMATCH_PASSWORD_2 = process.env.TEST_USER_MISMATCH_PASSWORD2!;
 
 export const registerUsers: {
   valid: () => RegisterUser;
@@ -9,22 +15,22 @@ export const registerUsers: {
 } = {
   valid: () => ({
     email: uniqueEmail(),
-    password: 'ValidPass1!',
-    confirmPassword: 'ValidPass1!',
+    password: VALID_PASSWORD,
+    confirmPassword: VALID_PASSWORD,
     acceptTerms: true,
   }),
 
   weakPassword: () => ({
     email: uniqueEmail(),
-    password: 'Weak1!',
-    confirmPassword: 'Weak1!',
+    password: WEAK_PASSWORD,
+    confirmPassword: WEAK_PASSWORD,
     acceptTerms: true,
   }),
 
   mismatchPassword: () => ({
     email: uniqueEmail(),
-    password: 'ValidPass1!',
-    confirmPassword: 'Different1!',
+    password: MISMATCH_PASSWORD_1,
+    confirmPassword: MISMATCH_PASSWORD_2,
     acceptTerms: true,
   }),
 };
