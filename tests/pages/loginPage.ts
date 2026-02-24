@@ -16,7 +16,7 @@ export class LoginPage extends BasePage {
   // Methods
   async navigateToLogin() {
     await this.goto('/login');
-    await this.waitForLoadState();
+    await this.waitForLoadState('networkidle');
   }
 
   async fillEmail(email: string) {

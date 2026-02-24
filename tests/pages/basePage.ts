@@ -7,7 +7,7 @@ export class BasePage {
     await this.page.goto(path);
   }
 
-  async waitForLoadState() {
+  async waitForLoadState(p0: string) {
     await this.page.waitForLoadState('networkidle');
   }
 }
