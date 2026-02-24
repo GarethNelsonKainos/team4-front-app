@@ -1,8 +1,6 @@
 import { test, expect } from '../fixtures/fixture';
 
 test.describe('Login Page', () => {
-  let loginPage: LoginPage;
-
   test.beforeEach(async ({ loginPage }) => {
     await loginPage.navigateToLogin();
   });
