@@ -181,5 +181,137 @@ describe("Auth Utils", () => {
 			expect((mockRequest as AuthRequest).user?.isAuthenticated).toBe(false);
 			expect(mockNext).toHaveBeenCalled();
 		});
+
+		it("should set user as unauthenticated when token is missing", () => {
+			mockRequest.cookies = {};
+
+			authMiddleware(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			const authReq = mockRequest as AuthRequest;
+			expect(authReq.user).toEqual({
+				email: null,
+				role: null,
+				isAuthenticated: false,
+			});
+		});
+
+		it("should extract user info from valid token", () => {
+			// Create a simple JWT-like token for testing
+			const payload = { userEmail: "test@example.com", userRole: "admin" };
+			const encodedPayload = Buffer.from(JSON.stringify(payload)).toString(
+				"base64",
+			);
+			const mockToken = `header.${encodedPayload}.signature`;
+			mockRequest.cookies = { authToken: mockToken };
+
+			authMiddleware(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			const authReq = mockRequest as AuthRequest;
+			expect(authReq.user?.email).toBe("test@example.com");
+			expect(authReq.user?.role).toBe("admin");
+			expect(authReq.user?.isAuthenticated).toBe(true);
+		});
+	});
+
+	describe("requireAuth", () => {
+		it("should call next() when user is authenticated", async () => {
+			const { requireAuth } = await import("../utils/auth.js");
+			(mockRequest as AuthRequest).user = {
+				email: "test@example.com",
+				role: "applicant",
+				isAuthenticated: true,
+			};
+
+			requireAuth(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockNext).toHaveBeenCalled();
+			expect(mockResponse.redirect).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to login when user is not authenticated", async () => {
+			const { requireAuth } = await import("../utils/auth.js");
+			(mockRequest as AuthRequest).user = {
+				email: null,
+				role: null,
+				isAuthenticated: false,
+			};
+
+			requireAuth(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockNext).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to login when user object is missing", async () => {
+			const { requireAuth } = await import("../utils/auth.js");
+			(mockRequest as AuthRequest).user = undefined;
+
+			requireAuth(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockNext).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("requireAdmin", () => {
+		it("should call next() when user is authenticated admin", async () => {
+			const { requireAdmin } = await import("../utils/auth.js");
+			(mockRequest as AuthRequest).user = {
+				email: "admin@example.com",
+				role: "admin",
+				isAuthenticated: true,
+			};
+
+			requireAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockNext).toHaveBeenCalled();
+			expect(mockResponse.redirect).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to error when user is not admin", async () => {
+			const { requireAdmin } = await import("../utils/auth.js");
+			(mockRequest as AuthRequest).user = {
+				email: "user@example.com",
+				role: "applicant",
+				isAuthenticated: true,
+			};
+
+			requireAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			expect(mockNext).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to error when user is not authenticated", async () => {
+			const { requireAdmin } = await import("../utils/auth.js");
+			(mockRequest as AuthRequest).user = {
+				email: null,
+				role: null,
+				isAuthenticated: false,
+			};
+
+			requireAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			expect(mockNext).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to error when user object is missing", async () => {
+			const { requireAdmin } = await import("../utils/auth.js");
+			(mockRequest as AuthRequest).user = undefined;
+
+			requireAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			expect(mockNext).not.toHaveBeenCalled();
+		});
 	});
 });

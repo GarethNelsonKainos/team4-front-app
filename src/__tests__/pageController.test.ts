@@ -78,6 +78,43 @@ describe("PageController", () => {
 		});
 	});
 
+	describe("getApplicationSuccessPage", () => {
+		it("should render application success page", () => {
+			pageController.getApplicationSuccessPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/application-success.njk",
+				expect.objectContaining({
+					title: "Application Submitted",
+					user: expect.objectContaining({
+						isAuthenticated: true,
+						role: "applicant",
+					}),
+				}),
+			);
+		});
+
+		it("should redirect to error page on exception", () => {
+			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+				() => {
+					throw new Error("Template error");
+				},
+			);
+
+			pageController.getApplicationSuccessPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
 	describe("getHomePage", () => {
 		it("should render home page with correct data", () => {
 			pageController.getHomePage(
@@ -660,6 +697,229 @@ describe("PageController", () => {
 			);
 
 			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
+	describe("Admin Pages", () => {
+		beforeEach(() => {
+			// Set user as admin for these tests
+			(mockRequest as AuthRequest).user = {
+				email: "admin@example.com",
+				role: "admin",
+				isAuthenticated: true,
+			};
+		});
+
+		describe("getAdminDashboard", () => {
+			it("should render admin dashboard page", () => {
+				pageController.getAdminDashboard(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.render).toHaveBeenCalledWith(
+					"pages/admin-dashboard.njk",
+					expect.objectContaining({
+						title: "Admin Dashboard - Kainos",
+						currentPage: "admin",
+						user: expect.objectContaining({
+							isAuthenticated: true,
+							role: "admin",
+						}),
+					}),
+				);
+			});
+
+			it("should redirect to error page on exception", () => {
+				vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+					() => {
+						throw new Error("Template error");
+					},
+				);
+
+				pageController.getAdminDashboard(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			});
+		});
+
+		describe("getAdminJobsPage", () => {
+			it("should render admin jobs page with all jobs", async () => {
+				await pageController.getAdminJobsPage(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.render).toHaveBeenCalledWith(
+					"pages/admin-jobs.njk",
+					expect.objectContaining({
+						title: "Manage Job Listings - Kainos",
+						currentPage: "admin",
+						user: expect.objectContaining({
+							isAuthenticated: true,
+							role: "admin",
+						}),
+					}),
+				);
+			});
+
+			it("should redirect to error page on API failure", async () => {
+				vi.mocked(apiClient.getJobRolesPublic).mockResolvedValue({
+					success: false,
+					error: "API Error",
+					status: 500,
+				});
+
+				await pageController.getAdminJobsPage(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			});
+
+			it("should redirect to error page on exception", async () => {
+				vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+					() => {
+						throw new Error("Template error");
+					},
+				);
+
+				await pageController.getAdminJobsPage(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			});
+		});
+
+		describe("getAdminCreateJobPage", () => {
+			it("should render create job page", () => {
+				pageController.getAdminCreateJobPage(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.render).toHaveBeenCalledWith(
+					"pages/admin-create-job.njk",
+					expect.objectContaining({
+						title: "Create New Job - Kainos",
+						currentPage: "admin",
+						user: expect.objectContaining({
+							isAuthenticated: true,
+							role: "admin",
+						}),
+					}),
+				);
+			});
+
+			it("should redirect to error page on exception", () => {
+				vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+					() => {
+						throw new Error("Template error");
+					},
+				);
+
+				pageController.getAdminCreateJobPage(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			});
+		});
+
+		describe("getAdminCreateAdminPage", () => {
+			it("should render create admin page", () => {
+				pageController.getAdminCreateAdminPage(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.render).toHaveBeenCalledWith(
+					"pages/admin-create-admin.njk",
+					expect.objectContaining({
+						title: "Create Admin Account - Kainos",
+						currentPage: "admin",
+						user: expect.objectContaining({
+							isAuthenticated: true,
+							role: "admin",
+						}),
+					}),
+				);
+			});
+
+			it("should redirect to error page on exception", () => {
+				vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+					() => {
+						throw new Error("Template error");
+					},
+				);
+
+				pageController.getAdminCreateAdminPage(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			});
+		});
+
+		describe("getAdminAdminsPage", () => {
+			it("should render admin management page with mock admins", async () => {
+				await pageController.getAdminAdminsPage(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.render).toHaveBeenCalledWith(
+					"pages/admin-admins.njk",
+					expect.objectContaining({
+						title: "Manage Administrators - Kainos",
+						currentPage: "admin",
+						admins: expect.arrayContaining([
+							expect.objectContaining({
+								email: expect.any(String),
+								role: "admin",
+							}),
+						]),
+						user: expect.objectContaining({
+							isAuthenticated: true,
+							role: "admin",
+						}),
+					}),
+				);
+			});
+
+			it("should redirect to error page on exception", async () => {
+				vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+					() => {
+						throw new Error("Template error");
+					},
+				);
+
+				await pageController.getAdminAdminsPage(
+					mockRequest as Request,
+					mockResponse as Response,
+					mockNext,
+				);
+
+				expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			});
 		});
 	});
 });

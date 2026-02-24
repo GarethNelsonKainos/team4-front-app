@@ -40,6 +40,20 @@ jobs:
          name: coverage-report
          path: output/test/
 
+     - name: Install Playwright Browsers
+       run: npx playwright install --with-deps
+
+     - name: Run Playwright tests
+       run: npx playwright test
+
+     - name: Upload Playwright report
+       if: ${{ !cancelled() }}
+       uses: actions/upload-artifact@v4
+       with:
+         name: playwright-report
+         path: playwright-report/
+         retention-days: 30
+
      - name: Create accessibility reports directory
        run: mkdir -p output/accessibility
 

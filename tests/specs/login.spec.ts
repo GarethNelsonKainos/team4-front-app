@@ -1,5 +1,5 @@
-import { test, expect } from '../fixtures/fixture';
 import "dotenv/config";
+import { test, expect } from '../fixtures/fixture';
 
 
 test.describe('Login Page', () => {

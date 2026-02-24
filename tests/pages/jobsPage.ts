@@ -12,7 +12,7 @@ export class JobsPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.pageTitle = page.getByRole('heading', { name: 'Available Job Roles' });
-    this.openPositionsCount = page.locator('.bg-green-600 .text-white');
+    this.openPositionsCount = page.locator('.bg-green-800 .text-white');
     this.jobTable = page.locator('table.min-w-full');
     this.jobCards = page.locator('.lg\\:hidden > div');
     this.getInTouchButton = page.getByRole('link', { name: 'Get in Touch' });
