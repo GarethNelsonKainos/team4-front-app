@@ -19,7 +19,7 @@
 		"lint": "biome lint --write",
 		"check": "biome check --write",
 		"ci:check": "biome ci .",
-		"bdd": "cucumber-js tests/bdd/features/**/*.feature"
+		"bdd": "cucumber-js tests/bdd/features/**/*.feature --require-module tsx/esm --import tests/bdd/support/world.ts --import tests/bdd/support/hooks.ts --import tests/bdd/steps/login.steps.ts"
 	},
 	"repository": {
 		"type": "git",
