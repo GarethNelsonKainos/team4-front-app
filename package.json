@@ -18,7 +18,8 @@
 		"format": "biome format --write",
 		"lint": "biome lint --write",
 		"check": "biome check --write",
-		"ci:check": "biome ci ."
+		"ci:check": "biome ci .",
+		"bdd": "cucumber-js tests/bdd/features/**/*.feature"
 	},
 	"repository": {
 		"type": "git",
@@ -45,7 +46,7 @@
 		"@types/form-data": "^2.2.1",
 		"@types/jsonwebtoken": "^9.0.10",
 		"@types/multer": "^2.0.0",
-		"@types/node": "^25.2.2",
+		"@types/node": "^25.3.0",
 		"@types/nunjucks": "^3.2.6",
 		"@types/supertest": "^6.0.3",
 		"@types/yup": "^0.29.14",
