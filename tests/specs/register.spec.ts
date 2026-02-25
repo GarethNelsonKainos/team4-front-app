@@ -7,10 +7,10 @@ test.describe('Register', () => {
     const registerPage = new RegisterPage(page);
     const user = registerUsers.valid();
 
-    await registerPage.navigateToRegister();
     await registerPage.register(user);
 
-    await registerPage.isAlreadyRegisteredHeadingVisible();
+    await expect(page).toHaveURL(/\/login/);
+    await expect(registerPage.successRedirectHeading).toBeVisible();
   });
 
   test('shows error for mismatched passwords', async ({ page }) => {
@@ -19,7 +19,7 @@ test.describe('Register', () => {
 
     await registerPage.register(user);
 
-    await registerPage.isPasswordMismatchErrorVisible();
+    await expect(registerPage.passwordMismatchError).toBeVisible();
   });
 
 });

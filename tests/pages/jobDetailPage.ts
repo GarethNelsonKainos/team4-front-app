@@ -245,8 +245,15 @@ export class JobDetailPage extends BasePage {
   async toggleSave() {
     const initialState = await this.isJobSaved();
     await this.clickSaveButton();
-    // Wait for state to change
-    await this.page.waitForTimeout(100);
+    // Wait for the save state to change
+    const heartIcon = this.saveButton.locator('.heart-icon');
+    const expectedFill = initialState ? 'none' : 'currentColor';
+    await this.page.waitForFunction(
+      async () => {
+        const fill = await heartIcon.evaluate((el) => el.getAttribute('fill'));
+        return fill === expectedFill;
+      }
+    );
     return !initialState;
   }
 }

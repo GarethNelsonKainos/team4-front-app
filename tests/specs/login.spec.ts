@@ -9,7 +9,7 @@ test.describe('Login Page', () => {
   test('should successfully login with valid credentials', async ({ loginPage, page }) => {
     await expect(page.locator('h1:has-text("Welcome Back")')).toBeVisible();
     await loginPage.login('applicant@example.com', process.env.PLAYWRIGHT_PASSWORD!);
-    // Add assertion for successful login redirect
+    await expect(page).toHaveURL(/\/jobs/);
   });
 
   test('should display error message on invalid login', async ({ loginPage }) => {

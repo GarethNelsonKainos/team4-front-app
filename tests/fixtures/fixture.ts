@@ -1,16 +1,17 @@
-import { test as base, Page } from '@playwright/test';
+import { test as base, expect, Page } from '@playwright/test';
 import { BasePage } from '../pages/basePage';
-import { LoginPage } from '../pages/loginPage';
+import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/registerPage';
 import { JobsPage } from '../pages/jobsPage';
 import { JobDetailPage } from '../pages/jobDetailPage';
 
-type TestFixtures = {
+export type TestFixtures = {
   basePage: BasePage;
   loginPage: LoginPage;
   registerPage: RegisterPage;
   jobsPage: JobsPage;
   jobDetailPage: JobDetailPage;
+  page: Page;
 };
 
 export const test = base.extend<TestFixtures>({
@@ -36,4 +37,5 @@ export const test = base.extend<TestFixtures>({
   },
 });
 
-export { expect } from '@playwright/test';
+export { expect };
+export type { Page } from '@playwright/test';

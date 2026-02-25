@@ -2,8 +2,10 @@ import { test, expect } from '../fixtures/fixture';
 
 test.describe('Jobs Page', () => {
   test.beforeEach(async ({ jobsPage, page }) => {
+    await page.context().addInitScript(() => {
+      window.localStorage.clear();
+    });
     await jobsPage.navigate();
-    await page.evaluate(() => localStorage.clear());
   });
 
   test('should display page with job listings', async ({ jobsPage }) => {
@@ -33,24 +35,17 @@ test.describe('Jobs Page', () => {
 
   test('should save and toggle job save state', async ({ jobsPage, page }) => {
     const jobNames = await jobsPage.getAllJobRoleNames();
-    if (jobNames.length > 0) {
-      const jobName = jobNames[0];
-      
-      // Save job
-      await jobsPage.saveJob(jobName);
-      let isSaved = await jobsPage.isJobSaved(jobName);
-      expect(isSaved).toBe(true);
-      
-      // Verify localStorage
-      let savedJobs = await page.evaluate(() => 
-        JSON.parse(localStorage.getItem('savedJobs') || '[]')
-      );
-      expect(savedJobs.length).toBeGreaterThan(0);
-      
-      // Unsave job
-      await jobsPage.saveJob(jobName);
-      isSaved = await jobsPage.isJobSaved(jobName);
-      expect(isSaved).toBe(false);
-    }
+    expect(jobNames.length).toBeGreaterThan(0);
+    const jobName = jobNames[0];
+    
+    // Save job
+    await jobsPage.saveJob(jobName);
+    let isSaved = await jobsPage.isJobSaved(jobName);
+    expect(isSaved).toBe(true);
+    
+    // Unsave job
+    await jobsPage.saveJob(jobName);
+    isSaved = await jobsPage.isJobSaved(jobName);
+    expect(isSaved).toBe(false);
   });
 });

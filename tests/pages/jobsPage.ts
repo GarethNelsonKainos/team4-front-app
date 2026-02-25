@@ -26,7 +26,7 @@ export class JobsPage extends BasePage {
    * Navigate to the jobs page
    */
   async navigate() {
-    await this.goto('/job-roles');
+    await this.goto('/jobs');
   }
 
   /**
