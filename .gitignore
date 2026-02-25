@@ -48,6 +48,10 @@ coverage/
 output/
 .nyc_output
 
+# Test results and reports
+test-results/
+playwright-report/
+
 # Dependency directories
 jspm_packages/
 
