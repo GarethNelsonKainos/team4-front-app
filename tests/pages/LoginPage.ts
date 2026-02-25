@@ -12,6 +12,7 @@ export class LoginPage extends BasePage {
   private readonly errorMessage: Locator;
   private readonly togglePasswordButton: Locator;
   private readonly alreadyLoggedInMessage: Locator;
+  private readonly welcomeBackHeading: Locator;
 
   // Selectors
   constructor(page: Page) {
@@ -25,6 +26,7 @@ export class LoginPage extends BasePage {
     this.errorMessage = this.page.locator('.bg-red-50');
     this.togglePasswordButton = this.page.locator('#togglePassword');
     this.alreadyLoggedInMessage = this.page.locator('h1:has-text("Already Logged In")');
+    this.welcomeBackHeading = this.page.locator('h1:has-text("Welcome Back")');
   }
   // Methods
   async navigateToLogin() {
@@ -75,6 +77,10 @@ export class LoginPage extends BasePage {
 
   async isAlreadyLoggedInMessageVisible(): Promise<boolean> {
     return await this.alreadyLoggedInMessage.isVisible();
+  }
+
+  async isWelcomeBackHeadingVisible(): Promise<boolean> {
+    return await this.welcomeBackHeading.isVisible();
   }
 
   /**
