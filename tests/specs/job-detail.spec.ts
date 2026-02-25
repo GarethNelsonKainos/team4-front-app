@@ -24,7 +24,8 @@ test.describe('Job Detail Page', () => {
     expect(details.description).toBeTruthy();
     expect(details.responsibilities.length).toBeGreaterThan(0);
     
-    await expect(jobDetailPage.saveButton).toBeVisible();
+    const isSaveVisible = await jobDetailPage.isSaveButtonVisible();
+    expect(isSaveVisible).toBe(true);
   });
 
   test('should navigate between jobs and job detail pages', async ({ page }: { page: Page }) => {

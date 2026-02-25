@@ -10,7 +10,8 @@ test.describe('Register', () => {
     await registerPage.register(user);
 
     await expect(page).toHaveURL(/\/login/);
-    await expect(registerPage.successRedirectHeading).toBeVisible();
+    const isSuccessRedirectHeadingVisible = await registerPage.isSuccessRedirectHeadingVisible();
+    expect(isSuccessRedirectHeadingVisible).toBe(true);
   });
 
   test('shows error for mismatched passwords', async ({ page }) => {
@@ -19,7 +20,8 @@ test.describe('Register', () => {
 
     await registerPage.register(user);
 
-    await expect(registerPage.passwordMismatchError).toBeVisible();
+    const isPasswordMismatchErrorVisible = await registerPage.isPasswordMismatchErrorVisible();
+    expect(isPasswordMismatchErrorVisible).toBe(true);
   });
 
 });

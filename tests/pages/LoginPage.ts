@@ -3,15 +3,15 @@ import { BasePage } from './basePage';
 
 export class LoginPage extends BasePage {
 
-  readonly emailInput: Locator;
-  readonly passwordInput: Locator;
-  readonly rememberCheckbox: Locator;
-  readonly signInButton: Locator
-  readonly forgotPasswordLink: Locator;
-  readonly signUpLink: Locator
-  readonly errorMessage: Locator;
-  readonly togglePasswordButton: Locator;
-  readonly alreadyLoggedInMessage: Locator;
+  private readonly emailInput: Locator;
+  private readonly passwordInput: Locator;
+  private readonly rememberCheckbox: Locator;
+  private readonly signInButton: Locator
+  private readonly forgotPasswordLink: Locator;
+  private readonly signUpLink: Locator
+  private readonly errorMessage: Locator;
+  private readonly togglePasswordButton: Locator;
+  private readonly alreadyLoggedInMessage: Locator;
 
   // Selectors
   constructor(page: Page) {
@@ -37,6 +37,10 @@ export class LoginPage extends BasePage {
 
   async fillPassword(password: string) {
     await this.passwordInput.fill(password);
+  }
+
+  async clearPassword() {
+    await this.passwordInput.clear();
   }
 
   async checkRememberMe() {

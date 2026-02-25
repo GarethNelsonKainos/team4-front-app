@@ -3,22 +3,22 @@ import { BasePage } from './basePage';
 
 export class JobDetailPage extends BasePage {
   // Page elements
-  readonly jobTitle: Locator;
-  readonly locationBadge: Locator;
-  readonly capabilityBadge: Locator;
-  readonly bandBadge: Locator;
-  readonly saveButton: Locator;
-  readonly applyButton: Locator;
-  readonly openPositionsText: Locator;
-  readonly closingDateText: Locator;
-  readonly descriptionSection: Locator;
-  readonly descriptionText: Locator;
-  readonly viewSpecificationLink: Locator;
-  readonly responsibilitiesSection: Locator;
-  readonly responsibilitiesList: Locator;
-  readonly viewAllJobsLink: Locator;
-  readonly moreCapabilityRolesLink: Locator;
-  readonly backToJobRolesLink: Locator;
+  private readonly jobTitle: Locator;
+  private readonly locationBadge: Locator;
+  private readonly capabilityBadge: Locator;
+  private readonly bandBadge: Locator;
+  private readonly saveButton: Locator;
+  private readonly applyButton: Locator;
+  private readonly openPositionsText: Locator;
+  private readonly closingDateText: Locator;
+  private readonly descriptionSection: Locator;
+  private readonly descriptionText: Locator;
+  private readonly viewSpecificationLink: Locator;
+  private readonly responsibilitiesSection: Locator;
+  private readonly responsibilitiesList: Locator;
+  private readonly viewAllJobsLink: Locator;
+  private readonly moreCapabilityRolesLink: Locator;
+  private readonly backToJobRolesLink: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -163,6 +163,17 @@ export class JobDetailPage extends BasePage {
   async isApplyButtonVisible(): Promise<boolean> {
     try {
       return await this.applyButton.isVisible();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Check if the Save button is visible
+   */
+  async isSaveButtonVisible(): Promise<boolean> {
+    try {
+      return await this.saveButton.isVisible();
     } catch {
       return false;
     }

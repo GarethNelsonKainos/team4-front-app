@@ -9,8 +9,11 @@ test.describe('Jobs Page', () => {
   });
 
   test('should display page with job listings', async ({ jobsPage }) => {
-    await expect(jobsPage.pageTitle).toBeVisible();
-    await expect(jobsPage.pageTitle).toHaveText('Available Job Roles');
+    const isLoaded = await jobsPage.isPageLoaded();
+    expect(isLoaded).toBe(true);
+
+    const titleText = await jobsPage.getPageTitleText();
+    expect(titleText).toBe('Available Job Roles');
     
     const count = await jobsPage.getOpenPositionsCount();
     expect(count).toMatch(/\d+ Open Positions/);

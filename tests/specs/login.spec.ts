@@ -25,7 +25,7 @@ test.describe('Login Page', () => {
     expect(inputType).toBe('text');
     
     // Clear and fill with actual credentials while visibility is toggled
-    await loginPage.passwordInput.clear();
+    await loginPage.clearPassword();
     await loginPage.login('applicant@example.com', process.env.PLAYWRIGHT_PASSWORD!);
     
     // Verify successful login

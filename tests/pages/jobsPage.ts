@@ -3,13 +3,13 @@ import { BasePage } from './basePage';
 
 export class JobsPage extends BasePage {
   // Page elements
-  readonly pageTitle: Locator;
-  readonly openPositionsCount: Locator;
-  readonly jobTable: Locator;
-  readonly jobCards: Locator;
-  readonly getInTouchButton: Locator;
-  readonly jobLinks: Locator;
-  readonly jobTableRows: Locator;
+  private readonly pageTitle: Locator;
+  private readonly openPositionsCount: Locator;
+  private readonly jobTable: Locator;
+  private readonly jobCards: Locator;
+  private readonly getInTouchButton: Locator;
+  private readonly jobLinks: Locator;
+  private readonly jobTableRows: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -135,6 +135,14 @@ export class JobsPage extends BasePage {
    */
   async isPageLoaded(): Promise<boolean> {
     return await this.pageTitle.isVisible();
+  }
+
+  /**
+   * Get the page title text
+   */
+  async getPageTitleText(): Promise<string> {
+    const text = await this.pageTitle.textContent();
+    return text?.trim() || '';
   }
 
   /**

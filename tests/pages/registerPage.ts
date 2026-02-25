@@ -10,17 +10,17 @@ export type RegisterUser = {
 
 export class RegisterPage extends BasePage {
 
-  readonly emailInput: Locator;
-  readonly passwordInputField: Locator;
-  readonly confirmPasswordInputField: Locator;
-  readonly termsCheckbox: Locator;
-  readonly createAccountButton: Locator;
-  readonly togglePasswordButton: Locator;
-  readonly toggleConfirmPasswordButton: Locator;
-  readonly pageHeading: Locator;
-  readonly alreadyRegisteredHeading: Locator;
-  readonly successRedirectHeading: Locator;
-  readonly passwordMismatchError: Locator;
+  private readonly emailInput: Locator;
+  private readonly passwordInputField: Locator;
+  private readonly confirmPasswordInputField: Locator;
+  private readonly termsCheckbox: Locator;
+  private readonly createAccountButton: Locator;
+  private readonly togglePasswordButton: Locator;
+  private readonly toggleConfirmPasswordButton: Locator;
+  private readonly pageHeading: Locator;
+  private readonly alreadyRegisteredHeading: Locator;
+  private readonly successRedirectHeading: Locator;
+  private readonly passwordMismatchError: Locator;
 
   constructor(page: Page) {
     super(page);
