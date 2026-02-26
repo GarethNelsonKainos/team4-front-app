@@ -3,12 +3,12 @@ import { expect } from '@playwright/test';
 import { CustomWorld } from '../support/world';
 import { RegisterPage } from '../../pages/registerPage';
 
-Given('I am on the registration page', async function(this: CustomWorld) {
+Given('I am on the register page', async function(this: CustomWorld) {
     const registerPage = new RegisterPage(this.page);
     await registerPage.navigateToRegister();
 });
 
-When('I register with email {string} and password {string} and confirmPassword {string} and acceptTerms {string}', async function(this: CustomWorld, email: string, password: string, confirmPassword: string, acceptTerms: string) {
+When('I register with email {string} and password {string} and confirmPassword {string} and acceptTerms {string} and click submit', async function(this: CustomWorld, email: string, password: string, confirmPassword: string, acceptTerms: string) {
     const registerPage = new RegisterPage(this.page);
     await registerPage.fillEmail(email);
     await registerPage.fillPassword(password);
@@ -20,6 +20,6 @@ When('I register with email {string} and password {string} and confirmPassword {
     await registerPage.register({ email, password, confirmPassword, acceptTerms: acceptTerms.toLowerCase() === 'true' });
 });
 
-Then('I should be redirected to the login page', async function(this: CustomWorld) {
+Then('I should see the login page', async function(this: CustomWorld) {
   await expect(this.page).toHaveURL(/\/login/);
 });
