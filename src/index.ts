@@ -9,7 +9,7 @@ import { authMiddleware, requireAdmin } from "./utils/auth";
 import { cvUploadConfig } from "./utils/multerConfig";
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
 
 // Configure once and reuse the environment for filters
 const nunjucksEnv = nunjucks.configure("views", {
@@ -90,7 +90,7 @@ app.post(
 	applicationController.submitApplication,
 );
 
-export { app };
+export { app, port };
 
 const _server = app.listen(port, () => {
 	console.log(`App now listening on port ${port}`);

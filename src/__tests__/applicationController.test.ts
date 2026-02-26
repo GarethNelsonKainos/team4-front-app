@@ -178,4 +178,81 @@ describe("ApplicationController", () => {
 		});
 		consoleErrorSpy.mockRestore();
 	});
+
+	it("should handle jobRoleId as an array", async () => {
+		mockRequest.params = { id: ["456", "789"] };
+
+		vi.mocked(apiClient.submitJobApplication).mockResolvedValue({
+			success: true,
+			data: { id: 1 },
+		});
+
+		await applicationController.submitApplication(
+			mockRequest as Request,
+			mockResponse as Response,
+			mockNext,
+		);
+
+		// Should use the first element of the array
+		expect(apiClient.submitJobApplication).toHaveBeenCalled();
+		expect(mockResponse.status).toHaveBeenCalledWith(200);
+	});
+
+	it("should handle API error without status", async () => {
+		vi.mocked(apiClient.submitJobApplication).mockResolvedValue({
+			success: false,
+			error: "Unknown error",
+		});
+
+		await applicationController.submitApplication(
+			mockRequest as Request,
+			mockResponse as Response,
+			mockNext,
+		);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(500);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			success: false,
+			message: "Unknown error",
+		});
+	});
+
+	it("should handle API error without error message", async () => {
+		vi.mocked(apiClient.submitJobApplication).mockResolvedValue({
+			success: false,
+			status: 503,
+		});
+
+		await applicationController.submitApplication(
+			mockRequest as Request,
+			mockResponse as Response,
+			mockNext,
+		);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(503);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			success: false,
+			message: "Failed to submit application",
+		});
+	});
+
+	it("should handle non-Error exceptions", async () => {
+		const consoleErrorSpy = vi
+			.spyOn(console, "error")
+			.mockImplementation(() => {});
+		vi.mocked(apiClient.submitJobApplication).mockRejectedValue("String error");
+
+		await applicationController.submitApplication(
+			mockRequest as Request,
+			mockResponse as Response,
+			mockNext,
+		);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(500);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			success: false,
+			message: "An error occurred while processing your application",
+		});
+		consoleErrorSpy.mockRestore();
+	});
 });

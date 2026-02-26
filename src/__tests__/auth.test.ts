@@ -4,8 +4,11 @@ import {
 	type AuthRequest,
 	authMiddleware,
 	clearAuthCookie,
+	requireAdmin,
+	requireAuth,
 	setAuthCookie,
 } from "../utils/auth.js";
+import * as jwtDecoder from "../utils/jwtDecoder.js";
 
 describe("Auth Utils", () => {
 	let mockRequest: Partial<Request>;
@@ -180,6 +183,147 @@ describe("Auth Utils", () => {
 
 			expect((mockRequest as AuthRequest).user?.isAuthenticated).toBe(false);
 			expect(mockNext).toHaveBeenCalled();
+		});
+
+		it("should handle expired tokens and clear cookie", () => {
+			const expiredToken = "expired.token.here";
+			mockRequest.cookies = { authToken: expiredToken };
+
+			// Mock isTokenExpired to return true
+			vi.spyOn(jwtDecoder, "isTokenExpired").mockReturnValue(true);
+
+			authMiddleware(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.clearCookie).toHaveBeenCalledWith(
+				"authToken",
+				expect.any(Object),
+			);
+			expect((mockRequest as AuthRequest).user?.isAuthenticated).toBe(false);
+			expect(mockNext).toHaveBeenCalled();
+		});
+
+		it("should extract user email and role from valid token", () => {
+			const validToken = "valid.jwt.token";
+			mockRequest.cookies = { authToken: validToken };
+
+			vi.spyOn(jwtDecoder, "isTokenExpired").mockReturnValue(false);
+			vi.spyOn(jwtDecoder, "getUserEmail").mockReturnValue("test@example.com");
+			vi.spyOn(jwtDecoder, "getUserRole").mockReturnValue("admin");
+
+			authMiddleware(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect((mockRequest as AuthRequest).user?.email).toBe("test@example.com");
+			expect((mockRequest as AuthRequest).user?.role).toBe("admin");
+			expect((mockRequest as AuthRequest).user?.isAuthenticated).toBe(true);
+			expect(mockNext).toHaveBeenCalled();
+		});
+	});
+
+	describe("requireAuth", () => {
+		it("should call next() when user is authenticated", () => {
+			(mockRequest as AuthRequest).user = {
+				email: "test@example.com",
+				role: "applicant",
+				isAuthenticated: true,
+			};
+
+			requireAuth(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockNext).toHaveBeenCalled();
+			expect(mockResponse.redirect).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to login when user is not authenticated", () => {
+			(mockRequest as AuthRequest).user = {
+				email: null,
+				role: null,
+				isAuthenticated: false,
+			};
+
+			requireAuth(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockNext).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to login when user object is missing", () => {
+			(mockRequest as AuthRequest).user = undefined;
+
+			requireAuth(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+			expect(mockNext).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("requireAdmin", () => {
+		it("should call next() when user is admin", () => {
+			(mockRequest as AuthRequest).user = {
+				email: "admin@example.com",
+				role: "admin",
+				isAuthenticated: true,
+			};
+
+			requireAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockNext).toHaveBeenCalled();
+			expect(mockResponse.redirect).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to error when user is not admin", () => {
+			(mockRequest as AuthRequest).user = {
+				email: "user@example.com",
+				role: "applicant",
+				isAuthenticated: true,
+			};
+
+			requireAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			expect(mockNext).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to error when user is not authenticated", () => {
+			(mockRequest as AuthRequest).user = {
+				email: null,
+				role: null,
+				isAuthenticated: false,
+			};
+
+			requireAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			expect(mockNext).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to error when user object is missing", () => {
+			(mockRequest as AuthRequest).user = undefined;
+
+			requireAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			expect(mockNext).not.toHaveBeenCalled();
+		});
+
+		it("should redirect to error when user is authenticated but role is null", () => {
+			(mockRequest as AuthRequest).user = {
+				email: "user@example.com",
+				role: null,
+				isAuthenticated: true,
+			};
+
+			requireAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+			expect(mockNext).not.toHaveBeenCalled();
 		});
 	});
 });

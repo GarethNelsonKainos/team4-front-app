@@ -4,6 +4,484 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // Mock axios at the module level
 vi.mock("axios");
 
+describe("API Client - loginUser", () => {
+	// biome-ignore lint/suspicious/noExplicitAny: Mock object requires flexible typing
+	let mockAxiosInstance: any;
+	// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type changes across test lifecycle
+	let loginUser: any;
+
+	beforeEach(async () => {
+		vi.clearAllMocks();
+		vi.resetModules();
+
+		mockAxiosInstance = {
+			post: vi.fn(),
+			get: vi.fn(),
+			put: vi.fn(),
+			delete: vi.fn(),
+		};
+
+		const axios = await import("axios");
+		vi.mocked(axios.default.create).mockReturnValue(mockAxiosInstance);
+
+		const apiClient = await import("../utils/apiClient.js");
+		loginUser = apiClient.loginUser;
+	});
+
+	it("should return success response on successful login", async () => {
+		const mockData = { token: "jwt-token", email: "test@example.com" };
+		mockAxiosInstance.post.mockResolvedValue({ data: mockData });
+
+		const result = await loginUser("test@example.com", "password123");
+
+		expect(result.success).toBe(true);
+		expect(result.data).toEqual(mockData);
+		expect(mockAxiosInstance.post).toHaveBeenCalledWith("/api/login", {
+			email: "test@example.com",
+			password: "password123",
+		});
+	});
+
+	it("should return error response on failed login", async () => {
+		const mockError = {
+			response: {
+				status: 401,
+				data: { message: "Invalid credentials" },
+			},
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.post.mockRejectedValue(mockError);
+
+		const result = await loginUser("test@example.com", "wrongpassword");
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Invalid credentials");
+		expect(result.status).toBe(401);
+	});
+
+	it("should return default error message when response message is missing", async () => {
+		const mockError = {
+			response: { status: 500, data: {} },
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.post.mockRejectedValue(mockError);
+
+		const result = await loginUser("test@example.com", "password123");
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Login failed");
+		expect(result.status).toBe(500);
+	});
+});
+
+describe("API Client - registerUser", () => {
+	// biome-ignore lint/suspicious/noExplicitAny: Mock object requires flexible typing
+	let mockAxiosInstance: any;
+	// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type changes across test lifecycle
+	let registerUser: any;
+
+	beforeEach(async () => {
+		vi.clearAllMocks();
+		vi.resetModules();
+
+		mockAxiosInstance = {
+			post: vi.fn(),
+			get: vi.fn(),
+			put: vi.fn(),
+			delete: vi.fn(),
+		};
+
+		const axios = await import("axios");
+		vi.mocked(axios.default.create).mockReturnValue(mockAxiosInstance);
+
+		const apiClient = await import("../utils/apiClient.js");
+		registerUser = apiClient.registerUser;
+	});
+
+	it("should return success response on successful registration", async () => {
+		const mockData = { message: "User registered successfully" };
+		mockAxiosInstance.post.mockResolvedValue({ data: mockData });
+
+		const result = await registerUser("new@example.com", "password123");
+
+		expect(result.success).toBe(true);
+		expect(result.data).toEqual(mockData);
+		expect(mockAxiosInstance.post).toHaveBeenCalledWith("/api/register", {
+			email: "new@example.com",
+			password: "password123",
+		});
+	});
+
+	it("should return error response on failed registration", async () => {
+		const mockError = {
+			response: {
+				status: 409,
+				data: { message: "Email already exists" },
+			},
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.post.mockRejectedValue(mockError);
+
+		const result = await registerUser("existing@example.com", "password123");
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Email already exists");
+		expect(result.status).toBe(409);
+	});
+
+	it("should return default error message when response message is missing", async () => {
+		const mockError = {
+			response: { status: 400, data: {} },
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.post.mockRejectedValue(mockError);
+
+		const result = await registerUser("test@example.com", "password123");
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Registration failed");
+		expect(result.status).toBe(400);
+	});
+});
+
+describe("API Client - getJobRolesPublic", () => {
+	// biome-ignore lint/suspicious/noExplicitAny: Mock object requires flexible typing
+	let mockAxiosInstance: any;
+	// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type changes across test lifecycle
+	let getJobRolesPublic: any;
+
+	beforeEach(async () => {
+		vi.clearAllMocks();
+		vi.resetModules();
+
+		mockAxiosInstance = {
+			post: vi.fn(),
+			get: vi.fn(),
+			put: vi.fn(),
+			delete: vi.fn(),
+		};
+
+		const axios = await import("axios");
+		vi.mocked(axios.default.create).mockReturnValue(mockAxiosInstance);
+
+		const apiClient = await import("../utils/apiClient.js");
+		getJobRolesPublic = apiClient.getJobRolesPublic;
+	});
+
+	it("should return success response with job roles", async () => {
+		const mockJobs = [
+			{ id: 1, roleName: "Developer", location: "Belfast" },
+			{ id: 2, roleName: "Designer", location: "London" },
+		];
+		mockAxiosInstance.get.mockResolvedValue({ data: mockJobs });
+
+		const result = await getJobRolesPublic();
+
+		expect(result.success).toBe(true);
+		expect(result.data).toEqual(mockJobs);
+		expect(mockAxiosInstance.get).toHaveBeenCalledWith("/api/job-roles");
+	});
+
+	it("should return error response on failure", async () => {
+		const mockError = {
+			response: {
+				status: 500,
+				data: { message: "Server error" },
+			},
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.get.mockRejectedValue(mockError);
+
+		const result = await getJobRolesPublic();
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Server error");
+		expect(result.status).toBe(500);
+	});
+
+	it("should return default error message when response message is missing", async () => {
+		const mockError = {
+			response: { status: 404, data: {} },
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.get.mockRejectedValue(mockError);
+
+		const result = await getJobRolesPublic();
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Failed to fetch job roles");
+	});
+});
+
+describe("API Client - getJobRole", () => {
+	// biome-ignore lint/suspicious/noExplicitAny: Mock object requires flexible typing
+	let mockAxiosInstance: any;
+	// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type changes across test lifecycle
+	let getJobRole: any;
+
+	beforeEach(async () => {
+		vi.clearAllMocks();
+		vi.resetModules();
+
+		mockAxiosInstance = {
+			post: vi.fn(),
+			get: vi.fn(),
+			put: vi.fn(),
+			delete: vi.fn(),
+		};
+
+		const axios = await import("axios");
+		vi.mocked(axios.default.create).mockReturnValue(mockAxiosInstance);
+
+		const apiClient = await import("../utils/apiClient.js");
+		getJobRole = apiClient.getJobRole;
+	});
+
+	it("should return success response with specific job role", async () => {
+		const mockJob = { id: 1, roleName: "Developer", location: "Belfast" };
+		mockAxiosInstance.get.mockResolvedValue({ data: mockJob });
+
+		const result = await getJobRole(1);
+
+		expect(result.success).toBe(true);
+		expect(result.data).toEqual(mockJob);
+		expect(mockAxiosInstance.get).toHaveBeenCalledWith("/api/job-roles/1");
+	});
+
+	it("should return error response for non-existent job", async () => {
+		const mockError = {
+			response: {
+				status: 404,
+				data: { message: "Job role not found" },
+			},
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.get.mockRejectedValue(mockError);
+
+		const result = await getJobRole(999);
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Job role not found");
+		expect(result.status).toBe(404);
+	});
+
+	it("should return default error message when response message is missing", async () => {
+		const mockError = {
+			response: { status: 500, data: {} },
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.get.mockRejectedValue(mockError);
+
+		const result = await getJobRole(1);
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Failed to fetch job role");
+	});
+});
+
+describe("API Client - createJobRole", () => {
+	// biome-ignore lint/suspicious/noExplicitAny: Mock object requires flexible typing
+	let mockAxiosInstance: any;
+	// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type changes across test lifecycle
+	let createJobRole: any;
+
+	beforeEach(async () => {
+		vi.clearAllMocks();
+		vi.resetModules();
+
+		mockAxiosInstance = {
+			post: vi.fn(),
+			get: vi.fn(),
+			put: vi.fn(),
+			delete: vi.fn(),
+		};
+
+		const axios = await import("axios");
+		vi.mocked(axios.default.create).mockReturnValue(mockAxiosInstance);
+
+		const apiClient = await import("../utils/apiClient.js");
+		createJobRole = apiClient.createJobRole;
+	});
+
+	it("should create job role with authorization header", async () => {
+		const mockJobData = { roleName: "New Role", location: "Belfast" };
+		const mockToken = "jwt-token";
+		const mockResponse = { id: 3, ...mockJobData };
+		mockAxiosInstance.post.mockResolvedValue({ data: mockResponse });
+
+		const result = await createJobRole(mockJobData, mockToken);
+
+		expect(result.success).toBe(true);
+		expect(result.data).toEqual(mockResponse);
+		expect(mockAxiosInstance.post).toHaveBeenCalledWith(
+			"/api/job-roles",
+			mockJobData,
+			{
+				headers: { Authorization: `Bearer ${mockToken}` },
+			},
+		);
+	});
+
+	it("should return error response on creation failure", async () => {
+		const mockError = {
+			response: {
+				status: 403,
+				data: { message: "Forbidden" },
+			},
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.post.mockRejectedValue(mockError);
+
+		const result = await createJobRole({}, "token");
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Forbidden");
+		expect(result.status).toBe(403);
+	});
+
+	it("should return default error message when response message is missing", async () => {
+		const mockError = {
+			response: { status: 400, data: {} },
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.post.mockRejectedValue(mockError);
+
+		const result = await createJobRole({}, "token");
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Failed to create job role");
+	});
+});
+
+describe("API Client - updateJobRole", () => {
+	// biome-ignore lint/suspicious/noExplicitAny: Mock object requires flexible typing
+	let mockAxiosInstance: any;
+	// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type changes across test lifecycle
+	let updateJobRole: any;
+
+	beforeEach(async () => {
+		vi.clearAllMocks();
+		vi.resetModules();
+
+		mockAxiosInstance = {
+			post: vi.fn(),
+			get: vi.fn(),
+			put: vi.fn(),
+			delete: vi.fn(),
+		};
+
+		const axios = await import("axios");
+		vi.mocked(axios.default.create).mockReturnValue(mockAxiosInstance);
+
+		const apiClient = await import("../utils/apiClient.js");
+		updateJobRole = apiClient.updateJobRole;
+	});
+
+	it("should update job role with authorization header", async () => {
+		const mockJobData = { roleName: "Updated Role" };
+		const mockToken = "jwt-token";
+		const mockResponse = { id: 1, ...mockJobData };
+		mockAxiosInstance.put.mockResolvedValue({ data: mockResponse });
+
+		const result = await updateJobRole(1, mockJobData, mockToken);
+
+		expect(result.success).toBe(true);
+		expect(result.data).toEqual(mockResponse);
+		expect(mockAxiosInstance.put).toHaveBeenCalledWith(
+			"/api/job-roles/1",
+			mockJobData,
+			{
+				headers: { Authorization: `Bearer ${mockToken}` },
+			},
+		);
+	});
+
+	it("should return error response on update failure", async () => {
+		const mockError = {
+			response: {
+				status: 404,
+				data: { message: "Job not found" },
+			},
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.put.mockRejectedValue(mockError);
+
+		const result = await updateJobRole(999, {}, "token");
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Job not found");
+		expect(result.status).toBe(404);
+	});
+
+	it("should return default error message when response message is missing", async () => {
+		const mockError = {
+			response: { status: 500, data: {} },
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.put.mockRejectedValue(mockError);
+
+		const result = await updateJobRole(1, {}, "token");
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Failed to update job role");
+	});
+});
+
+describe("API Client - deleteJobRole", () => {
+	// biome-ignore lint/suspicious/noExplicitAny: Mock object requires flexible typing
+	let mockAxiosInstance: any;
+	// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type changes across test lifecycle
+	let deleteJobRole: any;
+
+	beforeEach(async () => {
+		vi.clearAllMocks();
+		vi.resetModules();
+
+		mockAxiosInstance = {
+			post: vi.fn(),
+			get: vi.fn(),
+			put: vi.fn(),
+			delete: vi.fn(),
+		};
+
+		const axios = await import("axios");
+		vi.mocked(axios.default.create).mockReturnValue(mockAxiosInstance);
+
+		const apiClient = await import("../utils/apiClient.js");
+		deleteJobRole = apiClient.deleteJobRole;
+	});
+
+	it("should delete job role with authorization header", async () => {
+		const mockToken = "jwt-token";
+		const mockResponse = { message: "Job deleted successfully" };
+		mockAxiosInstance.delete.mockResolvedValue({ data: mockResponse });
+
+		const result = await deleteJobRole(1, mockToken);
+
+		expect(result.success).toBe(true);
+		expect(result.data).toEqual(mockResponse);
+		expect(mockAxiosInstance.delete).toHaveBeenCalledWith("/api/job-roles/1", {
+			headers: { Authorization: `Bearer ${mockToken}` },
+		});
+	});
+
+	it("should return error response on deletion failure", async () => {
+		const mockError = {
+			response: {
+				status: 404,
+				data: { message: "Job not found" },
+			},
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.delete.mockRejectedValue(mockError);
+
+		const result = await deleteJobRole(999, "token");
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Job not found");
+		expect(result.status).toBe(404);
+	});
+
+	it("should return default error message when response message is missing", async () => {
+		const mockError = {
+			response: { status: 403, data: {} },
+		} as unknown as AxiosError<{ message?: string }>;
+		mockAxiosInstance.delete.mockRejectedValue(mockError);
+
+		const result = await deleteJobRole(1, "token");
+
+		expect(result.success).toBe(false);
+		expect(result.error).toBe("Failed to delete job role");
+	});
+});
+
 describe("API Client - submitJobApplication", () => {
 	const mockToken = "test-jwt-token";
 	const mockFormData = new FormData();

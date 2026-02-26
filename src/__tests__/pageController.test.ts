@@ -78,6 +78,61 @@ describe("PageController", () => {
 		});
 	});
 
+	describe("getApplicationSuccessPage", () => {
+		it("should render application success page", () => {
+			pageController.getApplicationSuccessPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/application-success.njk",
+				expect.objectContaining({
+					title: "Application Submitted",
+					user: expect.objectContaining({
+						isAuthenticated: true,
+						role: "applicant",
+					}),
+				}),
+			);
+		});
+
+		it("should redirect to error page on rendering exception", () => {
+			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+				() => {
+					throw new Error("Template error");
+				},
+			);
+
+			pageController.getApplicationSuccessPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
+	describe("getJobsPage", () => {
+		it("should redirect to error page when API call fails", async () => {
+			vi.mocked(apiClient.getJobRolesPublic).mockResolvedValue({
+				success: false,
+				error: "Database error",
+				status: 500,
+			});
+
+			await pageController.getJobsPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
 	describe("getHomePage", () => {
 		it("should render home page with correct data", () => {
 			pageController.getHomePage(
@@ -660,6 +715,467 @@ describe("PageController", () => {
 			);
 
 			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
+	describe("getAdminDashboard", () => {
+		it("should render admin dashboard page", () => {
+			(mockRequest as AuthRequest).user = {
+				email: "admin@example.com",
+				role: "admin",
+				isAuthenticated: true,
+			};
+
+			pageController.getAdminDashboard(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/admin-dashboard.njk",
+				{
+					title: "Admin Dashboard - Kainos",
+					currentPage: "admin",
+					user: expect.objectContaining({
+						role: "admin",
+						isAuthenticated: true,
+					}),
+				},
+			);
+		});
+
+		it("should redirect to error page if rendering fails", () => {
+			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+				() => {
+					throw new Error("Template error");
+				},
+			);
+
+			pageController.getAdminDashboard(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
+	describe("getAdminJobsPage", () => {
+		it("should render admin jobs page with job roles", async () => {
+			(mockRequest as AuthRequest).user = {
+				email: "admin@example.com",
+				role: "admin",
+				isAuthenticated: true,
+			};
+
+			await pageController.getAdminJobsPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(apiClient.getJobRolesPublic).toHaveBeenCalled();
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/admin-jobs.njk",
+				expect.objectContaining({
+					title: "Manage Job Listings - Kainos",
+					currentPage: "admin",
+					jobRoles: expect.any(Array),
+					user: expect.objectContaining({
+						role: "admin",
+					}),
+				}),
+			);
+		});
+
+		it("should redirect to error page when API call fails", async () => {
+			vi.mocked(apiClient.getJobRolesPublic).mockResolvedValue({
+				success: false,
+				error: "API Error",
+				status: 500,
+			});
+
+			await pageController.getAdminJobsPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+
+		it("should redirect to error page if rendering fails", async () => {
+			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+				() => {
+					throw new Error("Template error");
+				},
+			);
+
+			await pageController.getAdminJobsPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
+	describe("getAdminCreateJobPage", () => {
+		it("should render create job page", () => {
+			(mockRequest as AuthRequest).user = {
+				email: "admin@example.com",
+				role: "admin",
+				isAuthenticated: true,
+			};
+
+			pageController.getAdminCreateJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/admin-create-job.njk",
+				{
+					title: "Create New Job - Kainos",
+					currentPage: "admin",
+					user: expect.objectContaining({
+						role: "admin",
+					}),
+				},
+			);
+		});
+
+		it("should redirect to error page if rendering fails", () => {
+			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+				() => {
+					throw new Error("Template error");
+				},
+			);
+
+			pageController.getAdminCreateJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
+	describe("getAdminCreateAdminPage", () => {
+		it("should render create admin page", () => {
+			(mockRequest as AuthRequest).user = {
+				email: "admin@example.com",
+				role: "admin",
+				isAuthenticated: true,
+			};
+
+			pageController.getAdminCreateAdminPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/admin-create-admin.njk",
+				{
+					title: "Create Admin Account - Kainos",
+					currentPage: "admin",
+					user: expect.objectContaining({
+						role: "admin",
+					}),
+				},
+			);
+		});
+
+		it("should redirect to error page if rendering fails", () => {
+			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+				() => {
+					throw new Error("Template error");
+				},
+			);
+
+			pageController.getAdminCreateAdminPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
+	describe("getAdminAdminsPage", () => {
+		it("should render admin management page with mock admins", async () => {
+			(mockRequest as AuthRequest).user = {
+				email: "admin@example.com",
+				role: "admin",
+				isAuthenticated: true,
+			};
+
+			await pageController.getAdminAdminsPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/admin-admins.njk",
+				expect.objectContaining({
+					title: "Manage Administrators - Kainos",
+					currentPage: "admin",
+					admins: expect.arrayContaining([
+						expect.objectContaining({
+							email: expect.any(String),
+							role: "admin",
+						}),
+					]),
+					user: expect.objectContaining({
+						role: "admin",
+					}),
+				}),
+			);
+		});
+
+		it("should redirect to error page if rendering fails", async () => {
+			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+				() => {
+					throw new Error("Template error");
+				},
+			);
+
+			await pageController.getAdminAdminsPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
+	describe("getJobDetailPage - additional branch coverage", () => {
+		it("should redirect to error when job is null after successful API call", async () => {
+			mockRequest.params = { id: "1" };
+
+			vi.mocked(apiClient.getJobRole).mockResolvedValue({
+				success: true,
+				data: null,
+			});
+
+			await pageController.getJobDetailPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+
+		it("should handle non-numeric ID in string format", async () => {
+			mockRequest.params = { id: "invalid" };
+
+			await pageController.getJobDetailPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+
+		it("should render job detail page when feature flag is disabled", async () => {
+			process.env.FEATURE_JOB_APPLY_VIEW = "false";
+			mockRequest.params = { id: "1" };
+
+			await pageController.getJobDetailPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/job-detail.njk",
+				expect.objectContaining({
+					features: expect.objectContaining({
+						jobApplyView: false,
+					}),
+				}),
+			);
+		});
+	});
+
+	describe("getApplyJobPage - additional branch coverage", () => {
+		it("should redirect to login when user is not authenticated", async () => {
+			(mockRequest as AuthRequest).user = undefined;
+			mockRequest.params = { id: "1" };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+		});
+
+		it("should redirect to login when user role is not applicant", async () => {
+			(mockRequest as AuthRequest).user = {
+				email: "admin@example.com",
+				role: "admin",
+				isAuthenticated: true,
+			};
+			mockRequest.params = { id: "1" };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+		});
+
+		it("should redirect to login when user is not isAuthenticated", async () => {
+			(mockRequest as AuthRequest).user = {
+				email: "test@example.com",
+				role: "applicant",
+				isAuthenticated: false,
+			};
+			mockRequest.params = { id: "1" };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/login");
+		});
+
+		it("should redirect to error when job ID is non-numeric", async () => {
+			(mockRequest as AuthRequest).user = {
+				email: "test@example.com",
+				role: "applicant",
+				isAuthenticated: true,
+			};
+			mockRequest.params = { id: "invalid" };
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+
+		it("should redirect to error when job is null after successful API call", async () => {
+			(mockRequest as AuthRequest).user = {
+				email: "test@example.com",
+				role: "applicant",
+				isAuthenticated: true,
+			};
+			mockRequest.params = { id: "1" };
+
+			vi.mocked(apiClient.getJobRole).mockResolvedValue({
+				success: true,
+				data: null,
+			});
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+
+		it("should redirect to error on exception", async () => {
+			(mockRequest as AuthRequest).user = {
+				email: "test@example.com",
+				role: "applicant",
+				isAuthenticated: true,
+			};
+			mockRequest.params = { id: "1" };
+
+			vi.mocked(mockResponse.render as Response["render"]).mockImplementation(
+				() => {
+					throw new Error("Template error");
+				},
+			);
+
+			await pageController.getApplyJobPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.redirect).toHaveBeenCalledWith("/error");
+		});
+	});
+
+	describe("Feature flag coverage", () => {
+		it("should have admin dashboard disabled by default", () => {
+			delete process.env.FEATURE_ADMIN_DASHBOARD;
+
+			pageController.getHomePage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/home.njk",
+				expect.objectContaining({
+					features: expect.objectContaining({
+						adminDashboard: false,
+					}),
+				}),
+			);
+		});
+
+		it("should show job detail feature when enabled", async () => {
+			process.env.FEATURE_JOB_DETAIL_VIEW = "true";
+
+			await pageController.getJobsPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/jobs.njk",
+				expect.objectContaining({
+					features: expect.objectContaining({
+						jobDetailView: true,
+					}),
+				}),
+			);
+		});
+
+		it("should hide job detail feature when disabled", async () => {
+			process.env.FEATURE_JOB_DETAIL_VIEW = "false";
+
+			await pageController.getJobsPage(
+				mockRequest as Request,
+				mockResponse as Response,
+				mockNext,
+			);
+
+			expect(mockResponse.render).toHaveBeenCalledWith(
+				"pages/jobs.njk",
+				expect.objectContaining({
+					features: expect.objectContaining({
+						jobDetailView: false,
+					}),
+				}),
+			);
 		});
 	});
 });
