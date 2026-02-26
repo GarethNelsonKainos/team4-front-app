@@ -9,7 +9,9 @@ import { authMiddleware, requireAdmin } from "./utils/auth";
 import { cvUploadConfig } from "./utils/multerConfig";
 
 const app = express();
-const port = Number(process.env.PORT) || 3000;
+const rawPort = process.env.PORT;
+const parsedPort = rawPort !== undefined ? Number(rawPort) : NaN;
+const port = Number.isNaN(parsedPort) ? 3000 : parsedPort;
 
 // Configure once and reuse the environment for filters
 const nunjucksEnv = nunjucks.configure("views", {
@@ -90,9 +92,22 @@ app.post(
 	applicationController.submitApplication,
 );
 
+export function startServer() {
+	return app.listen(port, () => {
+		console.log(`App now listening on port ${port}`);
+		console.log("Server started successfully...");
+	});
+}
+
+export function isMainModule() {
+	return import.meta.url === `file://${process.argv[1]}`;
+}
+
 export { app, port };
 
-const _server = app.listen(port, () => {
-	console.log(`App now listening on port ${port}`);
-	console.log("Server started successfully...");
-});
+// Only start the server if this module is run directly (not imported in tests)
+/* c8 ignore start */
+if (isMainModule()) {
+	startServer();
+}
+/* c8 ignore stop */

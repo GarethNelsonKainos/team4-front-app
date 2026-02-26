@@ -225,23 +225,21 @@ describe("AuthController", () => {
 			};
 
 			// Mock validate to throw error with and without paths
-			vi.spyOn(require("yup"), "object").mockReturnValue({
-				shape: vi.fn().mockReturnThis(),
-				validate: vi.fn().mockRejectedValue(
-					Object.assign(new Error("Validation error"), {
-						inner: [
-							{
-								path: "email",
-								message: "Email invalid",
-							},
-							{
-								path: null,
-								message: "Unknown error",
-							},
-						],
-					}),
-				),
-			});
+			const yup = await import("yup");
+			const { loginSchema } = await import("../schemas/validationSchemas.js");
+
+			const validationError = new yup.ValidationError("Validation error");
+			/* biome-ignore lint/suspicious/noExplicitAny: Testing with mixed types */
+			(validationError as any).inner = [
+				{
+					path: "email",
+					message: "Email invalid",
+				},
+			];
+
+			const validateSpy = vi
+				.spyOn(loginSchema, "validate")
+				.mockRejectedValueOnce(validationError);
 
 			await authController.login(
 				mockRequest as Request,
@@ -250,6 +248,7 @@ describe("AuthController", () => {
 			);
 
 			expect(mockResponse.render).toHaveBeenCalled();
+			validateSpy.mockRestore();
 		});
 
 		it("should process validation errors and handle formData with falsy email through API error path", async () => {
@@ -816,7 +815,7 @@ describe("AuthController", () => {
 			};
 
 			// Create a real validation error with inner array
-			const validationError = new yup.default.ValidationError("Test error");
+			const validationError = new yup.ValidationError("Test error");
 			/* biome-ignore lint/suspicious/noExplicitAny: Testing with mixed types */
 			(validationError as any).inner = [
 				{

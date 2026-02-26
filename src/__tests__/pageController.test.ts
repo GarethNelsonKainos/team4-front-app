@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as pageController from "../controllers/pageController.js";
 import { jobRoles } from "../data/mockData.js";
 import * as apiClient from "../utils/apiClient.js";
@@ -1121,6 +1121,28 @@ describe("PageController", () => {
 	});
 
 	describe("Feature flag coverage", () => {
+		let originalAdminDashboard: string | undefined;
+		let originalJobDetailView: string | undefined;
+
+		beforeEach(() => {
+			originalAdminDashboard = process.env.FEATURE_ADMIN_DASHBOARD;
+			originalJobDetailView = process.env.FEATURE_JOB_DETAIL_VIEW;
+		});
+
+		afterEach(() => {
+			if (originalAdminDashboard === undefined) {
+				delete process.env.FEATURE_ADMIN_DASHBOARD;
+			} else {
+				process.env.FEATURE_ADMIN_DASHBOARD = originalAdminDashboard;
+			}
+
+			if (originalJobDetailView === undefined) {
+				delete process.env.FEATURE_JOB_DETAIL_VIEW;
+			} else {
+				process.env.FEATURE_JOB_DETAIL_VIEW = originalJobDetailView;
+			}
+		});
+
 		it("should have admin dashboard disabled by default", () => {
 			delete process.env.FEATURE_ADMIN_DASHBOARD;
 
