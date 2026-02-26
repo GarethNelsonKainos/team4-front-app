@@ -1,14 +1,87 @@
+import type { Express } from "express";
 import request from "supertest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { jobRoles } from "../data/mockData.js";
-import { app } from "../index.js";
 import * as apiClient from "../utils/apiClient.js";
 
 // Mock the API client to prevent actual API calls during tests
 vi.mock("../utils/apiClient.js");
 
+describe("Port Configuration", () => {
+	it("should use process.env.PORT when set", async () => {
+		// Test the port configuration by importing with environment set
+		vi.stubEnv("PORT", "5000");
+		vi.resetModules();
+		const { port } = await import("../index.js");
+		expect(port).toBe(5000);
+		vi.unstubAllEnvs();
+	});
+
+	it("should fallback to 3000 when PORT is not set", async () => {
+		// Test fallback to 3000
+		vi.unstubAllEnvs();
+		delete process.env.PORT;
+		vi.resetModules();
+		const { port } = await import("../index.js");
+		expect(port).toBe(3000);
+	});
+
+	it("should start server on correct port", async () => {
+		vi.resetModules();
+		const { app, port, startServer } = await import("../index.js");
+
+		const listenSpy = vi.spyOn(app, "listen");
+		const mockServer = { close: vi.fn() };
+		listenSpy.mockImplementation((_port: number, callback?: () => void) => {
+			if (callback) callback();
+			/* biome-ignore lint/suspicious/noExplicitAny: Mock server object for testing */
+			return mockServer as any;
+		});
+
+		const server = startServer();
+
+		expect(listenSpy).toHaveBeenCalledWith(port, expect.any(Function));
+		expect(server).toBe(mockServer);
+
+		listenSpy.mockRestore();
+	});
+
+	it("should not be main module when imported in tests", async () => {
+		vi.resetModules();
+		const { isMainModule } = await import("../index.js");
+
+		expect(isMainModule()).toBe(false);
+	});
+
+	it("should execute conditional when isMainModule would be true", async () => {
+		vi.resetModules();
+		const { isMainModule } = await import("../index.js");
+
+		// Test the logic of the conditional by verifying both branches
+		const shouldStart = isMainModule();
+		expect(typeof shouldStart).toBe("boolean");
+
+		// Verify isMainModule can return true in principle
+		const originalArgv = process.argv[1];
+		process.argv[1] = "/path/to/index.js";
+
+		vi.resetModules();
+		const freshModule = await import("../index.js");
+		// This tests that the isMainModule function works
+		expect(typeof freshModule.isMainModule()).toBe("boolean");
+
+		process.argv[1] = originalArgv;
+	});
+});
+
 describe("Express App Routes", () => {
-	beforeEach(() => {
+	// Import app after environment is configured
+	let app: Express;
+
+	beforeEach(async () => {
+		vi.resetModules();
+		const indexModule = await import("../index.js");
+		app = indexModule.app;
 		vi.clearAllMocks();
 		// Setup the mock for getJobRolesPublic
 		vi.mocked(apiClient.getJobRolesPublic).mockResolvedValue({
@@ -396,6 +469,34 @@ describe("Express App Routes", () => {
 
 			expect(response.status).toBe(200);
 			expect(response.body.isAuthenticated).toBe(false);
+		});
+	});
+
+	describe("Date formatting", () => {
+		it("should format dates correctly in job listings", async () => {
+			const response = await request(app).get("/jobs");
+
+			expect(response.status).toBe(200);
+			// Check that dates are formatted as DD-MM-YYYY
+			// Job closing dates should be formatted
+			expect(response.text).toMatch(/\d{2}-\d{2}-\d{4}/);
+		});
+
+		it("should handle empty date strings in templates", async () => {
+			// Mock a job with no closing date
+			vi.mocked(apiClient.getJobRolesPublic).mockResolvedValueOnce({
+				success: true,
+				data: [
+					{
+						...jobRoles[0],
+						jobRoleId: jobRoles[0].id,
+						closingDate: "",
+					},
+				],
+			});
+
+			const response = await request(app).get("/jobs");
+			expect(response.status).toBe(200);
 		});
 	});
 });

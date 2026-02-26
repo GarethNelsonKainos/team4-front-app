@@ -18,7 +18,11 @@ const fileFilter = (
 	if (allowedTypes.includes(file.mimetype)) {
 		cb(null, true);
 	} else {
-		cb(new Error("Invalid file type. Only PDF, DOC, DOCX allowed."));
+		cb(
+			// biome-ignore lint/suspicious/noExplicitAny: FileFilterCallback type incompatibility
+			new Error("Invalid file type. Only PDF, DOC, DOCX allowed.") as any,
+			false,
+		);
 	}
 };
 

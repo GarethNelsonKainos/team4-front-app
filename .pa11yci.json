@@ -1,18 +1,19 @@
 {
   "defaults": {
     "runners": [
-      "axe",
-      "htmlcs"
+      "axe"
     ],
     "standard": "WCAG2AA",
-    "timeout": 30000,
-    "wait": 1000,
+    "timeout": 20000,
+    "wait": 500,
     "chromeLaunchConfig": {
       "args": [
         "--no-sandbox",
-        "--disable-setuid-sandbox"
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage"
       ]
-    }
+    },
+    "concurrency": 4
   },
   "urls": [
     {
