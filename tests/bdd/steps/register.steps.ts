@@ -10,14 +10,13 @@ Given('I am on the register page', async function(this: CustomWorld) {
 
 When('I register with email {string} and password {string} and confirmPassword {string} and acceptTerms {string} and click submit', async function(this: CustomWorld, email: string, password: string, confirmPassword: string, acceptTerms: string) {
     const registerPage = new RegisterPage(this.page);
-    await registerPage.fillEmail("anything4712123@example.com");
+    await registerPage.fillEmail(email);
     await registerPage.fillPassword(password);
     await registerPage.fillConfirmPassword(confirmPassword);
     if (acceptTerms.toLowerCase() === 'true') {
         await registerPage.acceptTerms();
     }
     await registerPage.submit();
-    await registerPage.register({ email, password, confirmPassword, acceptTerms: acceptTerms.toLowerCase() === 'true' });
 });
 
 Then('I should see the login page', async function(this: CustomWorld) {
