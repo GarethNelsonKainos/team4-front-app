@@ -8,14 +8,16 @@ Given('I am on the registration page', async function(this: CustomWorld) {
     await registerPage.navigateToRegister();
 });
 
-When('I register with email {string} and password {string} and confirmPassword {string}', async function(this: CustomWorld, email: string, password: string, confirmPassword: string) {
+When('I register with email {string} and password {string} and confirmPassword {string} and acceptTerms {string}', async function(this: CustomWorld, email: string, password: string, confirmPassword: string, acceptTerms: string) {
     const registerPage = new RegisterPage(this.page);
     await registerPage.fillEmail(email);
     await registerPage.fillPassword(password);
     await registerPage.fillConfirmPassword(confirmPassword);
-    await registerPage.acceptTerms();
+    if (acceptTerms.toLowerCase() === 'true') {
+        await registerPage.acceptTerms();
+    }
     await registerPage.submit();
-    await registerPage.register({ email, password, confirmPassword });
+    await registerPage.register({ email, password, confirmPassword, acceptTerms: acceptTerms.toLowerCase() === 'true' });
 });
 
 Then('I should be redirected to the login page', async function(this: CustomWorld) {
