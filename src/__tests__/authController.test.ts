@@ -817,7 +817,8 @@ describe("AuthController", () => {
 
 			// Create a real validation error with inner array
 			const validationError = new yup.default.ValidationError("Test error");
-			validationError.inner = [
+			/* biome-ignore lint/suspicious/noExplicitAny: Testing with mixed types */
+			(validationError as any).inner = [
 				{
 					message: "Valid path error",
 					path: "email",
@@ -942,7 +943,8 @@ describe("AuthController", () => {
 
 			// Create a real validation error with inner array
 			const validationError = new yup.default.ValidationError("Test error");
-			validationError.inner = [
+			/* biome-ignore lint/suspicious/noExplicitAny: Testing with mixed types */
+			(validationError as any).inner = [
 				{
 					message: "Password error",
 					path: "password",
@@ -983,6 +985,7 @@ describe("AuthController", () => {
 			vi.spyOn(registrationSchema, "validate").mockResolvedValueOnce({
 				email: "implicit@example.com",
 				password: "password123!",
+				confirmPassword: "password123!",
 			});
 
 			// Then API throws a general error

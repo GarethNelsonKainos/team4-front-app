@@ -111,6 +111,9 @@ describe("ApplicationController", () => {
 	});
 
 	it("should return error response when API submission fails", async () => {
+		const consoleErrorSpy = vi
+			.spyOn(console, "error")
+			.mockImplementation(() => {});
 		vi.mocked(apiClient.submitJobApplication).mockResolvedValue({
 			success: false,
 			error: "Upload failed",
@@ -127,11 +130,16 @@ describe("ApplicationController", () => {
 			expect.any(FormData),
 			"test-token",
 		);
+		expect(console.error).toHaveBeenCalledWith(
+			"❌ Application submission failed:",
+			"Upload failed",
+		);
 		expect(mockResponse.status).toHaveBeenCalledWith(422);
 		expect(mockResponse.json).toHaveBeenCalledWith({
 			success: false,
 			message: "Upload failed",
 		});
+		consoleErrorSpy.mockRestore();
 	});
 
 	it("should return 200 when application is submitted successfully", async () => {
@@ -199,10 +207,14 @@ describe("ApplicationController", () => {
 	});
 
 	it("should handle API error without status", async () => {
+		const consoleErrorSpy = vi
+			.spyOn(console, "error")
+			.mockImplementation(() => {});
 		vi.mocked(apiClient.submitJobApplication).mockResolvedValue({
 			success: false,
 			error: "Unknown error",
-		});
+			// biome-ignore lint/suspicious/noExplicitAny: Allow mock without status property
+		} as any);
 
 		await applicationController.submitApplication(
 			mockRequest as Request,
@@ -210,16 +222,25 @@ describe("ApplicationController", () => {
 			mockNext,
 		);
 
+		expect(console.error).toHaveBeenCalledWith(
+			"❌ Application submission failed:",
+			"Unknown error",
+		);
 		expect(mockResponse.status).toHaveBeenCalledWith(500);
 		expect(mockResponse.json).toHaveBeenCalledWith({
 			success: false,
 			message: "Unknown error",
 		});
+		consoleErrorSpy.mockRestore();
 	});
 
 	it("should handle API error without error message", async () => {
+		const consoleErrorSpy = vi
+			.spyOn(console, "error")
+			.mockImplementation(() => {});
 		vi.mocked(apiClient.submitJobApplication).mockResolvedValue({
 			success: false,
+			error: "Failed to submit application",
 			status: 503,
 		});
 
@@ -229,11 +250,69 @@ describe("ApplicationController", () => {
 			mockNext,
 		);
 
+		expect(console.error).toHaveBeenCalledWith(
+			"❌ Application submission failed:",
+			"Failed to submit application",
+		);
 		expect(mockResponse.status).toHaveBeenCalledWith(503);
 		expect(mockResponse.json).toHaveBeenCalledWith({
 			success: false,
 			message: "Failed to submit application",
 		});
+		consoleErrorSpy.mockRestore();
+	});
+
+	it("should use default status 500 when result.status is undefined", async () => {
+		const consoleErrorSpy = vi
+			.spyOn(console, "error")
+			.mockImplementation(() => {});
+		vi.mocked(apiClient.submitJobApplication).mockResolvedValue({
+			success: false,
+			error: "Unknown error",
+			status: undefined,
+		});
+
+		await applicationController.submitApplication(
+			mockRequest as Request,
+			mockResponse as Response,
+			mockNext,
+		);
+
+		expect(console.error).toHaveBeenCalledWith(
+			"❌ Application submission failed:",
+			"Unknown error",
+		);
+		expect(mockResponse.status).toHaveBeenCalledWith(500);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			success: false,
+			message: "Unknown error",
+		});
+		consoleErrorSpy.mockRestore();
+	});
+
+	it("should use default message when result.error is empty", async () => {
+		const consoleErrorSpy = vi
+			.spyOn(console, "error")
+			.mockImplementation(() => {});
+		vi.mocked(apiClient.submitJobApplication).mockResolvedValue({
+			success: false,
+			error: "",
+			status: 422,
+			// biome-ignore lint/suspicious/noExplicitAny: Allow mock with empty error
+		} as any);
+
+		await applicationController.submitApplication(
+			mockRequest as Request,
+			mockResponse as Response,
+			mockNext,
+		);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(422);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			success: false,
+			message: "Failed to submit application",
+		});
+		consoleErrorSpy.mockRestore();
 	});
 
 	it("should handle non-Error exceptions", async () => {
