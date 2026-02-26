@@ -15,7 +15,8 @@ export class CustomWorld extends World {
   }
 
   async init() {
-    this.browser = await chromium.launch({ headless: true });
+    const headed = process.env.HEADED === "true"; 
+    this.browser = await chromium.launch({ headless: !headed });
     this.context = await this.browser.newContext({
       baseURL: "http://localhost:3000",
     });
