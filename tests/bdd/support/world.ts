@@ -16,8 +16,11 @@ export class CustomWorld extends World {
 
   async init() {
     const headed = process.env.HEADED === "true";
+    const slowMo = Number(process.env.SLOWMO ?? "0");
+
     this.browser = await chromium.launch({
       headless: !headed,
+      slowMo,
     });
     this.context = await this.browser.newContext({
       baseURL: "http://localhost:3000",
