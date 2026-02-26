@@ -23,7 +23,7 @@
 		"bdd:headed": "cross-env HEADED=true cucumber-js tests/bdd/features/**/*.feature --require-module tsx/esm --import tests/bdd/support/world.ts --import tests/bdd/support/hooks.ts --import tests/bdd/steps/**/*.steps.ts",
 		"bdd:headless": "cross-env HEADED=false cucumber-js tests/bdd/features/**/*.feature --require-module tsx/esm --import tests/bdd/support/world.ts --import tests/bdd/support/hooks.ts --import tests/bdd/steps/**/*.steps.ts",
 		"bdd:demo": "cross-env HEADED=true SLOWMO=500 cucumber-js tests/bdd/features/**/*.feature --require-module tsx/esm --import tests/bdd/support/world.ts --import tests/bdd/support/hooks.ts --import tests/bdd/steps/**/*.steps.ts"
-  	},
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/GarethNelsonKainos/team4-front-app.git"
