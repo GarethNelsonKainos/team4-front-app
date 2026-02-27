@@ -11,12 +11,16 @@ Given('I am on the login page', async function(this: CustomWorld) {
 
 When('I login with email {string} and password {string}', async function(this: CustomWorld, email: string, password: string) {
   const loginPage = new LoginPage(this.page);
-  const testUser = this.testUser ?? createTestUser();
-  const resolvedEmail = email === 'generated' ? testUser.email : email;
-  const resolvedPassword = password === 'generated' ? testUser.password : password;
-  if (email === 'generated' || password === 'generated') {
+  let testUser = this.testUser;
+  if ((email === 'generated' || password === 'generated') && !testUser) {
+    testUser = createTestUser();
     this.testUser = testUser;
   }
+  if (!testUser && (email === 'generated' || password === 'generated')) {
+    throw new Error('testUser is not set. Use @needs_registered_user tag to automatically create a registered user.');
+  }
+  const resolvedEmail = email === 'generated' ? testUser!.email : email;
+  const resolvedPassword = password === 'generated' ? testUser!.password : password;
   await loginPage.fillEmail(resolvedEmail);
   await loginPage.fillPassword(resolvedPassword);
   await Promise.all([

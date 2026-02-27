@@ -10,7 +10,7 @@ Before(async function (this: CustomWorld) {
 });
 
 Before({ tags: "@needs_registered_user" }, async function (this: CustomWorld) {
-  const testUser = this.testUser ?? createTestUser();
+  const testUser = createTestUser();
   this.testUser = testUser;
   const { email, password } = testUser;
   const registerPage = new RegisterPage(this.page);

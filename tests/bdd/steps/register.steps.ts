@@ -11,13 +11,17 @@ Given('I am on the register page', async function(this: CustomWorld) {
 
 When('I register with email {string} and password {string} and confirmPassword {string} and acceptTerms {string} and click submit', async function(this: CustomWorld, email: string, password: string, confirmPassword: string, acceptTerms: string) {
     const registerPage = new RegisterPage(this.page);
-    const testUser = this.testUser ?? createTestUser();
-    const resolvedEmail = email === 'generated' ? testUser.email : email;
-    const resolvedPassword = password === 'generated' ? testUser.password : password;
-    const resolvedConfirmPassword = confirmPassword === 'generated' ? testUser.password : confirmPassword;
-    if (email === 'generated' || password === 'generated' || confirmPassword === 'generated') {
+    let testUser = this.testUser;
+    if ((email === 'generated' || password === 'generated' || confirmPassword === 'generated') && !testUser) {
+        testUser = createTestUser();
         this.testUser = testUser;
     }
+    if (!testUser && (email === 'generated' || password === 'generated' || confirmPassword === 'generated')) {
+        throw new Error('testUser is not set. Use @needs_registered_user tag to automatically create a registered user.');
+    }
+    const resolvedEmail = email === 'generated' ? testUser!.email : email;
+    const resolvedPassword = password === 'generated' ? testUser!.password : password;
+    const resolvedConfirmPassword = confirmPassword === 'generated' ? testUser!.password : confirmPassword;
     await registerPage.fillEmail(resolvedEmail);
     await registerPage.fillPassword(resolvedPassword);
     await registerPage.fillConfirmPassword(resolvedConfirmPassword);
