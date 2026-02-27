@@ -3,7 +3,7 @@ import { RegisterPage } from "../../pages/registerPage";
 import { createTestUser } from "./testUser";
 import { CustomWorld } from "./world";
 
-setDefaultTimeout(15000);
+setDefaultTimeout(10000);
 
 Before(async function (this: CustomWorld) {
   await this.init();
