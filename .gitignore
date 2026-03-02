@@ -66,3 +66,5 @@ jspm_packages/
 
 # Generated Tailwind CSS build artifacts
 public/css/styles.css
+
+/projectOverview

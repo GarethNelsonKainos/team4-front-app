@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    container_name: team4-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - API_BASE_URL=http://host.docker.internal:8080
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+    restart: unless-stopped
