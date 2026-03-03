@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build-and-test:
@@ -98,3 +99,18 @@ jobs:
          if [ -f server.pid ]; then
            kill $(cat server.pid) || true
          fi
+
+     - name: Set Docker image tag
+       id: image_meta
+       run: echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+     - name: Build Docker image
+       timeout-minutes: 20
+       run: |
+         docker build \
+           --tag team4-front-app:${{ steps.image_meta.outputs.short_sha }} \
+           --tag team4-front-app:ci \
+           .
+
+     - name: Verify Docker image
+       run: docker image inspect team4-front-app:${{ steps.image_meta.outputs.short_sha }} > /dev/null

@@ -67,4 +67,12 @@ jspm_packages/
 # Generated Tailwind CSS build artifacts
 public/css/styles.css
 
+# Terraform local files
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+*.auto.tfvars
+
 /projectOverview
+REMOTE_STATE_GUIDE.md
