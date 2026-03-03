@@ -1,0 +1,30 @@
+# Production Environment Configuration (Example)
+# Copy and customize for production deployments
+
+environment         = "prod"
+acr_resource_group  = "rg-academy-acr"
+resource_group_name = "team4-frontend-cameron-rg"
+location            = "uksouth"
+dns_name_label      = "team4-frontend-cameron-prod"
+image_name          = "team4-front-app-cameron"
+image_tag           = "latest"  # In prod, use specific version tags like "v1.2.3" or "sha-abc1234"
+
+# Container resources - increased for production
+cpu_cores  = 2
+memory_gb  = 2.0
+
+# Environment variables for the container
+environment_variables = {
+  NODE_ENV        = "production"
+  API_BASE_URL    = "https://api.production.example.com"
+  LOG_LEVEL       = "info"
+}
+
+# Resource tags
+tags = {
+  project     = "team4-front-app"
+  owner       = "cameron"
+  managed_by  = "terraform"
+  cost_center = "engineering"
+  criticality = "high"
+}

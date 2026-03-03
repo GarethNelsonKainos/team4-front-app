@@ -83,3 +83,24 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "acr_login_server" {
+  description = "ACR login server URL (optional, uses data source if not provided)"
+  type        = string
+  default     = ""
+  sensitive   = false
+}
+
+variable "acr_username" {
+  description = "ACR username for authentication (optional, uses admin user from data source if not provided)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "acr_password" {
+  description = "ACR password for authentication (optional, uses admin password from data source if not provided)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

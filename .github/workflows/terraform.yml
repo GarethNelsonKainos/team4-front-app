@@ -1,0 +1,192 @@
+name: Terraform
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform.yml'
+  pull_request:
+    branches: ['**']
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform.yml'
+
+env:
+  TF_VERSION: '1.5'
+  TF_WORKING_DIR: './terraform'
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_CAM }}
+  ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID_CAM }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_CAM }}
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan (Dev)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=team4-front-tfstate-rg" \
+            -backend-config="storage_account_name=t4frontcamerontfstate" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=front-app-dev.tfstate"
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan -no-color -input=false \
+            -var="environment=dev" \
+            -var="acr_resource_group=rg-academy-acr" \
+            -var="resource_group_name=team4-frontend-cameron-rg" \
+            -var="dns_name_label=team4-frontend-cameron-$(date +%Y%m%d)" \
+            -var="image_tag=${{ github.sha }}" \
+            -var="acr_login_server=academyacrj3r5dv.azurecr.io" \
+            -var="acr_username=${{ secrets.AZURE_CLIENT_ID_CAM }}" \
+            -var="acr_password=${{ secrets.AZURE_CLIENT_SECRET_CAM }}" \
+            -out=tfplan
+        continue-on-error: true
+
+      - name: Upload Plan
+        if: steps.plan.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-dev
+          path: terraform/tfplan
+          retention-days: 5
+
+      - name: Comment PR with Plan
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            <details><summary>Validation Output</summary>
+
+            \`\`\`
+            ${{ steps.validate.outputs.stdout }}
+            \`\`\`
+
+            </details>
+
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+            
+            <details><summary>Show Plan</summary>
+            
+            \`\`\`terraform
+            ${{ steps.plan.outputs.stdout }}
+            \`\`\`
+            
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+  terraform-apply:
+    name: Terraform Apply (Dev)
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: dev
+      url: ${{ steps.apply.outputs.frontend_url }}
+    defaults:
+      run:
+        working-directory: terraform
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=team4-front-tfstate-rg" \
+            -backend-config="storage_account_name=t4frontcamerontfstate" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=front-app-dev.tfstate"
+
+      - name: Download Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan-dev
+          path: terraform
+
+      - name: Terraform Apply
+        id: apply
+        run: |
+          terraform apply -auto-approve -input=false tfplan
+          
+          # Capture outputs
+          echo "frontend_url=$(terraform output -raw frontend_url)" >> $GITHUB_OUTPUT
+          echo "frontend_fqdn=$(terraform output -raw frontend_fqdn)" >> $GITHUB_OUTPUT
+
+      - name: Display Deployment Info
+        run: |
+          echo "🚀 Deployment successful!"
+          echo "📍 Frontend URL: ${{ steps.apply.outputs.frontend_url }}"
+          echo "🌐 FQDN: ${{ steps.apply.outputs.frontend_fqdn }}"
+
+      - name: Comment PR with Apply Result
+        if: github.event_name == 'push'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `### 🚀 Terraform Apply Successful (Dev)
+            
+            **Environment:** dev
+            **Frontend URL:** ${{ steps.apply.outputs.frontend_url }}
+            **FQDN:** ${{ steps.apply.outputs.frontend_fqdn }}
+            
+            *Applied by: @${{ github.actor }} from commit \`${context.sha.substring(0,7)}\`*`;
+
+            // Find the most recent commit and comment on it
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: output
+            })

@@ -74,6 +74,7 @@ terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform/*.tfvars
 !terraform/terraform.tfvars.example
+!terraform/environments/*.tfvars.example
 terraform/.terraform.tfstate.lock.info
 terraform/crash.log
 terraform/crash.*.log
@@ -81,3 +82,5 @@ terraform/override.tf
 terraform/override.tf.json
 terraform/*_override.tf
 terraform/*_override.tf.json
+terraform/*.tfplan
+terraform/tfplan

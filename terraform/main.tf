@@ -52,14 +52,14 @@ resource "azurerm_container_group" "frontend" {
   })
 
   image_registry_credential {
-    server   = data.azurerm_container_registry.acr.login_server
-    username = data.azurerm_container_registry.acr.admin_username
-    password = data.azurerm_container_registry.acr.admin_password
+    server   = var.acr_login_server != "" ? var.acr_login_server : data.azurerm_container_registry.acr.login_server
+    username = var.acr_username != "" ? var.acr_username : data.azurerm_container_registry.acr.admin_username
+    password = var.acr_password != "" ? var.acr_password : data.azurerm_container_registry.acr.admin_password
   }
 
   container {
     name   = "frontend"
-    image  = "${data.azurerm_container_registry.acr.login_server}/${var.image_name}:${var.image_tag}"
+    image  = "${var.acr_login_server != "" ? var.acr_login_server : data.azurerm_container_registry.acr.login_server}/${var.image_name}:${var.image_tag}"
     cpu    = var.cpu_cores
     memory = var.memory_gb
 
