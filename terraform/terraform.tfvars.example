@@ -1,0 +1,20 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+acr_resource_group  = "your-acr-resource-group-name"
+resource_group_name = "team4-frontend-cameron-rg"
+location            = "uksouth"
+environment         = "dev"
+dns_name_label      = "team4-frontend-cameron-unique"
+image_tag           = "latest"
+
+# Optional: Environment variables for your app
+# environment_variables = {
+#   NODE_ENV = "production"
+#   API_URL  = "https://your-backend-api.com"
+# }
+
+# Optional: extra resource tags (environment tag is added automatically)
+# tags = {
+#   project = "team4-front-app"
+#   owner   = "cameron"
+# }
