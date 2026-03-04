@@ -121,6 +121,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
+          platforms: linux/amd64
           tags: team4-frontend:${{ env.SHORT_SHA }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -157,6 +158,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          platforms: linux/amd64
           tags: ${{ env.ACR_LOGIN_SERVER_BLAKE }}/blake-team4-frontend:${{ env.SHORT_SHA }}
 
       - name: Verify image in ACR
