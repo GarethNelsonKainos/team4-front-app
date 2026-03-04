@@ -29,6 +29,15 @@ data "azurerm_resource_group" "this" {
   name = "Blake-team4-rg"
 }
 
+# Current Azure client — used to grant the deploying identity Key Vault admin access
+data "azurerm_client_config" "current" {}
+
+# Reference the existing ACR
+data "azurerm_container_registry" "acr" {
+  name                = var.acr_name
+  resource_group_name = data.azurerm_resource_group.this.name
+}
+
 provider "azurerm" {
   features {}
 }

@@ -172,10 +172,23 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET_BLAKE }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_BLAKE }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID_BLAKE }}
+      # Terraform variables — TF_VAR_ prefix is picked up automatically
       TF_VAR_environment: dev
+      TF_VAR_acr_name: ${{ secrets.ACR_NAME_BLAKE }}
+      TF_VAR_acr_login_server: ${{ secrets.ACR_LOGIN_SERVER_BLAKE }}
+      TF_VAR_frontend_image_tag: ${{ github.sha && format('{0}', github.sha) }}
+      TF_VAR_backend_image_tag: latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Compute short Git SHA
+        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: Set image tags from short SHA
+        run: |
+          echo "TF_VAR_frontend_image_tag=$SHORT_SHA" >> $GITHUB_ENV
+          echo "TF_VAR_backend_image_tag=$SHORT_SHA" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -186,8 +199,9 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ./my-infrastructure
-        run: terraform plan -input=false -var "environment=${{ env.TF_VAR_environment }}"
+        run: terraform plan -input=false
 
       - name: Terraform Apply
         working-directory: ./my-infrastructure
-        run: terraform apply -auto-approve -input=false -var "environment=${{ env.TF_VAR_environment }}"
+        run: terraform apply -auto-approve -input=false
+

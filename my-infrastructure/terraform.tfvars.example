@@ -9,3 +9,15 @@ tags = {
   owner   = "your-team-name"
   project = "your-project-name"
 }
+
+# ── ACR ────────────────────────────────────────────────────────────────────────
+acr_name         = "myregistry"
+acr_login_server = "myregistry.azurecr.io"
+
+frontend_image_tag = "latest"
+backend_image_tag  = "latest"
+
+# ── Feature Flags ──────────────────────────────────────────────────────────────
+feature_admin_dashboard = "false"
+feature_job_detail_view = "false"
+feature_job_apply_view  = "false"

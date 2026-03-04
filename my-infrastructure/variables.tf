@@ -37,3 +37,47 @@ variable "tags" {
     project = "team4-front-app"
   }
 }
+
+# ── ACR ────────────────────────────────────────────────────────────────────────
+
+variable "acr_name" {
+  description = "The name of the Azure Container Registry (just the name, not the login server)."
+  type        = string
+}
+
+variable "acr_login_server" {
+  description = "The login server URL of the ACR, e.g. myregistry.azurecr.io"
+  type        = string
+}
+
+variable "frontend_image_tag" {
+  description = "Tag of the frontend Docker image to deploy."
+  type        = string
+  default     = "latest"
+}
+
+variable "backend_image_tag" {
+  description = "Tag of the backend Docker image to deploy."
+  type        = string
+  default     = "latest"
+}
+
+# ── Feature Flags ──────────────────────────────────────────────────────────────
+
+variable "feature_admin_dashboard" {
+  description = "Toggle the admin dashboard feature."
+  type        = string
+  default     = "false"
+}
+
+variable "feature_job_detail_view" {
+  description = "Toggle the job detail view feature."
+  type        = string
+  default     = "false"
+}
+
+variable "feature_job_apply_view" {
+  description = "Toggle the job apply view feature."
+  type        = string
+  default     = "false"
+}
