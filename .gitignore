@@ -84,3 +84,4 @@ terraform/*_override.tf
 terraform/*_override.tf.json
 terraform/*.tfplan
 terraform/tfplan
+terraform/*.dot

@@ -60,10 +60,6 @@ COPY --chown=nodejs:nodejs tsconfig.json ./
 # Switch to non-root user
 USER nodejs
 
-# Set environment variables
-ENV NODE_ENV=development
-ENV API_BASE_URL=http://host.docker.internal:8080
-
 # Expose default port
 EXPOSE 3000
 

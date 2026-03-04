@@ -57,16 +57,18 @@ jobs:
 
       - name: Terraform Plan
         id: plan
+        env:
+          TF_VAR_acr_username: ${{ secrets.AZURE_CLIENT_ID_CAM }}
+          TF_VAR_acr_password: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
         run: |
           terraform plan -no-color -input=false \
             -var="environment=dev" \
             -var="acr_resource_group=rg-academy-acr" \
             -var="resource_group_name=team4-frontend-cameron-rg" \
             -var="dns_name_label=team4-frontend-cameron-$(date +%Y%m%d)" \
-            -var="image_tag=${{ github.sha }}" \
+            -var="image_tag=sha-${GITHUB_SHA::7}" \
             -var="acr_login_server=academyacrj3r5dv.azurecr.io" \
-            -var="acr_username=${{ secrets.AZURE_CLIENT_ID_CAM }}" \
-            -var="acr_password=${{ secrets.AZURE_CLIENT_SECRET_CAM }}" \
+            -var='environment_variables={"NODE_ENV":"production","PORT":"3000"}' \
             -out=tfplan
         continue-on-error: true
 
@@ -153,6 +155,10 @@ jobs:
 
       - name: Terraform Apply
         id: apply
+        env:
+          TF_VAR_acr_username: ${{ secrets.AZURE_CLIENT_ID_CAM }}
+          TF_VAR_acr_password: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
+          TF_VAR_environment_variables: '{"NODE_ENV":"production","PORT":"3000"}'
         run: |
           terraform apply -auto-approve -input=false tfplan
 
