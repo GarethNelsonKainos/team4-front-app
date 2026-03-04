@@ -51,10 +51,10 @@ jobs:
          password: ${{ secrets.ACR_PASSWORD_BEN }}
 
      - name: Pull frontend image from ACR
-       run: docker pull ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-front-app:Ben
+       run: docker pull --platform linux/amd64 ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-front-app:Ben
 
      - name: Pull backend image from ACR
-       run: docker pull ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-back-app:Ben
+       run: docker pull --platform linux/amd64 ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-back-app:Ben
 
      - name: Run Pa11y accessibility tests
        id: pa11y
