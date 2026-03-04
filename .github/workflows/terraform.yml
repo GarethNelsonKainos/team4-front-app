@@ -34,7 +34,7 @@ jobs:
         working-directory: my-infrastructure/environments/dev
         run: terraform plan
 
-      - name: Terraform Apply (main branch only)
+      - name: Terraform Apply (To main branch only)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         working-directory: my-infrastructure/environments/dev
         run: terraform apply -auto-approve
