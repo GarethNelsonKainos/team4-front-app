@@ -124,11 +124,11 @@ jobs:
          load: ${{ !((github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push') }}
 
      - name: Verify Docker image (local builds)
-       if: !((github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push')
+       if: "!((github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push')"
        run: docker image inspect team4-front-app:${{ steps.image_meta.outputs.short_sha }} > /dev/null && echo "✅ Image built successfully"
 
      - name: Verify ACR push (main or josh-terraform branch)
-       if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push'
+       if: "(github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push'"
        run: |
          echo "✅ Image pushed to ACR successfully"
          echo "📦 Image tags:"
