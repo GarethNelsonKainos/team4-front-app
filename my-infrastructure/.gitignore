@@ -1,0 +1,9 @@
+# Terraform state files
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Secret files
+*.tfvars
+!example.tfvars

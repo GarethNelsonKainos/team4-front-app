@@ -43,15 +43,18 @@ jobs:
      - name: Create accessibility reports directory
        run: mkdir -p output/accessibility
 
-     - name: Start application server
-       run: |
-         npm run dev &
-         echo $! > server.pid
-         sleep 10
+     - name: Log in to Azure Container Registry
+       uses: docker/login-action@v3
+       with:
+         registry: ${{ secrets.ACR_LOGIN_SERVER_BEN }}
+         username: ${{ secrets.ACR_USERNAME_BEN }}
+         password: ${{ secrets.ACR_PASSWORD_BEN }}
 
-     - name: Wait for server to be ready
-       run: |
-         timeout 30 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+     - name: Pull frontend image from ACR
+       run: docker pull ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-front-app:Ben
+
+     - name: Pull backend image from ACR
+       run: docker pull ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-back-app:Ben
 
      - name: Run Pa11y accessibility tests
        id: pa11y
@@ -91,10 +94,3 @@ jobs:
        run: |
          echo "❌ Accessibility tests failed. Please review the accessibility report artifact."
          exit 1
-
-     - name: Stop server
-       if: always()
-       run: |
-         if [ -f server.pid ]; then
-           kill $(cat server.pid) || true
-         fi
