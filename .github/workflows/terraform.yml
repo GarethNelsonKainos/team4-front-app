@@ -33,7 +33,7 @@ jobs:
       - name: Debug Azure auth env
         run: |
           missing=0
-          for var in ARM_CLIENT_ID ARM_TENANT_ID ARM_CLIENT_SECRET ARM_SUBSCRIPTION_ID_JOSH; do
+          for var in ARM_CLIENT_ID ARM_TENANT_ID ARM_CLIENT_SECRET ARM_SUBSCRIPTION_ID; do
             if [ -z "${!var}" ]; then
               echo "Missing or empty: $var"
               missing=1
