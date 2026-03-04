@@ -32,10 +32,10 @@ data "azurerm_resource_group" "this" {
 # Current Azure client — used to grant the deploying identity Key Vault admin access
 data "azurerm_client_config" "current" {}
 
-# Reference the existing ACR
+# Reference the existing ACR (shared academy registry in rg-academy-acr)
 data "azurerm_container_registry" "acr" {
   name                = var.acr_name
-  resource_group_name = data.azurerm_resource_group.this.name
+  resource_group_name = "rg-academy-acr"
 }
 
 provider "azurerm" {

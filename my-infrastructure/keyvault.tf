@@ -29,3 +29,11 @@ resource "azurerm_role_assignment" "kv_admin_deployer" {
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
 }
+
+# Grant the 2026-Tech-Academy Azure AD group Key Vault Administrator access
+# so all team members can view and manage secrets in the portal.
+resource "azurerm_role_assignment" "kv_admin_team" {
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = "f2ae751a-9536-4c46-9209-46720122ed4a"
+}

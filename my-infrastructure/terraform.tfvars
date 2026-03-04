@@ -10,8 +10,8 @@ tags = {
 # ── ACR ────────────────────────────────────────────────────────────────────────
 # The ACR name is the same as your ACR username (ACR_USERNAME_BLAKE secret)
 # The CI pipeline injects these automatically via TF_VAR_ env vars
-acr_name         = "acrteam4zz76c25n"
-acr_login_server = "acrteam4zz76c25n.azurecr.io"
+acr_name         = "academyacrj3r5dv"
+acr_login_server = "academyacrj3r5dv.azurecr.io"
 
 # Image tags — the CI pipeline will override these with the short Git SHA
 frontend_image_tag = "latest"
