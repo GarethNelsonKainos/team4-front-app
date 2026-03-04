@@ -1,0 +1,19 @@
+# Backend Configuration for Terraform Remote State
+# This file shows how to configure remote state for different environments
+# 
+# Usage:
+#   terraform init -backend-config="path/to/backend-config-dev.hcl"
+# Or set environment variables:
+#   export ARM_ACCESS_KEY="your-storage-account-key"
+#   terraform init
+
+# For Development Environment
+# Update these values based on the setup-remote-state.sh output
+resource_group_name  = "tfstate-rg"
+storage_account_name = "tfstate1772544818"  # From setup-remote-state.sh
+container_name       = "terraform-state"
+key                  = "dev/team4.tfstate"  # Environment-specific state file
+
+# For Production Environment (future)
+# You can create separate backend configs:
+#   - backend-config-prod.hcl with key = "prod/team4.tfstate"
