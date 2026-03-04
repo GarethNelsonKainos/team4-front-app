@@ -2,7 +2,7 @@ name: Terraform Plan & Apply
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main, dev, josh-terraform ]
     paths:
       - 'my-infrastructure/**'
       - '.github/workflows/terraform.yml'
