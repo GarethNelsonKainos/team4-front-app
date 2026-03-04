@@ -108,11 +108,11 @@ jobs:
        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push'
        uses: docker/login-action@v3
        with:
-         registry: ${{ secrets.ACR_LOGIN_SERVER }}
+         registry: ${{ secrets.ACR_LOGIN_SERVER_JOSH }}
          # Use either admin credentials (ACR_ADMIN_USERNAME/PASSWORD) 
          # or service principal credentials (ACR_SERVICE_PRINCIPAL_ID/PASSWORD)
-         username: ${{ secrets.ACR_ADMIN_USERNAME || secrets.ACR_SERVICE_PRINCIPAL_ID }}
-         password: ${{ secrets.ACR_ADMIN_PASSWORD || secrets.ACR_SERVICE_PRINCIPAL_PASSWORD }}
+         username: ${{ secrets.ACR_ADMIN_USERNAME_JOSH || secrets.ACR_SERVICE_PRINCIPAL_ID_JOSH }}
+         password: ${{ secrets.ACR_ADMIN_PASSWORD_JOSH || secrets.ACR_SERVICE_PRINCIPAL_PASSWORD_JOSH }}
 
      - name: Build Docker image with cache
        uses: docker/build-push-action@v5
@@ -121,9 +121,9 @@ jobs:
          tags: |
            team4-front-app:${{ steps.image_meta.outputs.short_sha }}
            team4-front-app:ci
-           ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && format('{0}/team4-front-app:{1}', secrets.ACR_LOGIN_SERVER, steps.image_meta.outputs.short_sha) || '' }}
-           ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && format('{0}/team4-front-app:latest', secrets.ACR_LOGIN_SERVER) || '' }}
-           ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && format('{0}/team4-front-app:{1}', secrets.ACR_LOGIN_SERVER, steps.image_meta.outputs.timestamp) || '' }}
+           ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && format('{0}/team4-front-app:{1}', secrets.ACR_LOGIN_SERVER_JOSH, steps.image_meta.outputs.short_sha) || '' }}
+           ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && format('{0}/team4-front-app:latest', secrets.ACR_LOGIN_SERVER_JOSH) || '' }}
+           ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && format('{0}/team4-front-app:{1}', secrets.ACR_LOGIN_SERVER_JOSH, steps.image_meta.outputs.timestamp) || '' }}
          cache-from: type=gha
          cache-to: type=gha,mode=max
          push: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push' }}
@@ -138,6 +138,6 @@ jobs:
        run: |
          echo "✅ Image pushed to ACR successfully"
          echo "📦 Image tags:"
-         echo "  - ${{ secrets.ACR_LOGIN_SERVER }}/team4-front-app:${{ steps.image_meta.outputs.short_sha }}"
-         echo "  - ${{ secrets.ACR_LOGIN_SERVER }}/team4-front-app:latest"
-         echo "  - ${{ secrets.ACR_LOGIN_SERVER }}/team4-front-app:${{ steps.image_meta.outputs.timestamp }}"
+         echo "  - ${{ secrets.ACR_LOGIN_SERVER_JOSH }}/team4-front-app:${{ steps.image_meta.outputs.short_sha }}"
+         echo "  - ${{ secrets.ACR_LOGIN_SERVER_JOSH }}/team4-front-app:latest"
+         echo "  - ${{ secrets.ACR_LOGIN_SERVER_JOSH }}/team4-front-app:${{ steps.image_meta.outputs.timestamp }}"
