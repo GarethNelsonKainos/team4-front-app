@@ -153,7 +153,7 @@ jobs:
             -backend-config="container_name=joshstate" \
             -backend-config="key=${{ env.TF_ENVIRONMENT }}/team4.tfstate"
 
-      - name: Import Existing Resource Group (if present)
+      - name: Import Existing Resources (if present)
         working-directory: ./my-infrastructure
         run: |
           terraform import \
@@ -161,6 +161,48 @@ jobs:
             -var-file="${{ env.TF_ENVIRONMENT }}.tfvars" \
             module.resource_group.azurerm_resource_group.this \
             "/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/rg-team4-${{ env.TF_ENVIRONMENT }}" \
+            || true
+
+          terraform import \
+            -input=false \
+            -var-file="${{ env.TF_ENVIRONMENT }}.tfvars" \
+            azurerm_user_assigned_identity.frontend \
+            "/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/rg-team4-${{ env.TF_ENVIRONMENT }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/team4-${{ env.TF_ENVIRONMENT }}-frontend-identity" \
+            || true
+
+          terraform import \
+            -input=false \
+            -var-file="${{ env.TF_ENVIRONMENT }}.tfvars" \
+            azurerm_user_assigned_identity.backend \
+            "/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/rg-team4-${{ env.TF_ENVIRONMENT }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/team4-${{ env.TF_ENVIRONMENT }}-backend-identity" \
+            || true
+
+          terraform import \
+            -input=false \
+            -var-file="${{ env.TF_ENVIRONMENT }}.tfvars" \
+            azurerm_log_analytics_workspace.container_apps \
+            "/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/rg-team4-${{ env.TF_ENVIRONMENT }}/providers/Microsoft.OperationalInsights/workspaces/team4-${{ env.TF_ENVIRONMENT }}-aca-law" \
+            || true
+
+          terraform import \
+            -input=false \
+            -var-file="${{ env.TF_ENVIRONMENT }}.tfvars" \
+            azurerm_container_app_environment.platform \
+            "/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/rg-team4-${{ env.TF_ENVIRONMENT }}/providers/Microsoft.App/managedEnvironments/team4-${{ env.TF_ENVIRONMENT }}-aca-env" \
+            || true
+
+          terraform import \
+            -input=false \
+            -var-file="${{ env.TF_ENVIRONMENT }}.tfvars" \
+            azurerm_container_app.backend \
+            "/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/rg-team4-${{ env.TF_ENVIRONMENT }}/providers/Microsoft.App/containerApps/team4-${{ env.TF_ENVIRONMENT }}-backend" \
+            || true
+
+          terraform import \
+            -input=false \
+            -var-file="${{ env.TF_ENVIRONMENT }}.tfvars" \
+            azurerm_container_app.frontend \
+            "/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/rg-team4-${{ env.TF_ENVIRONMENT }}/providers/Microsoft.App/containerApps/team4-${{ env.TF_ENVIRONMENT }}-frontend" \
             || true
 
       - name: Terraform Apply
