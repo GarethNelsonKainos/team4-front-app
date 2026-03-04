@@ -8,7 +8,7 @@ on:
   workflow_run:
     workflows: [ "CI" ]
     types: [ completed ]
-    branches: [ main ]
+    branches: [ main, josh-terraform ]
 
 env:
   TERRAFORM_VERSION: '1.5.0'
