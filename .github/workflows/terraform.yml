@@ -1,0 +1,40 @@
+name: Terraform
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_BEN }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET_BEN }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_BEN }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID_BEN }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: my-infrastructure/environments/dev
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.TF_STATE_RG_BEN }}" \
+            -backend-config="storage_account_name=${{ secrets.TF_STATE_SA_BEN }}" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=dev.terraform.tfstate"
+
+      - name: Terraform Plan
+        working-directory: my-infrastructure/environments/dev
+        run: terraform plan
+
+      - name: Terraform Apply (main branch only)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        working-directory: my-infrastructure/environments/dev
+        run: terraform apply -auto-approve

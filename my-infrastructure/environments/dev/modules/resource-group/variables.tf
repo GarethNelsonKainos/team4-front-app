@@ -8,6 +8,13 @@ variable "name" {
   }
 }
 
+variable "environment" {
+
+  description = "Environment name (dev, prod)"
+  type        = string
+  default    = "dev"
+}
+
 variable "location" {
   description = "Azure region for the Resource Group."
   type        = string
