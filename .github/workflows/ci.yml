@@ -132,7 +132,7 @@ jobs:
     env:
       ACR_LOGIN_SERVER_BLAKE: ${{ secrets.ACR_LOGIN_SERVER_BLAKE }}
       ACR_USERNAME_BLAKE: ${{ secrets.ACR_USERNAME_BLAKE }}
-      ACR_PASSWORD_BLAKE: ${{ secrets.ACR_PASSWORD }}
+      ACR_PASSWORD_BLAKE: ${{ secrets.ACR_PASSWORD_BLAKE }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
