@@ -67,7 +67,7 @@ jobs:
           TF_VAR_acr_username: ${{ secrets.AZURE_CLIENT_ID_CAM }}
           TF_VAR_acr_password: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
         run: |
-          terraform plan -no-color -input=false \
+          terraform plan -no-color -input=false -lock=false \
             -var="environment=dev" \
             -var="acr_resource_group=rg-academy-acr" \
             -var="resource_group_name=team4-frontend-cameron-rg" \
@@ -167,7 +167,7 @@ jobs:
           TF_VAR_acr_password: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
           TF_VAR_environment_variables: '{"NODE_ENV":"production","PORT":"3000"}'
         run: |
-          terraform apply -auto-approve -input=false tfplan
+          terraform apply -auto-approve -input=false -lock=false tfplan
 
           # Capture outputs
           echo "frontend_url=$(terraform output -raw frontend_url)" >> $GITHUB_OUTPUT
