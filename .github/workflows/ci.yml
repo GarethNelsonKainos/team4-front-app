@@ -174,7 +174,7 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID_BLAKE }}
       # Terraform variables — TF_VAR_ prefix is picked up automatically
       TF_VAR_environment: dev
-      TF_VAR_acr_name: ${{ secrets.ACR_NAME_BLAKE }}
+      TF_VAR_acr_name: ${{ secrets.ACR_USERNAME_BLAKE }}
       TF_VAR_acr_login_server: ${{ secrets.ACR_LOGIN_SERVER_BLAKE }}
       TF_VAR_frontend_image_tag: ${{ github.sha && format('{0}', github.sha) }}
       TF_VAR_backend_image_tag: latest
@@ -204,4 +204,3 @@ jobs:
       - name: Terraform Apply
         working-directory: ./my-infrastructure
         run: terraform apply -auto-approve -input=false
-
