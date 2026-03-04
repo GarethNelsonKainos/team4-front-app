@@ -3,6 +3,7 @@
 variable "resource_group_name" {
   description = "The name of the Azure Resource Group."
   type        = string
+  default     = "rg-team4-dev"
 
   validation {
     condition     = length(var.resource_group_name) > 0
@@ -15,6 +16,7 @@ variable "resource_group_name" {
 variable "location" {
   description = "The Azure region where resources will be deployed."
   type        = string
+  default     = "uksouth"
 
   validation {
     condition     = contains(["uksouth"], var.location)
