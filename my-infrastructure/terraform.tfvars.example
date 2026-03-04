@@ -1,0 +1,11 @@
+# Example Terraform variables file
+# Copy this file to terraform.tfvars and adjust values as needed
+
+resource_group_name = "example-resource-group"
+location            = "UK South"
+environment         = "dev"
+
+tags = {
+  owner   = "your-team-name"
+  project = "your-project-name"
+}
