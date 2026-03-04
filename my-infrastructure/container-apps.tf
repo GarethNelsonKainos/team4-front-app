@@ -143,7 +143,7 @@ resource "azurerm_container_app" "backend" {
 
     container {
       name   = "backend"
-      image  = "${var.acr_login_server}/blake-team4-backend:${var.backend_image_tag}"
+      image  = "${var.acr_login_server}/team4-backend:${var.backend_image_tag}"
       cpu    = 0.5
       memory = "1Gi"
 

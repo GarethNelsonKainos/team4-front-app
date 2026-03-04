@@ -13,9 +13,10 @@ tags = {
 acr_name         = "academyacrj3r5dv"
 acr_login_server = "academyacrj3r5dv.azurecr.io"
 
-# Image tags — the CI pipeline will override these with the short Git SHA
-frontend_image_tag = "latest"
-backend_image_tag  = "latest"
+# Image tags — the CI pipeline will override frontend_image_tag with the short Git SHA
+# The backend tag is always pinned here (built and pushed separately)
+frontend_image_tag = "faa1278"
+backend_image_tag  = "f0d28ff"
 
 # ── Feature Flags ──────────────────────────────────────────────────────────────
 feature_admin_dashboard = "false"

@@ -28,6 +28,12 @@ resource "azurerm_role_assignment" "kv_admin_deployer" {
   scope                = azurerm_key_vault.main.id
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
+
+  # Prevent Terraform from replacing this when credentials change (e.g. local vs CI SP).
+  # The role assignment is intentionally stable — managed once at vault creation time.
+  lifecycle {
+    ignore_changes = [principal_id]
+  }
 }
 
 # Grant the 2026-Tech-Academy Azure AD group Key Vault Administrator access

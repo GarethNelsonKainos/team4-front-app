@@ -178,8 +178,8 @@ jobs:
       TF_VAR_environment: dev
       TF_VAR_acr_name: ${{ secrets.ACR_USERNAME_BLAKE }}
       TF_VAR_acr_login_server: ${{ secrets.ACR_LOGIN_SERVER_BLAKE }}
-      TF_VAR_frontend_image_tag: ${{ github.sha && format('{0}', github.sha) }}
-      TF_VAR_backend_image_tag: latest
+      # frontend_image_tag is set per-step below using the short Git SHA
+      # backend_image_tag is NOT overridden here — it is pinned in terraform.tfvars
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
