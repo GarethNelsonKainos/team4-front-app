@@ -223,9 +223,6 @@ jobs:
         run: |
           terraform plan \
             -var-file="${{ env.TF_ENVIRONMENT }}.tfvars" \
-            -var="acr_login_server=${{ secrets.ACR_LOGIN_SERVER_JOSH }}" \
-            -var="acr_admin_username=${{ secrets.ACR_ADMIN_USERNAME_JOSH }}" \
-            -var="acr_admin_password=${{ secrets.ACR_ADMIN_PASSWORD_JOSH }}" \
             -var="container_image_tag=latest" \
             -input=false \
             -out=tfplan \
