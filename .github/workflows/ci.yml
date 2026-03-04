@@ -215,7 +215,7 @@ jobs:
             -input=false \
             -backend-config="resource_group_name=tfstate-rg" \
             -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE_ACCOUNT }}" \
-            -backend-config="container_name=terraform-state" \
+            -backend-config="container_name=joshstate" \
             -backend-config="key=${{ env.TF_ENVIRONMENT }}/team4.tfstate"
 
       - name: Terraform Plan
@@ -273,7 +273,7 @@ jobs:
             -input=false \
             -backend-config="resource_group_name=tfstate-rg" \
             -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE_ACCOUNT }}" \
-            -backend-config="container_name=terraform-state" \
+            -backend-config="container_name=joshstate" \
             -backend-config="key=${{ env.TF_ENVIRONMENT }}/team4.tfstate"
 
       - name: Terraform Apply
