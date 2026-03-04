@@ -50,15 +50,24 @@ jobs:
          username: ${{ secrets.ACR_USERNAME_BEN }}
          password: ${{ secrets.ACR_PASSWORD_BEN }}
 
-     - name: Pull frontend image from ACR
-       run: docker pull ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-front-app:Ben
+
+     - name: Build Docker image
+       run: |
+         docker build -t ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-front-app:${{ github.sha }} \
+                      -t ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-front-app:latest \
+                      .    
+     - name: Push Docker image to ACR (main branch only)
+       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+       run: |
+         docker push ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-front-app:${{ github.sha }}
+         docker push ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-front-app:latest
 
      - name: Start frontend container
        run: |
          docker run -d \
            --name team4-frontend \
            -p 3000:3000 \
-           ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-front-app:Ben
+           ${{ secrets.ACR_LOGIN_SERVER_BEN }}/team4-front-app:${{ github.sha }}
 
      - name: Wait for frontend to be ready
        run: |
