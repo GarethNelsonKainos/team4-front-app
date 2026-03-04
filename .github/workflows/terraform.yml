@@ -12,6 +12,12 @@ on:
       - 'terraform/**'
       - '.github/workflows/terraform.yml'
   workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Image tag to deploy (e.g. latest or sha-abc1234)'
+        required: false
+        default: 'latest'
+        type: string
 
 env:
   TF_VERSION: '1.5'
@@ -67,12 +73,18 @@ jobs:
           TF_VAR_acr_username: ${{ secrets.AZURE_CLIENT_ID_CAM }}
           TF_VAR_acr_password: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
         run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            DEPLOY_IMAGE_TAG="${{ github.event.inputs.image_tag }}"
+          else
+            DEPLOY_IMAGE_TAG="sha-${GITHUB_SHA::7}"
+          fi
+
           terraform plan -no-color -input=false -lock=false \
             -var="environment=dev" \
             -var="acr_resource_group=rg-academy-acr" \
             -var="resource_group_name=team4-frontend-cameron-rg" \
             -var="dns_name_label=team4-frontend-cameron-$(date +%Y%m%d)" \
-            -var="image_tag=sha-${GITHUB_SHA::7}" \
+            -var="image_tag=${DEPLOY_IMAGE_TAG}" \
             -var="acr_login_server=academyacrj3r5dv.azurecr.io" \
             -var='environment_variables={"NODE_ENV":"production","PORT":"3000"}' \
             -out=tfplan
