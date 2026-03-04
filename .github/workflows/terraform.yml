@@ -1,14 +1,12 @@
 name: Terraform Plan & Apply
 
 on:
+  push:
+    branches: [ main, josh-terraform ]
   pull_request:
     branches: [ main ]
     paths:
       - 'my-infrastructure/**'
-  workflow_run:
-    workflows: [ "CI" ]
-    types: [ completed ]
-    branches: [ main, josh-terraform ]
 
 env:
   TERRAFORM_VERSION: '1.5.0'
@@ -28,7 +26,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     
     steps:
       - uses: actions/checkout@v4
@@ -59,7 +56,6 @@ jobs:
     needs: terraform-validate
     permissions:
       contents: read
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     
     steps:
       - uses: actions/checkout@v4
@@ -133,13 +129,8 @@ jobs:
     needs: terraform-plan
     permissions:
       contents: read
-    # Only apply on main branch after CI completes successfully
-    if: >-
-      ${{ 
-        github.ref == 'refs/heads/main' && 
-        github.event_name == 'workflow_run' && 
-        github.event.workflow_run.conclusion == 'success' 
-      }}
+    # Only apply on main branch when pushed (not on PRs)
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
       - uses: actions/checkout@v4
