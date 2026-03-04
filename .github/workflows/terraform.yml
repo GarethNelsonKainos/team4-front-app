@@ -126,8 +126,8 @@ jobs:
     needs: terraform-plan
     permissions:
       contents: read
-    # Only apply on main branch when pushed (not on PRs)
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Apply on main or josh-terraform branches when pushed (not on PRs)
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push'
     
     steps:
       - uses: actions/checkout@v4
@@ -140,7 +140,7 @@ jobs:
       - name: Download Plan Artifact
         uses: actions/download-artifact@v4
         with:
-          name: terraform-plan-prod
+          name: terraform-plan-${{ env.TF_ENVIRONMENT }}
           path: ./my-infrastructure
 
       - name: Terraform Init
@@ -151,7 +151,7 @@ jobs:
             -backend-config="resource_group_name=tfstate-rg" \
             -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE_ACCOUNT }}" \
             -backend-config="container_name=terraform-state" \
-            -backend-config="key=prod/team4.tfstate"
+            -backend-config="key=${{ env.TF_ENVIRONMENT }}/team4.tfstate"
 
       - name: Terraform Apply
         working-directory: ./my-infrastructure

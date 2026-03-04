@@ -242,7 +242,7 @@ jobs:
     needs: terraform-plan
     permissions:
       contents: read
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push'
     env:
       TERRAFORM_VERSION: '1.5.0'
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
@@ -250,7 +250,7 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_JOSH }}
       ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
-      TF_ENVIRONMENT: prod
+      TF_ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -263,7 +263,7 @@ jobs:
       - name: Download Plan Artifact
         uses: actions/download-artifact@v4
         with:
-          name: terraform-plan-prod
+          name: terraform-plan-${{ env.TF_ENVIRONMENT }}
           path: ./my-infrastructure
 
       - name: Terraform Init
@@ -274,7 +274,7 @@ jobs:
             -backend-config="resource_group_name=tfstate-rg" \
             -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE_ACCOUNT }}" \
             -backend-config="container_name=terraform-state" \
-            -backend-config="key=prod/team4.tfstate"
+            -backend-config="key=${{ env.TF_ENVIRONMENT }}/team4.tfstate"
 
       - name: Terraform Apply
         working-directory: ./my-infrastructure
