@@ -40,3 +40,18 @@ output "acr_admin_password" {
   description = "The password associated with the ACR admin account."
   sensitive   = true
 }
+# Container Instance Outputs
+output "app_fqdn" {
+  value       = azurerm_container_group.app.fqdn
+  description = "The FQDN of the container group (public URL)."
+}
+
+output "app_ip_address" {
+  value       = azurerm_container_group.app.ip_address
+  description = "The IP address of the container group."
+}
+
+output "app_url" {
+  value       = "http://${azurerm_container_group.app.fqdn}:3000"
+  description = "The full URL to access the deployed application."
+}

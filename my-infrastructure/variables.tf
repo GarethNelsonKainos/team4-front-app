@@ -56,6 +56,29 @@ variable "tags" {
   default     = {}
 }
 
+variable "acr_login_server" {
+  type        = string
+  description = "ACR login server URL (e.g., myregistry.azurecr.io)"
+}
+
+variable "acr_admin_username" {
+  type        = string
+  description = "ACR admin username for pulling images"
+  sensitive   = true
+}
+
+variable "acr_admin_password" {
+  type        = string
+  description = "ACR admin password for pulling images"
+  sensitive   = true
+}
+
+variable "container_image_tag" {
+  type        = string
+  description = "Docker image tag to deploy (e.g., 'latest' or commit SHA)"
+  default     = "latest"
+}
+
 # Local values for computed naming and tagging
 locals {
   # Resource naming prefix (e.g., "team4-dev", "team4-prod")
