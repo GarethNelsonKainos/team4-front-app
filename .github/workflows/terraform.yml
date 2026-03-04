@@ -28,18 +28,25 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     
     steps:
       - uses: actions/checkout@v4
 
-      - name: Azure login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.ARM_CLIENT_ID }}
-          tenant-id: ${{ secrets.ARM_TENANT_ID }}
-          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID_JOSH }}
+      - name: Debug Azure auth env
+        run: |
+          missing=0
+          for var in ARM_CLIENT_ID ARM_TENANT_ID ARM_CLIENT_SECRET ARM_SUBSCRIPTION_ID_JOSH; do
+            if [ -z "${!var}" ]; then
+              echo "Missing or empty: $var"
+              missing=1
+            else
+              echo "Present: $var"
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -67,18 +74,10 @@ jobs:
     needs: terraform-validate
     permissions:
       contents: read
-      id-token: write
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     
     steps:
       - uses: actions/checkout@v4
-
-      - name: Azure login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.ARM_CLIENT_ID }}
-          tenant-id: ${{ secrets.ARM_TENANT_ID }}
-          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID_JOSH }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -145,20 +144,12 @@ jobs:
     needs: terraform-plan
     permissions:
       contents: read
-      id-token: write
     # Only apply on main branch when pushed (not on PRs)
     if: >-
       ${{ github.ref == 'refs/heads/main' && github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' }}
     
     steps:
       - uses: actions/checkout@v4
-
-      - name: Azure login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.ARM_CLIENT_ID }}
-          tenant-id: ${{ secrets.ARM_TENANT_ID }}
-          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID_JOSH }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
