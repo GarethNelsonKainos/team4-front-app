@@ -114,27 +114,37 @@ jobs:
          username: ${{ secrets.ACR_ADMIN_USERNAME_JOSH || secrets.ACR_SERVICE_PRINCIPAL_ID_JOSH }}
          password: ${{ secrets.ACR_ADMIN_PASSWORD_JOSH || secrets.ACR_SERVICE_PRINCIPAL_PASSWORD_JOSH }}
 
-     - name: Build Docker image with cache
+     - name: Build and push Docker image to ACR
+       if: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push' }}
+       uses: docker/build-push-action@v5
+       with:
+         context: .
+         tags: |
+           ${{ format('{0}/team4-front-app:{1}', secrets.ACR_LOGIN_SERVER_JOSH, steps.image_meta.outputs.short_sha) }}
+           ${{ format('{0}/team4-front-app:latest', secrets.ACR_LOGIN_SERVER_JOSH) }}
+           ${{ format('{0}/team4-front-app:{1}', secrets.ACR_LOGIN_SERVER_JOSH, steps.image_meta.outputs.timestamp) }}
+         cache-from: type=gha
+         cache-to: type=gha,mode=max
+         push: true
+
+     - name: Build Docker image (local only)
+       if: ${{ !((github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push') }}
        uses: docker/build-push-action@v5
        with:
          context: .
          tags: |
            team4-front-app:${{ steps.image_meta.outputs.short_sha }}
            team4-front-app:ci
-           ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && format('{0}/team4-front-app:{1}', secrets.ACR_LOGIN_SERVER_JOSH, steps.image_meta.outputs.short_sha) || '' }}
-           ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && format('{0}/team4-front-app:latest', secrets.ACR_LOGIN_SERVER_JOSH) || '' }}
-           ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && format('{0}/team4-front-app:{1}', secrets.ACR_LOGIN_SERVER_JOSH, steps.image_meta.outputs.timestamp) || '' }}
          cache-from: type=gha
          cache-to: type=gha,mode=max
-         push: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push' }}
-         load: ${{ !((github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push') }}
+         load: true
 
      - name: Verify Docker image (local builds)
        if: ${{ !((github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push') }}
        run: docker image inspect team4-front-app:${{ steps.image_meta.outputs.short_sha }} > /dev/null && echo "✅ Image built successfully"
 
      - name: Verify ACR push (main or josh-terraform branch)
-       if: "(github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push'"
+       if: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/josh-terraform') && github.event_name == 'push' }}
        run: |
          echo "✅ Image pushed to ACR successfully"
          echo "📦 Image tags:"
