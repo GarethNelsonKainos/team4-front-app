@@ -56,27 +56,87 @@ variable "tags" {
   default     = {}
 }
 
-variable "acr_login_server" {
-  type        = string
-  description = "ACR login server URL (e.g., myregistry.azurecr.io)"
-}
-
-variable "acr_admin_username" {
-  type        = string
-  description = "ACR admin username for pulling images"
-  sensitive   = true
-}
-
-variable "acr_admin_password" {
-  type        = string
-  description = "ACR admin password for pulling images"
-  sensitive   = true
-}
-
 variable "container_image_tag" {
   type        = string
   description = "Docker image tag to deploy (e.g., 'latest' or commit SHA)"
   default     = "latest"
+}
+
+variable "frontend_image_repository" {
+  type        = string
+  description = "Frontend image repository name in ACR"
+  default     = "team4-front-app"
+}
+
+variable "backend_image_repository" {
+  type        = string
+  description = "Backend image repository name in ACR"
+  default     = "team4-back-app"
+}
+
+variable "frontend_container_port" {
+  type        = number
+  description = "Port exposed by the frontend container"
+  default     = 3000
+}
+
+variable "backend_container_port" {
+  type        = number
+  description = "Port exposed by the backend container"
+  default     = 8080
+}
+
+variable "feature_admin_dashboard" {
+  type        = bool
+  description = "Feature flag for admin dashboard"
+  default     = false
+}
+
+variable "feature_job_detail_view" {
+  type        = bool
+  description = "Feature flag for job detail view"
+  default     = true
+}
+
+variable "feature_job_apply_view" {
+  type        = bool
+  description = "Feature flag for job apply view"
+  default     = true
+}
+
+variable "backend_s3_bucket_name" {
+  type        = string
+  description = "S3 bucket name used by backend"
+  default     = ""
+}
+
+variable "backend_s3_region" {
+  type        = string
+  description = "S3 region used by backend"
+  default     = "eu-west-2"
+}
+
+variable "key_vault_name" {
+  type        = string
+  description = "Azure Key Vault name. If empty, one is generated."
+  default     = ""
+}
+
+variable "key_vault_sku_name" {
+  type        = string
+  description = "SKU name for Key Vault"
+  default     = "standard"
+
+  validation {
+    condition     = contains(["standard", "premium"], var.key_vault_sku_name)
+    error_message = "The key_vault_sku_name must be either 'standard' or 'premium'."
+  }
+}
+
+variable "key_vault_allowed_ip_cidrs" {
+  type        = list(string)
+  description = "Optional IP CIDR ranges allowed to access Key Vault data-plane (for portal/CLI secret management)."
+  default     = []
 }
 
 # Local values for computed naming and tagging

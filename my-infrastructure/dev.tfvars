@@ -20,3 +20,16 @@ tags = {
   cost_center = "dev"
   created_by  = "terraform"
 }
+
+# Container Apps Configuration
+frontend_image_repository = "team4-front-app"
+backend_image_repository  = "team4-back-app"
+
+# Feature Flags
+feature_admin_dashboard = false
+feature_job_detail_view = true
+feature_job_apply_view  = true
+
+# Backend S3 Configuration (set after S3 bucket is created)
+backend_s3_bucket_name = ""
+backend_s3_region      = "eu-west-2"
