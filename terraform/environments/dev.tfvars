@@ -10,14 +10,14 @@ image_name          = "team4-front-app-cameron"
 image_tag           = "latest"
 
 # Container resources
-cpu_cores  = 1
-memory_gb  = 1.5
+cpu_cores = 1
+memory_gb = 1.5
 
 # Environment variables for the container
 environment_variables = {
-  NODE_ENV        = "development"
-  API_BASE_URL    = "http://localhost:8080"
-  LOG_LEVEL       = "debug"
+  NODE_ENV     = "development"
+  API_BASE_URL = "http://localhost:8080"
+  LOG_LEVEL    = "debug"
 }
 
 # Resource tags
