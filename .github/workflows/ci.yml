@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, josh-terraform ]
   pull_request:
     branches: [ main ]
 
@@ -141,4 +141,3 @@ jobs:
          echo "  - ${{ secrets.ACR_LOGIN_SERVER }}/team4-front-app:${{ steps.image_meta.outputs.short_sha }}"
          echo "  - ${{ secrets.ACR_LOGIN_SERVER }}/team4-front-app:latest"
          echo "  - ${{ secrets.ACR_LOGIN_SERVER }}/team4-front-app:${{ steps.image_meta.outputs.timestamp }}"
-         
