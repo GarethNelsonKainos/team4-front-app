@@ -298,6 +298,10 @@ jobs:
       - name: Terraform Plan
         id: plan
         env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_CAM }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID_CAM }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID_CAM }}
           TF_VAR_acr_username: ${{ secrets.AZURE_CLIENT_ID_CAM }}
           TF_VAR_acr_password: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
         run: |
