@@ -154,14 +154,6 @@ jobs:
           echo "local_tags=${LOCAL_TAGS}" >> "$GITHUB_OUTPUT"
           echo "acr_tags=${ACR_TAGS}" >> "$GITHUB_OUTPUT"
 
-      - name: Login to Azure Container Registry (main branch only)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ steps.image_meta.outputs.acr_login_server }}
-          username: ${{ secrets.AZURE_CLIENT_ID_CAM }}
-          password: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
-
       - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
@@ -200,45 +192,80 @@ jobs:
         run: |
           docker stop ci-frontend || true
 
-      - name: Push to Azure Container Registry (main branch only)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          docker tag local/team4-front-app:${{ steps.image_meta.outputs.sha_tag }} \
-            ${{ steps.image_meta.outputs.acr_login_server }}/${{ steps.image_meta.outputs.image_name }}:latest
-          
-          docker tag local/team4-front-app:${{ steps.image_meta.outputs.sha_tag }} \
-            ${{ steps.image_meta.outputs.acr_login_server }}/${{ steps.image_meta.outputs.image_name }}:${{ steps.image_meta.outputs.sha_tag }}
-          
-          docker tag local/team4-front-app:${{ steps.image_meta.outputs.sha_tag }} \
-            ${{ steps.image_meta.outputs.acr_login_server }}/${{ steps.image_meta.outputs.image_name }}:$(date -u +'%Y-%m-%d')
-          
-          echo "🔄 Pushing image to ACR..."
-          docker push ${{ steps.image_meta.outputs.acr_login_server }}/${{ steps.image_meta.outputs.image_name }} --all-tags
-          echo "✅ Successfully pushed image to ACR"
+  push:
+    name: Push to ACR
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+    permissions:
+      contents: read
 
-      - name: Push PR image to Azure Container Registry (PR builds only)
-        if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate image tags and registry
+        id: image_meta
         run: |
-          PR_NUM=${{ github.event.pull_request.number }}
+          ACR_LOGIN_SERVER="${{ vars.ACR_LOGIN_SERVER_CAM || 'academyacrj3r5dv.azurecr.io' }}"
+          IMAGE_NAME="${{ vars.ACR_REGISTRY_NAME_CAM || 'team4-front-app-cameron' }}"
+          SHA_TAG="sha-${GITHUB_SHA::7}"
           
-          docker tag local/team4-front-app:${{ steps.image_meta.outputs.sha_tag }} \
-            ${{ steps.image_meta.outputs.acr_login_server }}/${{ steps.image_meta.outputs.image_name }}:pr-${PR_NUM}
-          
-          docker tag local/team4-front-app:${{ steps.image_meta.outputs.sha_tag }} \
-            ${{ steps.image_meta.outputs.acr_login_server }}/${{ steps.image_meta.outputs.image_name }}:pr-${PR_NUM}-${{ steps.image_meta.outputs.sha_tag }}
-          
-          # Try to push, but don't fail the build if it fails (PRs might not have ACR access)
-          echo "🔄 Attempting to push PR image to ACR..."
-          if docker push ${{ steps.image_meta.outputs.acr_login_server }}/${{ steps.image_meta.outputs.image_name }}:pr-${PR_NUM} 2>/dev/null && \
-             docker push ${{ steps.image_meta.outputs.acr_login_server }}/${{ steps.image_meta.outputs.image_name }}:pr-${PR_NUM}-${{ steps.image_meta.outputs.sha_tag }} 2>/dev/null; then
-            echo "✅ Successfully pushed PR image to ACR"
+          # Tags for ACR
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # PR tags: pr-123, pr-123-sha-abcd1234
+            PR_NUM="${{ github.event.pull_request.number }}"
+            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:pr-${PR_NUM},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:pr-${PR_NUM}-${SHA_TAG}"
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            # Main branch tags: latest, sha-abcd1234, YYYY-MM-DD
+            DATE_TAG=$(date -u +'%Y-%m-%d')
+            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest,${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${SHA_TAG},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${DATE_TAG}"
           else
-            echo "⚠️  Could not push PR image to ACR (this is OK - may lack credentials in PR context)"
+            # Other branches: branch-name, branch-name-sha-abcd1234
+            BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}" | sed 's/[^a-zA-Z0-9_.-]/-/g')
+            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${BRANCH_NAME},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${BRANCH_NAME}-${SHA_TAG}"
           fi
+          
+          echo "acr_login_server=${ACR_LOGIN_SERVER}" >> "$GITHUB_OUTPUT"
+          echo "image_name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "sha_tag=${SHA_TAG}" >> "$GITHUB_OUTPUT"
+          echo "acr_tags=${ACR_TAGS}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to Azure Container Registry
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ steps.image_meta.outputs.acr_login_server }}
+          username: ${{ secrets.AZURE_CLIENT_ID_CAM }}
+          password: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
+
+      - name: Build and push to ACR (main branch)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          cache-from: type=gha
+          tags: ${{ steps.image_meta.outputs.acr_tags }}
+
+      - name: Build and push to ACR (PR builds)
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          cache-from: type=gha
+          tags: ${{ steps.image_meta.outputs.acr_tags }}
 
   terraform-plan:
     name: Terraform Plan (Dev)
     runs-on: ubuntu-latest
+    needs: test
     permissions:
       contents: read
       pull-requests: write
