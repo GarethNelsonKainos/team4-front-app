@@ -253,6 +253,9 @@ jobs:
         working-directory: terraform
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Detect Terraform changes
         id: tf_changes
         if: github.event_name != 'workflow_dispatch'
@@ -268,9 +271,6 @@ jobs:
         run: |
           echo "No Terraform-related changes detected. Skipping."
           exit 0
-
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
