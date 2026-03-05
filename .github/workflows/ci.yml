@@ -1,100 +1,247 @@
 name: CI
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
-    branches: [ main ]
+    branches: [ 'main' ]
   pull_request:
-    branches: [ main ]
+    branches: [ '**' ]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Image tag to deploy (e.g. latest or sha-abc1234)'
+        required: false
+        default: 'latest'
+        type: string
 
 jobs:
-  build-and-test:
+  test:
+    name: Test & Quality
     runs-on: ubuntu-latest
 
     steps:
-     - uses: actions/checkout@v5
-    
-     - name: Setup Node.js
-       uses: actions/setup-node@v4
-       with:
-         node-version: '20'
-         cache: 'npm'
-    
-     - name: Install dependencies
-       run: npm ci
-    
-     - name: Run Biome checks
-       run: npm run ci:check
-    
-     - name: Build TypeScript
-       run: npm run build
-    
-     - name: Build CSS (Production)
-       run: npm run build-css-prod
-    
-     - name: Run tests with coverage
-       run: npm run test:coverage
+      - uses: actions/checkout@v5
 
-     - name: Upload coverage to Coverage report folder
-       uses: actions/upload-artifact@v4
-       with:
-         name: coverage-report
-         path: output/test/
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-     - name: Create accessibility reports directory
-       run: mkdir -p output/accessibility
+      - name: Install dependencies
+        run: npm ci
 
-     - name: Start application server
-       run: |
-         npm run dev &
-         echo $! > server.pid
-         sleep 10
+      - name: Run Biome checks
+        run: npm run ci:check
 
-     - name: Wait for server to be ready
-       run: |
-         timeout 30 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+      - name: Build TypeScript
+        run: npm run build
 
-     - name: Run Pa11y accessibility tests
-       id: pa11y
-       run: |
-         set +e
-         npx pa11y-ci --json > output/accessibility/pa11y-results.json 2>&1
-         EXIT_CODE=$?
-         echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
-         npx pa11y-ci
-         exit 0
+      - name: Build CSS (Production)
+        run: npm run build-css-prod
 
-     - name: Display Pa11y results
-       if: always()
-       run: |
-         if [ -f output/accessibility/pa11y-results.json ]; then
-           cat output/accessibility/pa11y-results.json
-         fi
+      - name: Run tests with coverage
+        run: npm run test:coverage
 
-     - name: Generate HTML accessibility report
-       if: always()
-       run: |
-         if [ -f output/accessibility/pa11y-results.json ]; then
-           node generate-a11y-report.js output/accessibility/pa11y-results.json || echo "Failed to generate report"
-         else
-           echo "No Pa11y results found"
-         fi
+      - name: Upload coverage to Coverage report folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: output/test/
 
-     - name: Upload accessibility report
-       if: always()
-       uses: actions/upload-artifact@v4
-       with:
-         name: accessibility-report
-         path: output/accessibility/
+      - name: Create accessibility reports directory
+        run: mkdir -p output/accessibility
 
-     - name: Fail build if accessibility tests failed
-       if: steps.pa11y.outputs.exit_code != '0'
-       run: |
-         echo "❌ Accessibility tests failed. Please review the accessibility report artifact."
-         exit 1
+      - name: Start application server
+        run: |
+          npm run dev &
+          echo $! > server.pid
+          sleep 10
 
-     - name: Stop server
-       if: always()
-       run: |
-         if [ -f server.pid ]; then
-           kill $(cat server.pid) || true
-         fi
+      - name: Wait for server to be ready
+        run: |
+          timeout 30 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+
+      - name: Run Pa11y accessibility tests
+        id: pa11y
+        run: |
+          set +e
+          npx pa11y-ci --json > output/accessibility/pa11y-results.json 2>&1
+          EXIT_CODE=$?
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0
+
+      - name: Display Pa11y results
+        if: always()
+        run: |
+          if [ -f output/accessibility/pa11y-results.json ]; then
+            cat output/accessibility/pa11y-results.json
+          fi
+
+      - name: Generate HTML accessibility report
+        if: always()
+        run: |
+          if [ -f output/accessibility/pa11y-results.json ]; then
+            node generate-a11y-report.js output/accessibility/pa11y-results.json || echo "Failed to generate report"
+          else
+            echo "No Pa11y results found"
+          fi
+
+      - name: Upload accessibility report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-report
+          path: output/accessibility/
+
+      - name: Fail build if accessibility tests failed
+        if: steps.pa11y.outputs.exit_code != '0'
+        run: |
+          echo "❌ Accessibility tests failed. Please review the accessibility report artifact."
+          exit 1
+
+      - name: Stop server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+          fi
+
+  build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate image tags and registry
+        id: image_meta
+        run: |
+          ACR_LOGIN_SERVER="${{ vars.ACR_LOGIN_SERVER_CAM || 'academyacrj3r5dv.azurecr.io' }}"
+          IMAGE_NAME="${{ vars.ACR_REGISTRY_NAME_CAM || 'team4-front-app-cameron' }}"
+          SHA_TAG="sha-${GITHUB_SHA::7}"
+          
+          # Tags for local build
+          LOCAL_TAGS="local/team4-front-app:${SHA_TAG},local/team4-front-app:ci"
+          
+          # Tags for ACR (if on main or PR)
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # PR tags: pr-123, pr-123-sha-abcd1234
+            PR_NUM="${{ github.event.pull_request.number }}"
+            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:pr-${PR_NUM},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:pr-${PR_NUM}-${SHA_TAG}"
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            # Main branch tags: latest, sha-abcd1234, YYYY-MM-DD
+            DATE_TAG=$(date -u +'%Y-%m-%d')
+            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest,${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${SHA_TAG},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${DATE_TAG}"
+          else
+            # Other branches: branch-name, branch-name-sha-abcd1234
+            BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}" | sed 's/[^a-zA-Z0-9_.-]/-/g')
+            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${BRANCH_NAME},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${BRANCH_NAME}-${SHA_TAG}"
+          fi
+          
+          echo "acr_login_server=${ACR_LOGIN_SERVER}" >> "$GITHUB_OUTPUT"
+          echo "image_name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "sha_tag=${SHA_TAG}" >> "$GITHUB_OUTPUT"
+          echo "local_tags=${LOCAL_TAGS}" >> "$GITHUB_OUTPUT"
+          echo "acr_tags=${ACR_TAGS}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          push: false
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ steps.image_meta.outputs.local_tags }}
+
+      - name: Run Docker container (smoke test)
+        run: |
+          docker run -d --rm \
+            -p 3000:3000 \
+            -e NODE_ENV=production \
+            -e API_BASE_URL=http://localhost:8080 \
+            --name ci-frontend \
+            local/team4-front-app:${{ steps.image_meta.outputs.sha_tag }}
+
+      - name: Wait for container to be ready
+        run: |
+          set -e
+          for i in {1..30}; do
+            if curl -fsS http://localhost:3000; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Container did not become ready"
+          docker logs ci-frontend || true
+          exit 1
+
+      - name: Stop Docker container
+        if: always()
+        run: |
+          docker stop ci-frontend || true
+
+  push:
+    name: Push to ACR (Main)
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'workflow_dispatch' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate image tags and registry
+        id: image_meta
+        run: |
+          ACR_LOGIN_SERVER="${{ vars.ACR_LOGIN_SERVER_CAM || 'academyacrj3r5dv.azurecr.io' }}"
+          IMAGE_NAME="${{ vars.ACR_REGISTRY_NAME_CAM || 'team4-front-app-cameron' }}"
+          SHA_TAG="sha-${GITHUB_SHA::7}"
+          
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            # Main branch tags: latest, sha-abcd1234, YYYY-MM-DD
+            DATE_TAG=$(date -u +'%Y-%m-%d')
+            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest,${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${SHA_TAG},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${DATE_TAG}"
+          else
+            # Non-main manual dispatch: branch-name, branch-name-sha-abcd1234
+            BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}" | sed 's/[^a-zA-Z0-9_.-]/-/g')
+            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${BRANCH_NAME},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${BRANCH_NAME}-${SHA_TAG}"
+          fi
+          
+          echo "acr_login_server=${ACR_LOGIN_SERVER}" >> "$GITHUB_OUTPUT"
+          echo "image_name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "sha_tag=${SHA_TAG}" >> "$GITHUB_OUTPUT"
+          echo "acr_tags=${ACR_TAGS}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to Azure Container Registry
+        if: github.event_name == 'workflow_dispatch' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ steps.image_meta.outputs.acr_login_server }}
+          username: ${{ secrets.AZURE_CLIENT_ID_CAM }}
+          password: ${{ secrets.AZURE_CLIENT_SECRET_CAM }}
+
+      - name: Build and push to ACR (main branch)
+        if: github.event_name == 'workflow_dispatch' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          cache-from: type=gha
+          tags: ${{ steps.image_meta.outputs.acr_tags }}

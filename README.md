@@ -199,6 +199,40 @@ The GitHub Actions workflow (`.github/workflows/ci.yml`) automatically:
 - Push to `main` branch
 - Pull requests to `main` branch
 
+## 🐳 ACR Image Publish (Manual)
+
+Use the script in [scripts/acr-build-push.sh](scripts/acr-build-push.sh) to build and push images to ACR.
+
+### Quick start
+
+```bash
+chmod +x scripts/acr-build-push.sh
+scripts/acr-build-push.sh
+```
+
+By default this pushes three tags: `latest`, `dev`, and `sha-<shortSHA>`.
+
+### Optional overrides
+
+```bash
+ACR_NAME=academyacrj3r5dv \
+ACR_LOGIN_SERVER=academyacrj3r5dv.azurecr.io \
+IMAGE_REPOSITORY=team4-front-app-cameron \
+PLATFORM=linux/amd64 \
+scripts/acr-build-push.sh
+```
+
+### Find immutable tags in ACR
+
+```bash
+az acr repository show-tags \
+   --name academyacrj3r5dv \
+   --repository team4-front-app-cameron \
+   --orderby time_desc \
+   --top 30 \
+   --output table | grep '^sha-'
+```
+
 ## 🧪 Testing
 
 The project includes comprehensive API testing using **Vitest** and **Supertest**:
