@@ -196,7 +196,7 @@ jobs:
     name: Push to ACR
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
       contents: read
 
@@ -213,20 +213,9 @@ jobs:
           IMAGE_NAME="${{ vars.ACR_REGISTRY_NAME_CAM || 'team4-front-app-cameron' }}"
           SHA_TAG="sha-${GITHUB_SHA::7}"
           
-          # Tags for ACR
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            # PR tags: pr-123, pr-123-sha-abcd1234
-            PR_NUM="${{ github.event.pull_request.number }}"
-            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:pr-${PR_NUM},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:pr-${PR_NUM}-${SHA_TAG}"
-          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            # Main branch tags: latest, sha-abcd1234, YYYY-MM-DD
-            DATE_TAG=$(date -u +'%Y-%m-%d')
-            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest,${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${SHA_TAG},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${DATE_TAG}"
-          else
-            # Other branches: branch-name, branch-name-sha-abcd1234
-            BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}" | sed 's/[^a-zA-Z0-9_.-]/-/g')
-            ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${BRANCH_NAME},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${BRANCH_NAME}-${SHA_TAG}"
-          fi
+          # Main branch tags: latest, sha-abcd1234, YYYY-MM-DD
+          DATE_TAG=$(date -u +'%Y-%m-%d')
+          ACR_TAGS="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest,${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${SHA_TAG},${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${DATE_TAG}"
           
           echo "acr_login_server=${ACR_LOGIN_SERVER}" >> "$GITHUB_OUTPUT"
           echo "image_name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
@@ -243,17 +232,6 @@ jobs:
 
       - name: Build and push to ACR (main branch)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          platforms: linux/amd64
-          cache-from: type=gha
-          tags: ${{ steps.image_meta.outputs.acr_tags }}
-
-      - name: Build and push to ACR (PR builds)
-        if: github.event_name == 'pull_request'
-        continue-on-error: true
         uses: docker/build-push-action@v6
         with:
           context: .
